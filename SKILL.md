@@ -138,13 +138,14 @@ product spec, do not weaken them:
   and the account badge. Title text must be large, centered, high
   contrast.
 
-### 12. Episode splitting (final video over 60 minutes)
+### 12. Episode splitting (content over 60 minutes)
 
-- If the finished video is 60 minutes or shorter: single episode, no split.
-- If longer: split into episodes of max 59 minutes each, using
-  `clipper.split_episodes(total_seconds, segments)`:
-  cuts snap to subtitle segment boundaries (never mid-sentence — each cut
-  is the segment end nearest the 59-minute mark).
+- Content per episode is max 55 minutes; every episode ends with the 4 s
+  fan-group outro (§14), so a published episode never exceeds 59 minutes.
+- If the content is 60 minutes or shorter: single episode, no split.
+- If longer: split with `clipper.split_episodes(total_seconds, segments)`
+  (55-minute target): cuts snap to subtitle segment boundaries (never
+  mid-sentence — each cut is the segment end nearest the 55-minute mark).
 - The last episode must be longer than 2 minutes. If the naive split would
   leave a shorter tail, move the cut point earlier so the tail is absorbed
   into the final episode; if that would exceed the platform's duration cap,
@@ -157,7 +158,25 @@ product spec, do not weaken them:
   e.g. `黄仁勋：AI没有知觉，不比宠物石头更有生命｜英文精听（上）`.
   Tags stay the same on every episode. Publish episodes in order.
 
-### 13. Publish
+### 13. Excel vocab list (for the fan group)
+
+- After the vocab is final, generate `clipper.make_vocab_excel(vocab,
+  video_title, out_dir)` → `{video_title}.xlsx` (filename sanitized).
+- Columns: 序号 | 单词 | 中文释义 | 出现次数. Header styled, filter on,
+  frozen top row. This file is what gets shared in the fan group for
+  download — generate it for every video/episode.
+
+### 14. 4-second fan-group outro
+
+- Every published video/episode ends with a 4 s end card:
+  `clipper.make_outro(vocab_count, out_mp4, badge)` then
+  `clipper.append_outro(main_mp4, outro_mp4, final_mp4)`.
+- Card design (1080x1920, brand style): gold speech-bubble icon,
+  `加入粉丝群` / `领取本集生词清单` / `{N} 个生词 · 中英对照 Excel`,
+  account badge at the bottom. Silent audio.
+- The 4 s is part of the 59-minute episode cap: content ≤ 55 min.
+
+### 15. Publish
 
 - Douyin creator platform: upload the mp4, title format
   `《人物：金句｜英文精听》`, add ALL FOUR topic tags
