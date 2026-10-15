@@ -60,7 +60,20 @@ def cmd_run(a):
         sys.exit(2)
     os.makedirs(WORK, exist_ok=True)
 
-    print("[1/9] downloading (1080p preferred, min 720p)...")
+    print("[0/10] redistribution check (mandatory gate)...")
+    chk = clipper.check_redistribution(a.url)
+    if not chk["ok"]:
+        print("       REFUSED: source explicitly prohibits rebroadcasting.")
+        for f in chk["flags"]:
+            print("       -", f)
+        print("       Stopping. Tell the user and ask how to proceed.")
+        sys.exit(3)
+    if chk["flags"]:
+        print("       note:", chk["flags"], "(metadata unavailable — user decides)")
+    else:
+        print("       no explicit prohibition found.")
+
+    print("[1/10] downloading (1080p preferred, min 720p)...")
     src = clipper.download(a.url, WORK)
     h = json.loads(sh(["ffprobe", "-v", "error", "-select_streams", "v:0",
                        "-show_entries", "stream=height", "-of", "json",
@@ -68,14 +81,20 @@ def cmd_run(a):
     assert int(h) >= 720, f"source height {h} < 720p, refusing"
     print("       source:", src, f"{h}p")
 
-    print("[2/9] opening-logo inspection — frames in", WORK)
+    print("[2/10] opening-logo + ending inspection — frames in", WORK)
     frames = clipper.extract_first_frames(src, WORK)
     for f in frames:
         print("       ", f)
+    print("       Also inspect the LAST 15 s for end cards/logos:")
+    for t in ("end-15", "end-10", "end-5", "end-1"):
+        print("       ", f"ffmpeg -ss {t} -i {src} -frames:v 1 ...")
     trim_in = input("       Look at head_0/0.1/0.15: any logo ident or fade ghost? "
                     "If yes, enter seconds to trim (e.g. 4.3), else 0: ").strip()
     # NOTE: the agent must actually look at the frames before answering.
     trim_s = float(trim_in or 0)
+    end_trim_in = input("       End card/logo start time in seconds (e.g. 1616), "
+                        "else 0 to keep to the end: ").strip()
+    end_trim_s = float(end_trim_in or 0)
     print("[3/9] transcribing (faster-whisper, word timestamps)...")
     segs = None
     if trim_s > 0:
@@ -119,14 +138,49 @@ def cmd_run(a):
     print("       (agent: compose short previews, show the user, wait)")
     input("       Press Enter when the user approved the layout...")
 
-    print("[8/9] composing full 1080x1920 video (this takes a while)...")
+    print("[8/10] composing full 1080x1920 video (this takes a while)...")
     for i, s in enumerate(segs):
         s["zh"] = subs.get(str(i), "")
+    if end_trim_s > 0:
+        segs = [s for s in segs if s["start"] < end_trim_s]
+        for s in segs:
+            s["end"] = min(s["end"], end_trim_s)
+        print(f"       trimmed ending at {end_trim_s}s, {len(segs)} segments kept")
     out = os.path.join(WORK, "final.mp4")
-    clipper.compose(src, segs, vocab, out)
+    clipper.compose(src, segs, vocab, out,
+                    total=end_trim_s if end_trim_s > 0 else None)
     print("       FINAL:", out)
 
-    print("[9/9] covers (3:4 + 4:3)...")
+    print("[9/10] fan-group assets (§13/§14) + 2s source card (§3a)...")
+    title = input("       Video publish title (used for {title}.xlsx): "
+                  ).strip() or "video"
+    src_name = input("       Source name for 2s card [e.g. Korea Society]: "
+                     ).strip() or "YouTube"
+    intro = os.path.join(WORK, "source_intro.mp4")
+    clipper.make_source_intro(src_name, intro)
+    print("       2s source card:", intro)
+    xlsx = clipper.make_vocab_excel(vocab, title, WORK)
+    print("       xlsx:", xlsx)
+    dur = float(sh(["ffprobe", "-v", "error", "-show_entries",
+                    "format=duration", "-of",
+                    "default=noprint_wrappers=1:nokey=1",
+                    out]).stdout.strip())
+    if dur + 4.0 > 3600:
+        print(f"       video is {dur:.0f}s: too long for a single episode — "
+              "§12 requires episode splitting first (split_episodes + "
+              "per-episode vocab/outro/covers). Skipping auto outro; "
+              "handle episodes manually per SKILL.md.")
+    else:
+        badge = (input("       Account badge for outro card "
+                       "[RealTalk英语课]: ").strip() or "RealTalk英语课")
+        outro = os.path.join(WORK, "outro.mp4")
+        clipper.make_outro(len(vocab), outro, badge)
+        final_out = os.path.join(WORK, "final_with_cards.mp4")
+        clipper.concat_mp4s([intro, out, outro], final_out)
+        print("       FINAL (2s source card + main + 4s outro):", final_out)
+        out = final_out
+
+    print("[10/10] covers (3:4 + 4:3)...")
     frame = os.path.join(WORK, "cover_src.png")
     sh(["ffmpeg", "-y", "-v", "error", "-ss", "60", "-i", out,
         "-frames:v", "1", "-vf", "scale=1280:720", frame])

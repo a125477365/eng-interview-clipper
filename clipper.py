@@ -17,6 +17,10 @@ filter must never be silently skipped.
 import os
 import subprocess
 import sys
+import string as _string
+
+# punctuation stripped from Whisper word timestamps before vocab lookup
+_PUNCT = _string.punctuation
 
 # robust: invoke via the current interpreter so venv installs are found
 YTDLP = os.environ.get("YTDLP_BIN", "").split() or [sys.executable, "-m", "yt_dlp"]
@@ -627,7 +631,11 @@ def _occurrences(segments: list[dict], vocab_index: dict) -> list[dict]:
         words = s.get("words") or []
         if words:
             for w in words:
-                wl = w["word"].lower().strip("-'")
+                # strip ALL surrounding punctuation: Whisper word timestamps
+                # often include trailing periods/commas ("optimism."), which
+                # would otherwise fail the vocab lookup and leave the word
+                # permanently out of the panel progress (e.g. 72/108).
+                wl = w["word"].lower().strip(_PUNCT)
                 if wl in vocab_index:
                     v = vocab_index[wl]
                     occs.append({"word": v["word"], "gloss": v.get("gloss", ""),
@@ -669,15 +677,16 @@ def _highlight_vocab(text: str, vocab_words: list[str]) -> str:
 
 
 def build_ass(segments: list[dict], vocab: list[dict], total: float,
-              out_path: str, max_rows: int = 5, source_label: str = ""):
+              out_path: str, max_rows: int = 5):
     """ASS with: EN/ZH subtitles (explicit positions) + scrolling vocab panel.
 
     The vocab panel follows the speech: for each vocab-word occurrence
     (word-level timestamps), the panel shows a 5-row window around the
     current word, highlighted gold; header shows progress i/N.
 
-    source_label: e.g. "视频来源：Korea Society" — shown for the first
-    2 seconds at the top of the frame (copyright attribution, mandatory).
+    NOTE: source attribution is a separate 2 s full-screen card
+    (make_source_card/make_source_intro), prepended via concat — NOT a
+    small overlay line. See SKILL.md §3a.
     """
     vocab_index = {v["word"]: v for v in vocab}
     vocab_words = [v["word"] for v in vocab]
@@ -704,19 +713,10 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
              "0,0,0,0,100,100,0,0,1,2,0,7,60,60,20,1")
     L.append(f"Style: VWcur,{FONT},46,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,7,60,60,20,1")
-    L.append(f"Style: SRC,{FONT},36,&H00CCCCCC,&H000019FF,&H00000000,&H80000000,"
-             "0,0,0,0,100,100,0,0,1,2,0,7,40,40,20,1")
     L.append("")
     L.append("[Events]")
     L.append("Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
              "Effect, Text")
-
-    # ---- source attribution: first 2 seconds, small gray line at top ----
-    # Copyright: every video must declare its source up front. Never ship
-    # without source_label.
-    if source_label:
-        L.append(f"Dialogue: 0,{_ass_time(0)},{_ass_time(2)},SRC,,0,0,0,,"
-                 f"{{\\pos(540,80)}}{source_label}")
 
     # ---- subtitles: one segment at a time, EN close above ZH ----
     for s in segments:
@@ -782,16 +782,14 @@ def make_panel_bg(out_path: str):
 
 def compose(source: str, segments: list[dict], vocab: list[dict],
             out_path: str, total: float | None = None,
-            preset: str | None = None, source_label: str = ""):
+            preset: str | None = None):
     """Assemble the final vertical video. segments need 'zh' keys.
-
-    source_label: e.g. "视频来源：Korea Society" — 2-second attribution
-    at the start (mandatory, see build_ass).
 
     NOTE: burned-in source logos/watermarks are intentionally LEFT VISIBLE.
     Do not blur/cover/remove them — obscuring rights-management info can
-    aggravate liability. The source attribution line is the correct way
-    to handle provenance.
+    aggravate liability. Source attribution is a separate 2 s full-screen
+    card (make_source_card/make_source_intro, SKILL.md §3a), prepended
+    after compose via concat_mp4s.
     """
     preset = preset or os.environ.get("CLIP2VERTICAL_PRESET", "medium")
     missing = sum(1 for v in vocab if not v.get("gloss"))
@@ -811,7 +809,7 @@ def compose(source: str, segments: list[dict], vocab: list[dict],
     workdir = os.path.dirname(out_path)
     ass_path = os.path.join(workdir, "_compose.ass")
     panel_path = os.path.join(workdir, "_panel.png")
-    build_ass(segments, vocab, total, ass_path, source_label=source_label)
+    build_ass(segments, vocab, total, ass_path)
     make_panel_bg(panel_path)
 
     # No logo blur: source watermarks stay visible (see docstring).
@@ -1232,3 +1230,121 @@ def append_outro(main_mp4: str, outro_mp4: str, out_mp4: str) -> str:
          "-movflags", "+faststart", out_mp4],
         check=True)
     return out_mp4
+
+
+def make_source_card(source_name: str, out_png: str,
+                     W: int = 1080, H: int = 1920) -> str:
+    """2-second full-screen source card: declares the video source AND the
+    educational purpose. Shown as a dedicated card, NOT a small overlay."""
+    from PIL import Image, ImageDraw, ImageFont, ImageFilter
+    fb = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
+    fr = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+    img = Image.new("RGB", (W, H), (8, 14, 38))
+    d = ImageDraw.Draw(img)
+    for y in range(H):
+        r = int(8 + (26 - 8) * y / H); g = int(14 + (44 - 14) * y / H)
+        b = int(38 + (96 - 38) * y / H)
+        d.line([(0, y), (W, y)], fill=(r, g, b))
+    # gold speech bubble icon (brand echo)
+    d = ImageDraw.Draw(img, "RGBA")
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow)
+    gd.ellipse([340, 380, 740, 700], fill=(255, 200, 70, 30))
+    img = Image.alpha_composite(img.convert("RGBA"),
+                                glow.filter(ImageFilter.GaussianBlur(40))
+                                ).convert("RGB")
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([390, 480, 690, 660], radius=45, fill=(255, 200, 70))
+    d.polygon([(470, 650), (440, 720), (530, 650)], fill=(255, 200, 70))
+
+    def tc(y, s, size, fill, fp=fb):
+        f2 = ImageFont.truetype(fp, size)
+        bb2 = d.textbbox((0, 0), s, font=f2)
+        d.text(((W - (bb2[2] - bb2[0])) / 2, y), s, font=f2, fill=fill)
+    tc(800, "视频来源", 72, (255, 255, 255), fr)
+    tc(900, source_name, 96, (255, 200, 70))
+    tc(1080, "本视频仅作英语学习教育用途", 54, (255, 255, 255), fr)
+    tc(1180, "中英逐句翻译 · 生词精讲", 48, (255, 200, 70), fr)
+    img.save(out_png)
+    return out_png
+
+
+def make_source_intro(source_name: str, out_mp4: str,
+                      duration: float = 2.0, fps: int = 30) -> str:
+    """Render the 2 s source card to mp4 (with silent audio for concat)."""
+    import subprocess
+    png = out_mp4 + ".card.png"
+    make_source_card(source_name, png)
+    subprocess.run(
+        ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
+         "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+         "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p",
+         "-r", str(fps), "-c:a", "aac", "-shortest", out_mp4],
+        check=True)
+    return out_mp4
+
+
+def concat_mp4s(parts: list[str], out_mp4: str) -> str:
+    """Concatenate N mp4s in order (e.g. source card + main + outro)."""
+    import subprocess
+    inputs, filt = [], []
+    for i, p in enumerate(parts):
+        inputs += ["-i", p]
+        filt.append(f"[{i}:v][{i}:a]")
+    filt.append(f"concat=n={len(parts)}:v=1:a=1[outv][outa]")
+    subprocess.run(
+        ["ffmpeg", "-y", "-v", "error"] + inputs +
+        ["-filter_complex", "".join(filt),
+         "-map", "[outv]", "-map", "[outa]", "-c:v", "libx264",
+         "-preset", "veryfast", "-crf", "20", "-c:a", "aac",
+         "-movflags", "+faststart", out_mp4],
+        check=True)
+    return out_mp4
+
+
+def check_redistribution(url: str) -> dict:
+    """Check whether the source explicitly prohibits rebroadcasting.
+
+    Fetches video metadata (title/description/license) and scans for
+    explicit no-reuse statements. Returns a dict; if result['ok'] is
+    False, the caller MUST refuse to generate and notify the user.
+
+    This is a heuristic — it catches explicit prohibitions, not a legal
+    clearance. When in doubt, ask the user.
+    """
+    import subprocess
+    import re
+    import shutil
+    import sys
+    result = {"ok": True, "license": "", "flags": [], "title": ""}
+    ytdlp = (shutil.which("yt-dlp")
+             or os.path.join(os.path.dirname(sys.executable), "yt-dlp"))
+    try:
+        r = subprocess.run(
+            [ytdlp, "--no-warnings", "--dump-json", "--no-download",
+             "--extractor-args", "youtube:player_client=android", url],
+            capture_output=True, text=True, timeout=90)
+        if r.returncode != 0:
+            result["flags"].append("metadata_unavailable")
+            return result  # cannot verify; caller decides (default: warn)
+        import json as _json
+        meta = _json.loads(r.stdout)
+    except Exception as e:  # noqa: BLE001
+        result["flags"].append(f"metadata_error: {e}")
+        return result
+    result["title"] = meta.get("title", "")
+    result["license"] = meta.get("license", "")
+    text = f"{meta.get('title', '')}\n{meta.get('description', '')}"
+    patterns = [
+        r"禁止.{0,6}转[载播]", r"不得转[载播]", r"未经.{0,8}不得",
+        r"no\s*re-?upload", r"do\s*not\s*re-?upload",
+        r"no\s*re-?broadcast", r"prohibited.*re-?distribut",
+        r"all\s*rights\s*reserved.{0,40}no.*use",
+    ]
+    for pat in patterns:
+        m = re.search(pat, text, re.IGNORECASE)
+        if m:
+            result["flags"].append(f"explicit_prohibition: {m.group(0)[:60]}")
+    if result["flags"]:
+        result["ok"] = False
+    return result

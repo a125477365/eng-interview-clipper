@@ -24,6 +24,17 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
 
 ## Pipeline (run in order, do not skip steps)
 
+### 0. Redistribution check — mandatory gate
+
+- BEFORE downloading, run `clipper.check_redistribution(url)`. It fetches
+  the video's title/description/license and scans for explicit
+  no-rebroadcast statements (e.g. 禁止转载/转播, no re-upload).
+- If it returns `ok: False`: STOP. Do not download, transcribe, or render
+  anything. Tell the user which statement was found and ask how to
+  proceed. This is a hard gate, not a warning to scroll past.
+- If metadata is unavailable (network block), say so explicitly and let
+  the user decide — do not silently assume permission.
+
 ### 1. Download — resolution first
 
 - Use `clipper.download()`. Format must prefer 1080p and never go below
@@ -32,16 +43,20 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   `--extractor-args youtube:player_client=android`, then `web_embedded`.
 - Verify the downloaded file: `ffprobe` height must be ≥ 720.
 
-### 2. Trim the opening — logos and fades
+### 2. Trim the opening AND the ending — logos and fades
 
-- Extract frames at t=0, 0.1, 0.5, 1, 2, 3, 4, 5s and look at them.
+- Extract frames at t=0, 0.1, 0.5, 1, 2, 3, 4, 5s AND at the last 15 s
+  (t=end-15 … end) and look at them.
 - Broadcaster logo animations at the start (e.g. the first ~4s) must be
   cut. After cutting, re-check t=0 / 0.1 / 0.15: logo fade-outs often leave
   a residual ghost on the first frames — trim further until frame 0 is
   clean interview footage. Shift every subtitle timestamp by the trimmed
   amount (clamp at 0).
+- End cards / logo outros (e.g. "THE KOREA SOCIETY / Watch more like
+  this") must be cut too: find where the end card starts and trim the
+  source there. Drop or clamp any subtitle segments beyond the cut point.
 - This is the user's explicit copyright requirement: no third-party
-  logos or idents in the first second.
+  logos or idents in the first OR last seconds.
 
 ### 3. Burned-in corner logos — keep them visible
 
@@ -51,12 +66,22 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   attribution (§3a) is the correct approach. `clipper.compose()` no longer
   blurs anything — this is deliberate.
 
-### 3a. Source attribution — first 2 seconds (mandatory)
+### 3a. Source card — 2 s full-screen (mandatory)
 
-- Every video opens with a source line shown for the first 2 seconds:
-  `视频来源：{source}` (e.g. `视频来源：Korea Society`), small gray text
-  at the top of the frame (y=80, above the vocab panel).
-- Pass it as `source_label` to `clipper.compose()` / `build_ass()`.
+- Every video OPENS with a dedicated 2-second full-screen card (1080x1920),
+  NOT a small overlay line. It declares the source AND the educational
+  purpose, e.g.:
+
+  ```
+  视频来源
+  Korea Society
+  本视频仅作英语学习教育用途
+  中英逐句翻译 · 生词精讲
+  ```
+
+- Build it with `clipper.make_source_card(source_name, out_png)` then
+  `clipper.make_source_intro(source_name, out_mp4)` (2 s, silent audio
+  for concat). Prepend with `clipper.concat_mp4s([intro, main, outro])`.
   Never ship a video without it.
 
 ### 4. Transcribe
@@ -87,6 +112,9 @@ yours. Practical rules (not legal advice):
 
 - ALWAYS credit the source (§3a, never skipped) and NEVER obscure, blur,
   or remove source logos or watermarks (§3).
+- BEFORE downloading, run the redistribution check (§0): if the source
+  explicitly prohibits rebroadcasting, STOP and tell the user — do not
+  generate the video.
 - Full-length re-uploads carry the highest risk. Prefer short excerpts
   (a few minutes) with your own commentary over full reproductions —
   excerpts + genuine commentary are far more defensible than a full
@@ -127,6 +155,12 @@ product spec, do not weaken them:
   fixed display width so the Chinese column aligns across rows.
   `clipper.compose()` raises if any gloss is missing; never ship a
   render with an English-only panel.
+- HARD RULE: the occurrence matcher MUST strip ALL surrounding
+  punctuation from Whisper word timestamps before vocab lookup.
+  Whisper emits words like `"optimism."` — matching only stripped
+  `-`/`'` silently drops such words and the panel progress stalls
+  (the 72/108 incident). Verify with `_occurrences()`: unique matched
+  words must equal the vocab size.
 
 ### 8. Sample frames before the full render
 
@@ -197,15 +231,27 @@ product spec, do not weaken them:
 ### 14. 4-second fan-group outro
 
 - Every published video/episode ends with a 4 s end card:
-  `clipper.make_outro(vocab_count, out_mp4, badge)` then
-  `clipper.append_outro(main_mp4, outro_mp4, final_mp4)`.
+  `clipper.make_outro(vocab_count, out_mp4, badge)` renders the card to mp4.
 - Card design (1080x1920, brand style): gold speech-bubble icon,
   `加入粉丝群` / `领取本集生词清单` / `{N} 个生词 · 中英对照 Excel`,
   account badge at the bottom. Silent audio.
 - The 4 s is appended AFTER the 59-minute content: episode = 59:00 + 0:04.
 
+### 14a. Final assembly — always card + main + outro
+
+- The finished video is ALWAYS: 2 s source card (§3a) + main video (§9) +
+  4 s outro (§14), joined with
+  `clipper.concat_mp4s([intro_mp4, main_mp4, outro_mp4], final_mp4)`.
+- Total must stay under the platform limit (§12). If main + 6 s exceeds
+  1 h, split into episodes FIRST (§12), then assemble each episode.
+
 ### 15. Publish
 
+- Upload the FULL-QUALITY master (the crf-20 `final_with_cards.mp4`,
+  ~200 MB) to the platforms — NEVER a recompressed preview. Heavily
+  compressed uploads (e.g. crf 28) soften subtitle/vocab text edges;
+  platforms re-encode anyway, so give their encoder the best source.
+  Compressed copies are for review links only.
 - Douyin creator platform: upload the mp4, title format
   `《人物：金句｜英文精听》`, add ALL FOUR topic tags
   `#人物 #公司 #AI #英语精听` (verify each one landed — the platform
