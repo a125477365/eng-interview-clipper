@@ -138,14 +138,16 @@ product spec, do not weaken them:
   and the account badge. Title text must be large, centered, high
   contrast.
 
-### 12. Episode splitting (content over 60 minutes)
+### 12. Episode splitting (final video over 60 minutes)
 
-- Content per episode is max 55 minutes; every episode ends with the 4 s
-  fan-group outro (§14), so a published episode never exceeds 59 minutes.
-- If the content is 60 minutes or shorter: single episode, no split.
-- If longer: split with `clipper.split_episodes(total_seconds, segments)`
-  (55-minute target): cuts snap to subtitle segment boundaries (never
-  mid-sentence — each cut is the segment end nearest the 55-minute mark).
+- If the finished video is 60 minutes or shorter: single episode, no split.
+- If longer: split into episodes of about 59 minutes each, using
+  `clipper.split_episodes(total_seconds, segments)`:
+  cuts snap to subtitle segment boundaries (never mid-sentence — each cut
+  is the segment end nearest the 59-minute mark). The 59 minutes is a soft
+  target, not a rigid cap.
+- Every published episode then gets the 4 s fan-group outro appended
+  (§14). Hard rule: content + outro must stay under 1 hour total.
 - The last episode must be longer than 2 minutes. If the naive split would
   leave a shorter tail, move the cut point earlier so the tail is absorbed
   into the final episode; if that would exceed the platform's duration cap,
@@ -174,7 +176,7 @@ product spec, do not weaken them:
 - Card design (1080x1920, brand style): gold speech-bubble icon,
   `加入粉丝群` / `领取本集生词清单` / `{N} 个生词 · 中英对照 Excel`,
   account badge at the bottom. Silent audio.
-- The 4 s is part of the 59-minute episode cap: content ≤ 55 min.
+- The 4 s is appended AFTER the 59-minute content: episode = 59:00 + 0:04.
 
 ### 15. Publish
 
