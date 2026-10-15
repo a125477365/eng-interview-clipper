@@ -1,0 +1,5 @@
+name: "eng_interview_clipper"
+title: "English Interview Clipper"
+description: "Turn a YouTube interview into a vertical 1080x1920 bilingual learning video (sentence-by-sentence EN/ZH subtitles, CET-4→IELTS vocab panel, covers) and publish it to Douyin."
+category: "Work and knowledge"
+include_in_prompt: false
