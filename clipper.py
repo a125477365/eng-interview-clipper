@@ -917,7 +917,7 @@ def _nearest_end(segments: list, t: float) -> float:
     return min(segments, key=lambda s: abs(s["end"] - t))["end"]
 
 
-def split_episodes(total: float, segments: list, ep_len: float = 55 * 60,
+def split_episodes(total: float, segments: list, ep_len: float = 59 * 60,
                    min_last: float = 2 * 60, hard_cap: float = 60 * 60):
     """Split a long video into episode (start, end) ranges in seconds.
 
