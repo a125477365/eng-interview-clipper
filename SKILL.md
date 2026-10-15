@@ -95,6 +95,12 @@ product spec, do not weaken them:
 - Treat `zipf == 0` with count < 3 as transcription noise and drop it.
 - Add a concise Chinese gloss to every word
   (`clipper.gloss_vocab()`).
+- HARD RULE: every vocab entry must carry a non-empty Chinese gloss
+  BEFORE composing. The vocab panel is bilingual by design — English
+  word + Chinese gloss + count, with the English column padded to a
+  fixed display width so the Chinese column aligns across rows.
+  `clipper.compose()` raises if any gloss is missing; never ship a
+  render with an English-only panel.
 
 ### 8. Sample frames before the full render
 
