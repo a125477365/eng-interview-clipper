@@ -913,6 +913,49 @@ def cut_ranges(video: str, segments: list, ranges: list, out_video: str):
     return out
 
 
+def _nearest_end(segments: list, t: float) -> float:
+    return min(segments, key=lambda s: abs(s["end"] - t))["end"]
+
+
+def split_episodes(total: float, segments: list, ep_len: float = 59 * 60,
+                   min_last: float = 2 * 60, hard_cap: float = 60 * 60):
+    """Split a long video into episode (start, end) ranges in seconds.
+
+    - No split when total <= hard_cap (60 min): returns [(0, total)].
+    - Cuts snap to subtitle segment boundaries — never mid-sentence:
+      each cut is the segment end nearest to the 59-minute mark.
+    - The last episode must be longer than min_last (2 min). If the naive
+      split would leave a shorter tail, the cut point moves earlier
+      ("cutting" adjustment): the tail is absorbed into the final episode.
+      If that would exceed hard_cap, the remainder is split evenly in two
+      instead — a < 2-minute orphan episode is never shipped.
+    Returns [(start_sec, end_sec), ...].
+    """
+    if total <= hard_cap:
+        return [(0.0, total)]
+    bounds = [0.0]
+    while True:
+        start = bounds[-1]
+        remaining = total - start
+        if remaining <= hard_cap:
+            bounds.append(total)
+            break
+        cut = _nearest_end(segments, start + ep_len)
+        if cut <= start:  # no valid cut ahead; force close
+            bounds.append(total)
+            break
+        if 0 < total - cut < min_last:
+            if total - start <= hard_cap:
+                bounds.append(total)  # absorb the short tail
+            else:
+                mid = _nearest_end(segments, (start + total) / 2)
+                bounds.append(mid if mid > start else (start + total) / 2)
+                bounds.append(total)
+            break
+        bounds.append(cut)
+    return list(zip(bounds[:-1], bounds[1:]))
+
+
 def flag_sensitive(segments: list) -> list:
     """Keyword pre-filter only. The agent must still read everything."""
     hits = []
