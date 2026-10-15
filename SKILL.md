@@ -114,7 +114,7 @@ product spec, do not weaken them:
 
 - Vocab panel: top at y=170 — below the iPhone Dynamic Island / notch
   safe area. Header `本集生词 N 个 i/N`, then a 5-row window that scrolls
-  to follow the speech, centered at x=540; the word being spoken is
+  to follow the speech, anchored slightly left of center at x=500 (long words must never clip); the word being spoken is
   highlighted gold. Panel background is a dark translucent overlay.
 - Interview video: 16:9 fitted to 1080x608, top edge at y=610.
 - Subtitles, one segment at a time: English at y=1300 (white; words that
