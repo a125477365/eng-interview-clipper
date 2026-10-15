@@ -138,7 +138,26 @@ product spec, do not weaken them:
   and the account badge. Title text must be large, centered, high
   contrast.
 
-### 12. Publish
+### 12. Episode splitting (final video over 60 minutes)
+
+- If the finished video is 60 minutes or shorter: single episode, no split.
+- If longer: split into episodes of max 59 minutes each, using
+  `clipper.split_episodes(total_seconds, segments)`:
+  cuts snap to subtitle segment boundaries (never mid-sentence — each cut
+  is the segment end nearest the 59-minute mark).
+- The last episode must be longer than 2 minutes. If the naive split would
+  leave a shorter tail, move the cut point earlier so the tail is absorbed
+  into the final episode; if that would exceed the platform's duration cap,
+  split the remainder evenly in two instead. Never ship a < 2-minute
+  orphan episode.
+- Each episode is rendered as its own video (compose per episode range)
+  with its own vocab panel: only words occurring in that episode, re-ranked,
+  top 108, each with a Chinese gloss. Own covers per episode too.
+- Title suffix per episode: （上）/（中）/（下） or 第1集/第2集…,
+  e.g. `黄仁勋：AI没有知觉，不比宠物石头更有生命｜英文精听（上）`.
+  Tags stay the same on every episode. Publish episodes in order.
+
+### 13. Publish
 
 - Douyin creator platform: upload the mp4, title format
   `《人物：金句｜英文精听》`, add ALL FOUR topic tags
