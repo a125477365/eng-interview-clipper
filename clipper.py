@@ -773,6 +773,13 @@ def compose(source: str, segments: list[dict], vocab: list[dict],
             preset: str | None = None):
     """Assemble the final vertical video. segments need 'zh' keys."""
     preset = preset or os.environ.get("CLIP2VERTICAL_PRESET", "medium")
+    missing = sum(1 for v in vocab if not v.get("gloss"))
+    if missing:
+        raise RuntimeError(
+            f"{missing}/{len(vocab)} vocab words have no Chinese gloss. "
+            "The vocab panel must be bilingual (word + Chinese gloss + "
+            "count). Fill the glosses with gloss_vocab() before composing; "
+            "refusing to render an English-only panel.")
     r = subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",
          "-of", "default=noprint_wrappers=1:nokey=1", source],
@@ -783,10 +790,6 @@ def compose(source: str, segments: list[dict], vocab: list[dict],
     workdir = os.path.dirname(out_path)
     ass_path = os.path.join(workdir, "_compose.ass")
     panel_path = os.path.join(workdir, "_panel.png")
-    missing = sum(1 for v in vocab if not v.get("gloss"))
-    if missing:
-        print(f"WARNING: {missing}/{len(vocab)} vocab words have no Chinese "
-              f"gloss — the panel will show English only", flush=True)
     build_ass(segments, vocab, total, ass_path)
     make_panel_bg(panel_path)
 
