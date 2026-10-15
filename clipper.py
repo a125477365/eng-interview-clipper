@@ -597,7 +597,7 @@ VID_Y = 610          # video top edge (below vocab panel)
 PANEL_Y = 170        # vocab panel top (below iPhone Dynamic Island / notch safe area)
 PANEL_H = 400
 SUB_EN_Y = 1300
-SUB_ZH_Y = 1440
+SUB_ZH_Y = 1465
 FONT = "Noto Sans CJK SC"
 
 WORD_RE = re.compile(r"[a-zA-Z][a-zA-Z\-']*[a-zA-Z]|[a-zA-Z]")
@@ -703,15 +703,15 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
              "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, "
              "ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
              "Alignment, MarginL, MarginR, MarginV, Encoding")
-    L.append(f"Style: EN,{FONT},58,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: EN,{FONT},64,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,3,0,5,60,60,40,1")
-    L.append(f"Style: ZH,{FONT},54,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: ZH,{FONT},60,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,3,0,5,60,60,40,1")
-    L.append(f"Style: VH,{FONT},40,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: VH,{FONT},44,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,7,40,40,20,1")
-    L.append(f"Style: VW,{FONT},44,&H00E0E0E0,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: VW,{FONT},48,&H00E0E0E0,&H000019FF,&H00000000,&H80000000,"
              "0,0,0,0,100,100,0,0,1,2,0,7,60,60,20,1")
-    L.append(f"Style: VWcur,{FONT},46,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: VWcur,{FONT},50,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,7,60,60,20,1")
     L.append("")
     L.append("[Events]")
