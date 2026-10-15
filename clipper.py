@@ -383,6 +383,16 @@ from collections import Counter
 
 WORD_RE = re.compile(r"[a-zA-Z][a-zA-Z\-']*[a-zA-Z]|[a-zA-Z]")
 
+
+def _dwidth(s: str) -> int:
+    """Display width: CJK counts as 2, Latin as 1."""
+    return sum(2 if ord(c) > 0x2E7F else 1 for c in s)
+
+
+def _pad(s: str, width: int) -> str:
+    """Pad to fixed display width so columns align across rows."""
+    return s + " " * max(0, width - _dwidth(s))
+
 STOPWORDS = set("""
 a about above after again against all am an and any are as at be because been
 before being below between both but by can cannot could did do does doing don
@@ -740,7 +750,8 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
             for j, w in enumerate(win):
                 y = PANEL_Y + 88 + j * 72
                 style = "VWcur" if j == cur_j else "VW"
-                txt = f"{w['word']}  {w.get('gloss', '')}  \u00d7{w['count']}"
+                txt = (f"{_pad(w['word'], 18)}  "
+                         f"{w.get('gloss', '')}  \u00d7{w['count']}")
                 L.append(f"Dialogue: 0,{a},{b},{style},,0,0,0,,"
                          f"{{\\pos(540,{y})}}{txt}")
     else:
@@ -772,6 +783,10 @@ def compose(source: str, segments: list[dict], vocab: list[dict],
     workdir = os.path.dirname(out_path)
     ass_path = os.path.join(workdir, "_compose.ass")
     panel_path = os.path.join(workdir, "_panel.png")
+    missing = sum(1 for v in vocab if not v.get("gloss"))
+    if missing:
+        print(f"WARNING: {missing}/{len(vocab)} vocab words have no Chinese "
+              f"gloss — the panel will show English only", flush=True)
     build_ass(segments, vocab, total, ass_path)
     make_panel_bg(panel_path)
 
