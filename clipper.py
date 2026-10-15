@@ -745,7 +745,7 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
             win = before + [o] + after
             cur_j = len(before)
             L.append(f"Dialogue: 0,{a},{b},VH,,0,0,0,,"
-                     f"{{\\pos(540,{PANEL_Y + 28})}}本集生词 {n} 个  "
+                     f"{{\\pos(500,{PANEL_Y + 28})}}本集生词 {n} 个  "
                      f"{len(seen_total)}/{n}")
             for j, w in enumerate(win):
                 y = PANEL_Y + 88 + j * 72
@@ -753,10 +753,10 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
                 txt = (f"{_pad(w['word'], 18)}  "
                          f"{w.get('gloss', '')}  \u00d7{w['count']}")
                 L.append(f"Dialogue: 0,{a},{b},{style},,0,0,0,,"
-                         f"{{\\pos(540,{y})}}{txt}")
+                         f"{{\\pos(500,{y})}}{txt}")
     else:
         L.append(f"Dialogue: 0,{_ass_time(0)},{_ass_time(total)},VH,,0,0,0,,"
-                 f"{{\\pos(540,{PANEL_Y + 28})}}本集生词 {n} 个")
+                 f"{{\\pos(500,{PANEL_Y + 28})}}本集生词 {n} 个")
 
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(L) + "\n")
