@@ -504,7 +504,7 @@ def extract(segments: list[dict], top_n: int = 150,
     Audience: passed CET-4, preparing for IELTS.
     - lemma-aware: getting->get, daughters->daughter (via ECDICT exchange map)
     - excludes anything a CET-4 learner already knows: stopwords, BASIC list,
-      proper nouns, brands, CET-4-tagged words, or zipf > 5.0
+      proper nouns, brands, CET-4-tagged words, or zipf > 4.6
     - tier 0: IELTS-tagged words (the exam sweet spot)
     - tier 1: other unfamiliar words (CET-6/TOEFL/GRE level etc.)
     - within a tier, more frequent in the video ranks higher
