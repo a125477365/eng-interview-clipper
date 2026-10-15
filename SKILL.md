@@ -43,12 +43,21 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
 - This is the user's explicit copyright requirement: no third-party
   logos or idents in the first second.
 
-### 3. Blur burned-in corner logos
+### 3. Burned-in corner logos — keep them visible
 
-- If the source has a burned-in logo (e.g. top-right 170x125 at x=910),
-  blur it in the compose filter chain:
-  `[v]crop=170:125:910:0,boxblur=12` overlaid back at the same position.
-- Never cover it with opaque boxes; a blur keeps the frame natural.
+- If the source has a burned-in logo/watermark, LEAVE IT VISIBLE. Do NOT
+  blur, cover, or remove it. Obscuring rights-management information can
+  aggravate liability and looks like hiding the source; a clear source
+  attribution (§3a) is the correct approach. `clipper.compose()` no longer
+  blurs anything — this is deliberate.
+
+### 3a. Source attribution — first 2 seconds (mandatory)
+
+- Every video opens with a source line shown for the first 2 seconds:
+  `视频来源：{source}` (e.g. `视频来源：Korea Society`), small gray text
+  at the top of the frame (y=80, above the vocab panel).
+- Pass it as `source_label` to `clipper.compose()` / `build_ass()`.
+  Never ship a video without it.
 
 ### 4. Transcribe
 
@@ -69,6 +78,23 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   China (or other politically sensitive content unsuitable for a mainland
   audience), cut that segment's time range from both video and subtitles
   before composing. When in doubt, cut it. Record what was cut and why.
+
+### 6a. Copyright — read before you publish
+
+Reposting an interview with subtitles is reproduction + adaptation of
+someone else's copyrighted work. Subtitles and vocab panels do not make it
+yours. Practical rules (not legal advice):
+
+- ALWAYS credit the source (§3a, never skipped) and NEVER obscure, blur,
+  or remove source logos or watermarks (§3).
+- Full-length re-uploads carry the highest risk. Prefer short excerpts
+  (a few minutes) with your own commentary over full reproductions —
+  excerpts + genuine commentary are far more defensible than a full
+  re-upload with subtitles only.
+- Avoid material from rights-aggressive outlets. Nonprofit/educational
+  sources (e.g. Korea Society) are lower-risk and sometimes grant
+  permission for educational use — ask when in doubt.
+- If a takedown or claim arrives, consult a lawyer; do not ignore it.
 
 ### 7. Vocabulary extraction — the core value
 
@@ -132,7 +158,7 @@ product spec, do not weaken them:
 ### 11. Covers — two ratios
 
 - `clipper.make_covers()`: from a clean interview frame (person not
-  stretched, burned-in logos blurred), produce BOTH
+  stretched; burned-in logos stay visible, never blurred), produce BOTH
   `cover_34.png` (1080x1440) and `cover_43.png` (1200x900).
 - Each carries: kicker line, the headline quote, `N个生词 · 中英逐句精讲`,
   and the account badge. Title text must be large, centered, high

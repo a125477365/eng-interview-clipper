@@ -669,12 +669,15 @@ def _highlight_vocab(text: str, vocab_words: list[str]) -> str:
 
 
 def build_ass(segments: list[dict], vocab: list[dict], total: float,
-              out_path: str, max_rows: int = 5):
+              out_path: str, max_rows: int = 5, source_label: str = ""):
     """ASS with: EN/ZH subtitles (explicit positions) + scrolling vocab panel.
 
     The vocab panel follows the speech: for each vocab-word occurrence
     (word-level timestamps), the panel shows a 5-row window around the
     current word, highlighted gold; header shows progress i/N.
+
+    source_label: e.g. "视频来源：Korea Society" — shown for the first
+    2 seconds at the top of the frame (copyright attribution, mandatory).
     """
     vocab_index = {v["word"]: v for v in vocab}
     vocab_words = [v["word"] for v in vocab]
@@ -701,10 +704,19 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
              "0,0,0,0,100,100,0,0,1,2,0,7,60,60,20,1")
     L.append(f"Style: VWcur,{FONT},46,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,7,60,60,20,1")
+    L.append(f"Style: SRC,{FONT},36,&H00CCCCCC,&H000019FF,&H00000000,&H80000000,"
+             "0,0,0,0,100,100,0,0,1,2,0,7,40,40,20,1")
     L.append("")
     L.append("[Events]")
     L.append("Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
              "Effect, Text")
+
+    # ---- source attribution: first 2 seconds, small gray line at top ----
+    # Copyright: every video must declare its source up front. Never ship
+    # without source_label.
+    if source_label:
+        L.append(f"Dialogue: 0,{_ass_time(0)},{_ass_time(2)},SRC,,0,0,0,,"
+                 f"{{\\pos(540,80)}}{source_label}")
 
     # ---- subtitles: one segment at a time, EN close above ZH ----
     for s in segments:
@@ -770,8 +782,17 @@ def make_panel_bg(out_path: str):
 
 def compose(source: str, segments: list[dict], vocab: list[dict],
             out_path: str, total: float | None = None,
-            preset: str | None = None):
-    """Assemble the final vertical video. segments need 'zh' keys."""
+            preset: str | None = None, source_label: str = ""):
+    """Assemble the final vertical video. segments need 'zh' keys.
+
+    source_label: e.g. "视频来源：Korea Society" — 2-second attribution
+    at the start (mandatory, see build_ass).
+
+    NOTE: burned-in source logos/watermarks are intentionally LEFT VISIBLE.
+    Do not blur/cover/remove them — obscuring rights-management info can
+    aggravate liability. The source attribution line is the correct way
+    to handle provenance.
+    """
     preset = preset or os.environ.get("CLIP2VERTICAL_PRESET", "medium")
     missing = sum(1 for v in vocab if not v.get("gloss"))
     if missing:
@@ -790,14 +811,13 @@ def compose(source: str, segments: list[dict], vocab: list[dict],
     workdir = os.path.dirname(out_path)
     ass_path = os.path.join(workdir, "_compose.ass")
     panel_path = os.path.join(workdir, "_panel.png")
-    build_ass(segments, vocab, total, ass_path)
+    build_ass(segments, vocab, total, ass_path, source_label=source_label)
     make_panel_bg(panel_path)
 
+    # No logo blur: source watermarks stay visible (see docstring).
     vf = (
         "[0:v]scale=1080:608:force_original_aspect_ratio=increase,"
-        "crop=1080:608,setsar=1,fps=30,split[v0][v1];"
-        "[v1]crop=170:125:910:0,boxblur=12[lg];"
-        "[v0][lg]overlay=910:0[v];"
+        "crop=1080:608,setsar=1,fps=30[v];"
         f"[v]pad=1080:1920:0:{VID_Y}:color=black[vp];"
         "[vp][1:v]overlay=0:170[v2];"
         f"[v2]subtitles={ass_path}:fontsdir=/usr/share/fonts,format=yuv420p[out]"
