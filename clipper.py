@@ -917,7 +917,7 @@ def _nearest_end(segments: list, t: float) -> float:
     return min(segments, key=lambda s: abs(s["end"] - t))["end"]
 
 
-def split_episodes(total: float, segments: list, ep_len: float = 59 * 60,
+def split_episodes(total: float, segments: list, ep_len: float = 55 * 60,
                    min_last: float = 2 * 60, hard_cap: float = 60 * 60):
     """Split a long video into episode (start, end) ranges in seconds.
 
@@ -1096,3 +1096,119 @@ def build_exam_words(out_path: str = "exam_words.json",
     print(f"wrote {out_path}: cet4={len(cet4)} ielts={len(ielts)} "
           f"lemma={len(lemma)}", flush=True)
     return out_path
+
+# ======================================================================
+# SECTION: excel + outro — fan-group vocab Excel and 4s end card
+# ======================================================================
+"""Excel vocab list (named after the video title) for the fan group,
+and a 4-second end card inviting viewers to join the group to get it.
+
+Episode rule: content <= 55 min per episode + 4 s outro, total < 59 min.
+"""
+
+
+def sanitize_filename(s: str) -> str:
+    import re
+    s = re.sub(r'[\\\\/:*?"<>|]', "_", s).strip().rstrip(".")
+    return s[:80] or "video"
+
+
+def make_vocab_excel(vocab: list, title: str, out_dir: str) -> str:
+    """Write {sanitized title}.xlsx — 序号 | 单词 | 中文释义 | 出现次数."""
+    import os
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment
+    os.makedirs(out_dir, exist_ok=True)
+    path = os.path.join(out_dir, sanitize_filename(title) + ".xlsx")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "生词清单"
+    ws.append(["序号", "单词", "中文释义", "出现次数"])
+    for cell in ws[1]:
+        cell.font = Font(bold=True, color="FFFFFF", size=12)
+        cell.fill = PatternFill("solid", fgColor="1F3864")
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+    for i, v in enumerate(vocab, 1):
+        ws.append([i, v["word"], v.get("gloss", ""), v["count"]])
+    ws.column_dimensions["A"].width = 8
+    ws.column_dimensions["B"].width = 24
+    ws.column_dimensions["C"].width = 32
+    ws.column_dimensions["D"].width = 12
+    ws.row_dimensions[1].height = 24
+    for row in ws.iter_rows(min_row=2, max_col=4):
+        row[0].alignment = Alignment(horizontal="center")
+        row[3].alignment = Alignment(horizontal="center")
+    ws.freeze_panes = "A2"
+    ws.auto_filter.ref = ws.dimensions
+    wb.save(path)
+    return path
+
+
+def make_outro_card(vocab_count: int, out_png: str, badge: str = "",
+                    W: int = 1080, H: int = 1920):
+    """4-second end card: join the fan group to get the vocab Excel."""
+    from PIL import Image, ImageDraw, ImageFont, ImageFilter
+    fb = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
+    fr = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+    img = Image.new("RGB", (W, H), (8, 14, 38))
+    d = ImageDraw.Draw(img)
+    for y in range(H):
+        r = int(8 + (26 - 8) * y / H); g = int(14 + (44 - 14) * y / H)
+        b = int(38 + (96 - 38) * y / H)
+        d.line([(0, y), (W, y)], fill=(r, g, b))
+    # gold speech bubble icon (brand echo)
+    d = ImageDraw.Draw(img, "RGBA")
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow)
+    gd.ellipse([340, 380, 740, 700], fill=(255, 200, 70, 30))
+    img = Image.alpha_composite(img.convert("RGBA"),
+                                glow.filter(ImageFilter.GaussianBlur(40))
+                                ).convert("RGB")
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([390, 480, 690, 660], radius=45, fill=(255, 200, 70))
+    d.polygon([(470, 650), (440, 720), (530, 650)], fill=(255, 200, 70))
+    f = ImageFont.truetype(fb, 64)
+    bb = d.textbbox((0, 0), "群", font=f)
+    d.text(((W - (bb[2] - bb[0])) / 2, 530), "群", font=f, fill=(12, 18, 44))
+
+    def tc(y, s, size, fill, fp=fb):
+        f2 = ImageFont.truetype(fp, size)
+        bb2 = d.textbbox((0, 0), s, font=f2)
+        d.text(((W - (bb2[2] - bb2[0])) / 2, y), s, font=f2, fill=fill)
+    tc(800, "加入粉丝群", 110, (255, 200, 70))
+    tc(960, "领取本集生词清单", 72, (255, 255, 255))
+    tc(1070, f"{vocab_count} 个生词 · 中英对照 Excel", 48,
+       (255, 200, 70), fr)
+    if badge:
+        tc(H - 220, badge, 52, (255, 255, 255), fr)
+    img.save(out_png)
+    return out_png
+
+
+def make_outro(vocab_count: int, out_mp4: str, badge: str = "",
+               duration: float = 4.0, fps: int = 30) -> str:
+    """Render the 4 s end card to mp4 (with silent audio for concat)."""
+    import subprocess
+    png = out_mp4 + ".card.png"
+    make_outro_card(vocab_count, png, badge)
+    subprocess.run(
+        ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
+         "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+         "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p",
+         "-r", str(fps), "-c:a", "aac", "-shortest", out_mp4],
+        check=True)
+    return out_mp4
+
+
+def append_outro(main_mp4: str, outro_mp4: str, out_mp4: str) -> str:
+    """Concatenate main video + 4 s outro. Returns out_mp4."""
+    import subprocess
+    subprocess.run(
+        ["ffmpeg", "-y", "-v", "error", "-i", main_mp4, "-i", outro_mp4,
+         "-filter_complex",
+         "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[outv][outa]",
+         "-map", "[outv]", "-map", "[outa]", "-c:v", "libx264",
+         "-preset", "veryfast", "-crf", "20", "-c:a", "aac",
+         "-movflags", "+faststart", out_mp4],
+        check=True)
+    return out_mp4
