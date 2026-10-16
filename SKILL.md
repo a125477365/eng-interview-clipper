@@ -161,8 +161,28 @@ product spec, do not weaken them:
   `-`/`'` silently drops such words and the panel progress stalls
   (the 72/108 incident). Verify with `_occurrences()`: unique matched
   words must equal the vocab size.
+- Phonetics: every single word gets an IPA phonetic symbol from
+  `phonetics.json` (via `clipper.add_phonetics()`), displayed in the
+  panel as `word /phonetic/ 中文`. Learned from @mjenglish.
+- Phrases: extract idiomatic multi-word expressions via
+  `clipper.extract_phrases()` (matches against `idioms.txt`), e.g.
+  "punch above your weight", "a walk in the park". Phrases get Chinese
+  glosses but no phonetics. They appear in the panel interleaved with
+  words by frequency. Learned from @mjenglish.
 
 ### 8. Sample frames before the full render
+
+### 7b. Vocab panel — @mjenglish two-line format (2026-10-16)
+
+Each vocab item uses TWO lines (learned from @mjenglish reference):
+- Line 1: English word (large, left) + ×count (right-aligned in its own
+  column at PANEL_R — NEVER inline, fixes the 2026-10-16 ×n cutoff bug)
+- Line 2: Chinese gloss + phonetic /.../ (smaller, left)
+- Current word: full-width highlight bar behind both lines
+
+Header: `本集生词 N 个` (left) + `i/N` (right). Background stays black
+transparent. 5-row scrolling window follows speech. Implemented in
+`clipper.build_ass()`.
 
 - Before the 20–40 minute full render, compose 3–5 sample frames
   (opening, middle, near end, one with the vocab panel visible) and get
@@ -182,6 +202,22 @@ product spec, do not weaken them:
   (gold). English and Chinese must never overlap or cover each other.
 - Interface stays clean and minimal. Only real footage from the source
   interview — never AI-generated visuals or stock filler.
+
+### 9a. Logo exclusion by symmetric crop (mandatory)
+
+Burned-in source logos/watermarks must be cropped OUT of the frame —
+NEVER blurred or mosaicked (user requirement 2026-10-16).
+
+Method: symmetric center crop. Crop equal amounts from left and right
+(towards the center) so the logo falls outside the frame while both
+speakers stay fully visible and the image stays balanced.
+
+For 1280x720 source (Korea Society, logo top-right at x>1130):
+`crop=980:551:150:85` — 150px from each side, 16:9 preserved, scaled to
+1080x608. Both Jensen and Juju fully visible, no logo.
+
+Do NOT use tight per-speaker crops — they don't suit vertical display
+(user feedback 2026-10-16: "裁剪的话不适合竖屏显示").
 
 ### 10. QC the render
 
@@ -245,6 +281,28 @@ product spec, do not weaken them:
 - Total must stay under the platform limit (§12). If main + 6 s exceeds
   1 h, split into episodes FIRST (§12), then assemble each episode.
 
+### 14b. Traditional Chinese version (for TikTok)
+
+- TikTok audience (Taiwan/HK/overseas) reads Traditional Chinese.
+- Generate a second version: convert ALL Chinese text (subtitles `zh`,
+  vocab glosses) via `clipper.to_traditional()` (OpenCC s2t) BEFORE
+  composing. Use `clipper.vocab_to_traditional(vocab)` and
+  `clipper.segments_to_traditional(segments)`.
+- Pass `traditional=True` to `clipper.compose()`, `make_source_intro()`,
+  and `make_outro()` for Traditional cards and panel headers.
+- The Traditional version goes to TikTok; Simplified goes to Douyin.
+- Titles/descriptions/tags should also be in Traditional for TikTok.
+
+### 14c. Learned from @mjenglish (reference implementation)
+
+The channel @mjenglish produces similar English-learning videos from
+interviews. Techniques adopted into this skill:
+- Phrases: extract idiomatic multi-word expressions (not just single
+  words), e.g. "punch above your weight". See §7.
+- Phonetics: IPA symbols in the vocab panel. See §7.
+- Panel layout: vocab on top, subtitles at bottom (mobile vertical).
+- Credit illustrative images properly (they use Wikimedia Commons).
+
 ### 15. Publish
 
 - Upload the FULL-QUALITY master (the crf-20 `final_with_cards.mp4`,
@@ -272,3 +330,13 @@ product spec, do not weaken them:
 - `run.py` — `python run.py --url <youtube-url>`: guided full run;
   `python run.py --build-exam-words`: one-time exam-word build.
 - `requirements.txt` — Python dependencies.
+
+### 9b. v12 定稿布局（2026-10-16 用户确认）
+
+- 生词栏：4 行（非 5 行），中英同字号 52，选中时中英×n 全部变金色，无背景高亮条
+- 视频居中：横中线在 y=960（VID_Y=656）
+- 字幕：EN y=1330，ZH y=1430（间距 100）
+- 开场 0-20s（姓名条时段）：不裁剪，用 AI inpainting 去 logo，姓名完整保留
+- 20s 后：对称裁剪（crop=980:551:150:85）去 logo
+- 无 2 秒来源卡（logo 已去）；片尾保留 4 秒进群卡
+- 输出 <1GB
