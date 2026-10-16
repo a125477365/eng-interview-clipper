@@ -675,11 +675,11 @@ import sys
 W, H = 1080, 1920
 VID_H = 608
 VID_Y = 656          # video top edge: centered (960-304)
-PANEL_Y = 100        # vocab panel top: close to Dynamic Island, no overlap
+PANEL_Y = 180        # vocab panel top: below iPhone status bar/Dynamic Island (~177px safe)
 PANEL_H = 400        # 4 rows
-PANEL_L = 200        # vocab text left
-PANEL_R = 700        # xn right
-ROW_H = 85           # row height for 4 rows
+PANEL_L = 290        # vocab text left (centered: (290+790)/2=540)
+PANEL_R = 790        # xn right (centered)
+ROW_H = 100          # row height for 4 rows
 SUB_EN_Y = 1330
 SUB_ZH_Y = 1430      # gap 100
 FONT = "Noto Sans CJK SC"
@@ -809,15 +809,15 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
     L.append(f"Style: VH,{FONT},44,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,7,40,40,20,1")
     # v12: EN/ZH same size 52, selected = gold bold, no background bar
-    L.append(f"Style: VE,{FONT},52,&H00E0E0E0,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: VE,{FONT},44,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "0,0,0,0,100,100,0,0,1,2,0,1,60,60,20,1")
     L.append(f"Style: VEC,{FONT},52,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,1,60,60,20,1")
-    L.append(f"Style: VWzh,{FONT},52,&H00C0C0C0,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: VWzh,{FONT},44,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "0,0,0,0,100,100,0,0,1,2,0,1,60,60,20,1")
     L.append(f"Style: VWzhCur,{FONT},52,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,1,60,60,20,1")
-    L.append(f"Style: VWct,{FONT},44,&H00A0A0A0,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: VWct,{FONT},40,&H00A0A0A0,&H000019FF,&H00000000,&H80000000,"
              "0,0,0,0,100,100,0,0,1,2,0,3,60,60,20,1")
     L.append(f"Style: VWctCur,{FONT},44,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,3,60,60,20,1")
@@ -869,7 +869,7 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
                      f"{len(seen_total)}/{n}")
             for j, w in enumerate(win):
                 is_cur = (j == cur_j)
-                y_en = PANEL_Y + 70 + j * ROW_H
+                y_en = PANEL_Y + 60 + j * ROW_H
                 y_zh = y_en + 42
                 word = w["word"]
                 phon = w.get("phonetic", "")
@@ -998,19 +998,17 @@ def compose(source: str, segments: list[dict], vocab: list[dict],
     ass_path = os.path.join(workdir, "_compose.ass")
     panel_path = os.path.join(workdir, "_panel.png")
     build_ass(segments, vocab, total, ass_path, traditional=traditional)
-    make_panel_bg(panel_path)
+    # v12: no panel background (user: 生词界面不要有背景底色)
 
     # v12: symmetric crop (150px each side) unless pre_cropped via prepare_source()
     _crop = "" if pre_cropped else "crop=980:551:150:85,"
     vf = (
         f"[0:v]{_crop}scale=1080:608,setsar=1,fps=30[v];"
         f"[v]pad=1080:1920:0:{VID_Y}:color=black[vp];"
-        "[vp][1:v]overlay=0:100[v2];"
-        f"[v2]subtitles={ass_path}:fontsdir=/usr/share/fonts,format=yuv420p[out]"
+        f"[vp]subtitles={ass_path}:fontsdir=/usr/share/fonts,format=yuv420p[out]"
     )
     cmd = ["ffmpeg", "-y", "-v", "error",
            "-i", source,
-           "-loop", "1", "-t", f"{total:.3f}", "-i", panel_path,
            "-filter_complex", vf,
            "-map", "[out]", "-map", "0:a?",
            "-c:v", "libx264", "-preset", preset, "-crf", "20",
