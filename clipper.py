@@ -558,6 +558,87 @@ def gloss(vocab: list[dict], translate_fn) -> list[dict]:
     return vocab
 
 
+def add_phonetics(vocab: list[dict], phon_path: str | None = None) -> list[dict]:
+    """Add IPA phonetic symbols to vocab entries from phonetics.json.
+
+    Learned from @mjenglish: phonetics help learners pronounce correctly.
+    Words without a phonetic entry get an empty string (panel skips it).
+    """
+    import json as _json
+    import os as _os
+    if phon_path is None:
+        phon_path = _os.path.join(_os.path.dirname(__file__), "phonetics.json")
+    try:
+        with open(phon_path, encoding="utf-8") as f:
+            phon = _json.load(f)
+    except FileNotFoundError:
+        phon = {}
+    for v in vocab:
+        v["phonetic"] = phon.get(v["word"].lower(), "")
+    return vocab
+
+
+def extract_phrases(segments: list[dict], idiom_path: str | None = None,
+                    min_count: int = 1) -> list[dict]:
+    """Extract idiomatic phrases (not just single words) from the transcript.
+
+    Learned from @mjenglish: phrases like "punch above your weight" and
+    "a walk in the park" are high-value for learners. Matches against a
+    curated idiom list (idioms.txt). Returns [{word, count, is_phrase=True}].
+    """
+    import os as _os
+    import re as _re
+    if idiom_path is None:
+        idiom_path = _os.path.join(_os.path.dirname(__file__), "idioms.txt")
+    try:
+        with open(idiom_path, encoding="utf-8") as f:
+            idioms = [l.strip().lower() for l in f if l.strip()]
+    except FileNotFoundError:
+        return []
+    text = " ".join(s["text"] for s in segments).lower()
+    found = []
+    for idiom in idioms:
+        pat = r"\b" + _re.escape(idiom) + r"\b"
+        cnt = len(_re.findall(pat, text))
+        if cnt >= min_count:
+            found.append({"word": idiom, "count": cnt, "is_phrase": True})
+    found.sort(key=lambda x: -x["count"])
+    return found
+
+
+def to_traditional(text: str) -> str:
+    """Convert Simplified Chinese to Traditional Chinese (for TikTok version).
+
+    Uses OpenCC s2t. The TikTok audience (Taiwan/HK/overseas) reads Traditional.
+    """
+    try:
+        from opencc import OpenCC
+    except ImportError:
+        raise RuntimeError("opencc-python-reimplemented not installed; "
+                           "pip install opencc-python-reimplemented")
+    _cc = getattr(to_traditional, "_cc", None)
+    if _cc is None:
+        _cc = OpenCC("s2t")
+        to_traditional._cc = _cc
+    return _cc.convert(text)
+
+
+def vocab_to_traditional(vocab: list[dict]) -> list[dict]:
+    """Convert all Chinese glosses in vocab to Traditional Chinese."""
+    for v in vocab:
+        if v.get("gloss"):
+            v["gloss"] = to_traditional(v["gloss"])
+    return vocab
+
+
+def segments_to_traditional(segments: list[dict]) -> list[dict]:
+    """Convert all Chinese subtitles (zh) to Traditional Chinese."""
+    for s in segments:
+        if s.get("zh"):
+            s["zh"] = to_traditional(s["zh"])
+    return segments
+
+
 def save(vocab: list[dict], path: str):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(vocab, f, ensure_ascii=False, indent=1)
@@ -593,11 +674,14 @@ import sys
 
 W, H = 1080, 1920
 VID_H = 608
-VID_Y = 610          # video top edge (below vocab panel)
-PANEL_Y = 170        # vocab panel top (below iPhone Dynamic Island / notch safe area)
-PANEL_H = 400
-SUB_EN_Y = 1300
-SUB_ZH_Y = 1465
+VID_Y = 656          # video top edge: centered (960-304)
+PANEL_Y = 100        # vocab panel top: close to Dynamic Island, no overlap
+PANEL_H = 400        # 4 rows
+PANEL_L = 200        # vocab text left
+PANEL_R = 700        # xn right
+ROW_H = 85           # row height for 4 rows
+SUB_EN_Y = 1330
+SUB_ZH_Y = 1430      # gap 100
 FONT = "Noto Sans CJK SC"
 
 WORD_RE = re.compile(r"[a-zA-Z][a-zA-Z\-']*[a-zA-Z]|[a-zA-Z]")
@@ -639,11 +723,15 @@ def _occurrences(segments: list[dict], vocab_index: dict) -> list[dict]:
                 if wl in vocab_index:
                     v = vocab_index[wl]
                     occs.append({"word": v["word"], "gloss": v.get("gloss", ""),
-                                 "count": v["count"], "start": w["start"]})
+                                 "count": v["count"], "start": w["start"],
+                                 "phonetic": v.get("phonetic", ""),
+                                 "is_phrase": v.get("is_phrase", False)})
         else:
             for v in _words_in(s["text"], vocab_index):
                 occs.append({"word": v["word"], "gloss": v.get("gloss", ""),
-                             "count": v["count"], "start": s["start"]})
+                             "count": v["count"], "start": s["start"],
+                             "phonetic": v.get("phonetic", ""),
+                             "is_phrase": v.get("is_phrase", False)})
     # drop consecutive duplicates of the same word (stutter in timestamps)
     dedup = []
     for o in occs:
@@ -651,6 +739,20 @@ def _occurrences(segments: list[dict], vocab_index: dict) -> list[dict]:
                 and o["start"] - dedup[-1]["start"] < 1.0:
             continue
         dedup.append(o)
+    # add phrase occurrences: match multi-word phrases against segment text
+    # (phrases don't have word-level timestamps, use segment start)
+    import re as _re2
+    phrases = [v for v in vocab_index.values() if v.get("is_phrase")]
+    for s in segments:
+        text_low = s["text"].lower()
+        for p in phrases:
+            pat = r"\b" + _re2.escape(p["word"].lower()) + r"\b"
+            if _re2.search(pat, text_low):
+                dedup.append({"word": p["word"], "gloss": p.get("gloss", ""),
+                              "count": p["count"], "start": s["start"],
+                              "is_phrase": True, "phonetic": ""})
+    # re-sort by start time (phrases were appended out of order)
+    dedup.sort(key=lambda o: o["start"])
     return dedup
 
 
@@ -677,16 +779,13 @@ def _highlight_vocab(text: str, vocab_words: list[str]) -> str:
 
 
 def build_ass(segments: list[dict], vocab: list[dict], total: float,
-              out_path: str, max_rows: int = 5):
+              out_path: str, max_rows: int = 4, traditional: bool = False):
     """ASS with: EN/ZH subtitles (explicit positions) + scrolling vocab panel.
 
     The vocab panel follows the speech: for each vocab-word occurrence
-    (word-level timestamps), the panel shows a 5-row window around the
-    current word, highlighted gold; header shows progress i/N.
-
-    NOTE: source attribution is a separate 2 s full-screen card
-    (make_source_card/make_source_intro), prepended via concat — NOT a
-    small overlay line. See SKILL.md §3a.
+    (word-level timestamps), the panel shows a 4-row window around the
+    current word. EN and ZH same size (52). Selected: EN+ZH+xn all gold,
+    no background highlight bar. Header shows progress i/N.
     """
     vocab_index = {v["word"]: v for v in vocab}
     vocab_words = [v["word"] for v in vocab]
@@ -709,10 +808,19 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
              "-1,0,0,0,100,100,0,0,1,3,0,5,60,60,40,1")
     L.append(f"Style: VH,{FONT},44,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,7,40,40,20,1")
-    L.append(f"Style: VW,{FONT},48,&H00E0E0E0,&H000019FF,&H00000000,&H80000000,"
-             "0,0,0,0,100,100,0,0,1,2,0,7,60,60,20,1")
-    L.append(f"Style: VWcur,{FONT},50,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
-             "-1,0,0,0,100,100,0,0,1,2,0,7,60,60,20,1")
+    # v12: EN/ZH same size 52, selected = gold bold, no background bar
+    L.append(f"Style: VE,{FONT},52,&H00E0E0E0,&H000019FF,&H00000000,&H80000000,"
+             "0,0,0,0,100,100,0,0,1,2,0,1,60,60,20,1")
+    L.append(f"Style: VEC,{FONT},52,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,1,60,60,20,1")
+    L.append(f"Style: VWzh,{FONT},52,&H00C0C0C0,&H000019FF,&H00000000,&H80000000,"
+             "0,0,0,0,100,100,0,0,1,2,0,1,60,60,20,1")
+    L.append(f"Style: VWzhCur,{FONT},52,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,1,60,60,20,1")
+    L.append(f"Style: VWct,{FONT},44,&H00A0A0A0,&H000019FF,&H00000000,&H80000000,"
+             "0,0,0,0,100,100,0,0,1,2,0,3,60,60,20,1")
+    L.append(f"Style: VWctCur,{FONT},44,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,3,60,60,20,1")
     L.append("")
     L.append("[Events]")
     L.append("Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
@@ -727,18 +835,16 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
         if zh:
             L.append(f"Dialogue: 0,{a},{b},ZH,,0,0,0,,{{\\pos(540,{SUB_ZH_Y})}}{zh}")
 
-    # ---- vocab panel: scrolling window around the current word ----
+    # ---- vocab panel: 4-row window, EN+ZH two lines, no highlight bar ----
     occs = _occurrences(segments, vocab_index)
     n = len(vocab)
     if occs:
-        # event boundaries: window i lasts from its word start
-        # (first window also covers t=0 .. first word) until next word starts
         seen_total = set()
         for i, o in enumerate(occs):
             a = _ass_time(o["start"] if i > 0 else 0.0)
             b = _ass_time(occs[i + 1]["start"] if i + 1 < len(occs) else total)
             seen_total.add(o["word"])
-            # unique-word window: current + up to 2 unique before/after
+            # 4-row window: 2 before + current + 1 after
             before, _seen_b = [], set()
             for w in reversed(occs[:i]):
                 if w["word"] != o["word"] and w["word"] not in _seen_b:
@@ -752,23 +858,42 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
                 if w["word"] != o["word"] and w["word"] not in _seen_a:
                     _seen_a.add(w["word"])
                     after.append(w)
-                    if len(after) == 2:
+                    if len(after) == 1:
                         break
             win = before + [o] + after
             cur_j = len(before)
+            hdr_txt = "本集生詞" if traditional else "本集生词"
+            unit_txt = "個" if traditional else "个"
             L.append(f"Dialogue: 0,{a},{b},VH,,0,0,0,,"
-                     f"{{\\pos(500,{PANEL_Y + 28})}}本集生词 {n} 个  "
+                     f"{{\\pos({PANEL_L},{PANEL_Y + 20})\\an1}}{hdr_txt} {n} {unit_txt}  "
                      f"{len(seen_total)}/{n}")
             for j, w in enumerate(win):
-                y = PANEL_Y + 88 + j * 72
-                style = "VWcur" if j == cur_j else "VW"
-                txt = (f"{_pad(w['word'], 18)}  "
-                         f"{w.get('gloss', '')}  \u00d7{w['count']}")
-                L.append(f"Dialogue: 0,{a},{b},{style},,0,0,0,,"
-                         f"{{\\pos(500,{y})}}{txt}")
+                is_cur = (j == cur_j)
+                y_en = PANEL_Y + 70 + j * ROW_H
+                y_zh = y_en + 42
+                word = w["word"]
+                phon = w.get("phonetic", "")
+                gloss = w.get("gloss", "")
+                count = w["count"]
+                is_phrase = w.get("is_phrase", False)
+                phon_str = f" /{phon}/" if phon and not is_phrase else ""
+                # EN line
+                st_en = "VEC" if is_cur else "VE"
+                L.append(f"Dialogue: 0,{a},{b},{st_en},,0,0,0,,"
+                         f"{{\\pos({PANEL_L},{y_en})\\an1}}{word}{phon_str}")
+                # xn (right)
+                st_ct = "VWctCur" if is_cur else "VWct"
+                L.append(f"Dialogue: 0,{a},{b},{st_ct},,0,0,0,,"
+                         f"{{\\pos({PANEL_R},{y_en})\\an3}}×{count}")
+                # ZH line (gloss)
+                st_zh = "VWzhCur" if is_cur else "VWzh"
+                L.append(f"Dialogue: 0,{a},{b},{st_zh},,0,0,0,,"
+                         f"{{\\pos({PANEL_L},{y_zh})\\an1}}{gloss}")
     else:
+        hdr_txt = "本集生詞" if traditional else "本集生词"
+        unit_txt = "個" if traditional else "个"
         L.append(f"Dialogue: 0,{_ass_time(0)},{_ass_time(total)},VH,,0,0,0,,"
-                 f"{{\\pos(500,{PANEL_Y + 28})}}本集生词 {n} 个")
+                 f"{{\\pos(500,{PANEL_Y + 28})}}{hdr_txt} {n} {unit_txt}")
 
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(L) + "\n")
@@ -780,16 +905,79 @@ def make_panel_bg(out_path: str):
     img.save(out_path)
 
 
+def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280, 180),
+                   name_end: float = 20.0, crop: tuple = (150, 85, 980, 551)) -> str:
+    """Prepare source with two-part logo removal (SKILL.md 9b).
+
+    0..name_end (name titles visible): NO crop, logo removed via OpenCV
+    inpainting (TELEA). Names stay fully visible.
+    After name_end: symmetric crop to exclude logo.
+    Both parts scaled to 1080x608 and concatenated.
+    logo_box: (x1,y1,x2,y2) of burned-in logo in 1280x720 source.
+    Returns out_path.
+    """
+    import cv2
+    import numpy as np
+    import tempfile
+    workdir = os.path.abspath(os.path.dirname(out_path) or ".")
+    out_path = os.path.abspath(out_path)
+    # Use workdir for temp files (not /tmp which is a small tmpfs)
+    part1 = os.path.join(workdir, "_src_part1.mp4")
+    part2 = os.path.join(workdir, "_src_part2.mp4")
+    cap = cv2.VideoCapture(source)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    x1, y1, x2, y2 = logo_box
+    mask = np.zeros((720, 1280), dtype=np.uint8)
+    mask[y1:y2, x1:x2] = 255
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    tmp1 = os.path.join(workdir, "_src_part1_raw.mp4")
+    out1 = cv2.VideoWriter(tmp1, fourcc, fps, (1280, 720))
+    for _ in range(int(fps * name_end)):
+        ret, frame = cap.read()
+        if not ret:
+            break
+        out1.write(cv2.inpaint(frame, mask, 3, cv2.INPAINT_TELEA))
+    cap.release()
+    out1.release()
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", tmp1,
+                    "-i", source, "-t", str(name_end),
+                    "-map", "0:v", "-map", "1:a",
+                    "-vf", "scale=1080:608,setsar=1",
+                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                    "-c:a", "aac", part1], check=True)
+    os.remove(tmp1)
+    cx, cy, cw, ch = crop
+    subprocess.run(["ffmpeg", "-y", "-v", "error",
+                    "-ss", str(name_end), "-i", source,
+                    "-vf", f"crop={cw}:{ch}:{cx}:{cy},scale=1080:608,setsar=1",
+                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                    "-c:a", "aac", part2], check=True)
+    lst = os.path.join(workdir, "_src_list.txt")
+    with open(lst, "w") as f:
+        f.write(f"file '{part1}'\nfile '{part2}'\n")
+    # Use concat filter (not demuxer) to fix timestamps correctly
+    subprocess.run(["ffmpeg", "-y", "-v", "error",
+                    "-i", part1, "-i", part2,
+                    "-filter_complex", "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[outv][outa]",
+                    "-map", "[outv]", "-map", "[outa]",
+                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                    "-c:a", "aac", out_path], check=True)
+    for p in (part1, part2, lst):
+        if os.path.exists(p):
+            os.remove(p)
+    return out_path
+
+
 def compose(source: str, segments: list[dict], vocab: list[dict],
             out_path: str, total: float | None = None,
-            preset: str | None = None):
+            preset: str | None = None, traditional: bool = False,
+            pre_cropped: bool = False):
     """Assemble the final vertical video. segments need 'zh' keys.
 
-    NOTE: burned-in source logos/watermarks are intentionally LEFT VISIBLE.
-    Do not blur/cover/remove them — obscuring rights-management info can
-    aggravate liability. Source attribution is a separate 2 s full-screen
-    card (make_source_card/make_source_intro, SKILL.md §3a), prepended
-    after compose via concat_mp4s.
+    pre_cropped: source already 1080x608 (via prepare_source()); skip
+    the internal symmetric crop.
+    NOTE: burned-in logos are removed via prepare_source() (inpainting
+    for name segment, symmetric crop after) -- NOT blurred. See 9a/9b.
     """
     preset = preset or os.environ.get("CLIP2VERTICAL_PRESET", "medium")
     missing = sum(1 for v in vocab if not v.get("gloss"))
@@ -809,15 +997,15 @@ def compose(source: str, segments: list[dict], vocab: list[dict],
     workdir = os.path.dirname(out_path)
     ass_path = os.path.join(workdir, "_compose.ass")
     panel_path = os.path.join(workdir, "_panel.png")
-    build_ass(segments, vocab, total, ass_path)
+    build_ass(segments, vocab, total, ass_path, traditional=traditional)
     make_panel_bg(panel_path)
 
-    # No logo blur: source watermarks stay visible (see docstring).
+    # v12: symmetric crop (150px each side) unless pre_cropped via prepare_source()
+    _crop = "" if pre_cropped else "crop=980:551:150:85,"
     vf = (
-        "[0:v]scale=1080:608:force_original_aspect_ratio=increase,"
-        "crop=1080:608,setsar=1,fps=30[v];"
+        f"[0:v]{_crop}scale=1080:608,setsar=1,fps=30[v];"
         f"[v]pad=1080:1920:0:{VID_Y}:color=black[vp];"
-        "[vp][1:v]overlay=0:170[v2];"
+        "[vp][1:v]overlay=0:100[v2];"
         f"[v2]subtitles={ass_path}:fontsdir=/usr/share/fonts,format=yuv420p[out]"
     )
     cmd = ["ffmpeg", "-y", "-v", "error",
@@ -1163,7 +1351,8 @@ def make_vocab_excel(vocab: list, title: str, out_dir: str) -> str:
 
 
 def make_outro_card(vocab_count: int, out_png: str, badge: str = "",
-                    W: int = 1080, H: int = 1920):
+                    W: int = 1080, H: int = 1920,
+                    traditional: bool = False):
     """4-second end card: join the fan group to get the vocab Excel."""
     from PIL import Image, ImageDraw, ImageFont, ImageFilter
     fb = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
@@ -1193,10 +1382,16 @@ def make_outro_card(vocab_count: int, out_png: str, badge: str = "",
         f2 = ImageFont.truetype(fp, size)
         bb2 = d.textbbox((0, 0), s, font=f2)
         d.text(((W - (bb2[2] - bb2[0])) / 2, y), s, font=f2, fill=fill)
-    tc(800, "加入粉丝群", 110, (255, 200, 70))
-    tc(960, "领取本集生词清单", 72, (255, 255, 255))
-    tc(1070, f"{vocab_count} 个生词 · 中英对照 Excel", 48,
-       (255, 200, 70), fr)
+    if traditional:
+        tc(800, "加入粉絲群", 110, (255, 200, 70))
+        tc(960, "領取本集生詞清單", 72, (255, 255, 255))
+        tc(1070, f"{vocab_count} 個生詞 · 中英對照 Excel", 48,
+           (255, 200, 70), fr)
+    else:
+        tc(800, "加入粉丝群", 110, (255, 200, 70))
+        tc(960, "领取本集生词清单", 72, (255, 255, 255))
+        tc(1070, f"{vocab_count} 个生词 · 中英对照 Excel", 48,
+           (255, 200, 70), fr)
     if badge:
         tc(H - 220, badge, 52, (255, 255, 255), fr)
     img.save(out_png)
@@ -1204,11 +1399,12 @@ def make_outro_card(vocab_count: int, out_png: str, badge: str = "",
 
 
 def make_outro(vocab_count: int, out_mp4: str, badge: str = "",
-               duration: float = 4.0, fps: int = 30) -> str:
+               duration: float = 4.0, fps: int = 30,
+               traditional: bool = False) -> str:
     """Render the 4 s end card to mp4 (with silent audio for concat)."""
     import subprocess
     png = out_mp4 + ".card.png"
-    make_outro_card(vocab_count, png, badge)
+    make_outro_card(vocab_count, png, badge, traditional=traditional)
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
          "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
@@ -1233,7 +1429,8 @@ def append_outro(main_mp4: str, outro_mp4: str, out_mp4: str) -> str:
 
 
 def make_source_card(source_name: str, out_png: str,
-                     W: int = 1080, H: int = 1920) -> str:
+                     W: int = 1080, H: int = 1920,
+                     traditional: bool = False) -> str:
     """2-second full-screen source card: declares the video source AND the
     educational purpose. Shown as a dedicated card, NOT a small overlay."""
     from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -1261,20 +1458,27 @@ def make_source_card(source_name: str, out_png: str,
         f2 = ImageFont.truetype(fp, size)
         bb2 = d.textbbox((0, 0), s, font=f2)
         d.text(((W - (bb2[2] - bb2[0])) / 2, y), s, font=f2, fill=fill)
-    tc(800, "视频来源", 72, (255, 255, 255), fr)
-    tc(900, source_name, 96, (255, 200, 70))
-    tc(1080, "本视频仅作英语学习教育用途", 54, (255, 255, 255), fr)
-    tc(1180, "中英逐句翻译 · 生词精讲", 48, (255, 200, 70), fr)
+    if traditional:
+        tc(800, "視頻來源", 72, (255, 255, 255), fr)
+        tc(900, source_name, 96, (255, 200, 70))
+        tc(1080, "本視頻僅作英語學習教育用途", 54, (255, 255, 255), fr)
+        tc(1180, "中英逐句翻譯 · 生詞精講", 48, (255, 200, 70), fr)
+    else:
+        tc(800, "视频来源", 72, (255, 255, 255), fr)
+        tc(900, source_name, 96, (255, 200, 70))
+        tc(1080, "本视频仅作英语学习教育用途", 54, (255, 255, 255), fr)
+        tc(1180, "中英逐句翻译 · 生词精讲", 48, (255, 200, 70), fr)
     img.save(out_png)
     return out_png
 
 
 def make_source_intro(source_name: str, out_mp4: str,
-                      duration: float = 2.0, fps: int = 30) -> str:
+                      duration: float = 2.0, fps: int = 30,
+                      traditional: bool = False) -> str:
     """Render the 2 s source card to mp4 (with silent audio for concat)."""
     import subprocess
     png = out_mp4 + ".card.png"
-    make_source_card(source_name, png)
+    make_source_card(source_name, png, traditional=traditional)
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
          "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
@@ -1300,6 +1504,56 @@ def concat_mp4s(parts: list[str], out_mp4: str) -> str:
          "-movflags", "+faststart", out_mp4],
         check=True)
     return out_mp4
+
+
+def crop_speaker(source: str, start: float, dur: float,
+                 crop_x: int, crop_y: int, crop_w: int = 640,
+                 crop_h: int = 360, out_path: str = "",
+                 preset: str | None = None) -> str:
+    """Extract a tight per-speaker crop from the source video.
+
+    For dynamic speaker switching (§9a): each speaker gets a tight 16:9
+    crop that excludes burned-in logos by framing (NOT by blurring).
+    Example (1280x720 source, Korea Society):
+      Jensen (left):  crop_x=0,   crop_y=200
+      Juju (right):   crop_x=640, crop_y=200
+    Both are 640x360, scaled to 1080x608 for the vertical layout.
+    """
+    import subprocess
+    preset = preset or os.environ.get("CLIP2VERTICAL_PRESET", "medium")
+    subprocess.run(
+        ["ffmpeg", "-y", "-v", "error",
+         "-ss", str(start), "-i", source, "-t", str(dur),
+         "-vf", f"crop={crop_w}:{crop_h}:{crop_x}:{crop_y},scale=1080:608",
+         "-c:v", "libx264", "-preset", preset, "-crf", "20",
+         "-c:a", "aac", "-b:a", "128k", out_path],
+        check=True)
+    return out_path
+
+
+def assemble_dynamic(timeline: list[dict], out_path: str) -> str:
+    """Assemble dynamic speaker-switching video from a timeline.
+
+    timeline: [{start, dur, crop_x, crop_y, tmp}, ...] — each entry is
+    rendered via crop_speaker() then concatenated in order.
+    The result switches framing to whoever is speaking (vivid, dynamic).
+    """
+    import subprocess
+    import tempfile
+    import os as _os
+    parts = []
+    tmpdir = tempfile.mkdtemp(prefix="dyn_")
+    try:
+        for i, seg in enumerate(timeline):
+            part = _os.path.join(tmpdir, f"part_{i:04d}.mp4")
+            crop_speaker(seg["source"], seg["start"], seg["dur"],
+                         seg["crop_x"], seg.get("crop_y", 200),
+                         out_path=part)
+            parts.append(part)
+        return concat_mp4s(parts, out_path)
+    finally:
+        import shutil
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 def check_redistribution(url: str) -> dict:
