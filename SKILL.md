@@ -94,6 +94,11 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   VAD. Then `merge_short()` and `split_sentences()` so every subtitle
   event is exactly one sentence — this is a hard requirement, never show
   two sentences in one subtitle card.
+- **Filter non-speech segments** (2026-10-17 user rule): remove segments
+  that are not human speech — sound effects ("Heat. Heat."), music beats,
+  pure countdown numbers ("4 3 2 1"), lone filler words ("like") with no
+  content. These clutter the learning experience. Delete them before
+  translating (reindex after removal).
 
 ### 5. Translate
 
@@ -118,6 +123,12 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
     don't fabricate complete sentences from them
   - If Chinese is slightly stiff but accurate, prefer accuracy over fluency
   - Students use these videos to learn; every mismatch erodes trust
+- **Use the most capable model for translation** (2026-10-17 user rule):
+  do not use a weak/fast model to save time. Translation quality is the
+  core value for students. After machine translation, do a full human
+  review pass checking for: missed translations (EN content absent in ZH),
+  wrong translations (ZH meaning ≠ EN meaning), and over-paraphrasing.
+  Fix all before composing.
 
 ### 5b. Proofread the English transcription — mandatory (2026-10-17)
 
@@ -188,6 +199,12 @@ product spec, do not weaken them:
 - Drop: any word whose lemma is in the CET-4 set (already known).
 - Drop: any word with `wordfreq.zipf_frequency > 4.6` (known to any
   CET-4 learner even if untagged).
+- **STRICT enforcement** (2026-10-17 user audit): the CET-4 exclusion must
+  be verified word by word. A lax pass once shipped "we'd", "demo",
+  "driver's", "manually" — all below CET-4 level — in a student-facing
+  video. After extraction, audit the final list: if any word is basic
+  enough that a CET-4 passer surely knows it, remove it. Never ship a
+  vocab panel with trivial words.
 - **Hard rule: the Python running this stage MUST have `wordfreq`
   installed. If the import fails, abort loudly — never silently skip the
   zipf filter.** (A silent skip once shipped a whole video of trivial
@@ -254,8 +271,22 @@ transparent. 5-row scrolling window follows speech. Implemented in
 - Subtitles, one segment at a time: English at y=1300 (white; words that
   are in the vocab list highlighted yellow-bold), Chinese at y=1440
   (gold). English and Chinese must never overlap or cover each other.
+- **Subtitle wrapping, never truncation** (2026-10-17 user rule): long
+  subtitles MUST wrap to multiple lines, NEVER be cut off. Follow movie
+  subtitle conventions:
+  - Chinese: break at punctuation (，。！？；：、), max ~17 full-width units
+    per line; if no punctuation, split evenly by character count
+  - English: break at word boundaries, balance line lengths
+  - Prefer one line per sentence; wrap only when necessary; never drop
+    characters to avoid wrapping
+  - Adjust Y position for multi-line: EN moves up, ZH moves down, keeping
+    the "four no-touches" layout intact
 - Interface stays clean and minimal. Only real footage from the source
   interview — never AI-generated visuals or stock filler.
+- **Crop must preserve headroom** (2026-10-17 user rule): when cropping
+  to remove logos, NEVER cut off speakers' heads. The default symmetric
+  crop's top offset must be 0 (not 85px). Verify with frame extraction at
+  talking-head timestamps before full render.
 
 ### 9a. Logo exclusion by symmetric crop (mandatory)
 
