@@ -226,18 +226,18 @@ product spec, do not weaken them:
   panel as `中文 /phonetic/` — a SINGLE slash pair AFTER the Chinese
   gloss, never before it (2026-10-17 user rule: `//` double slashes
   banned; phonetic-after-gloss keeps long phonetics from overlapping
-  the ×N column). Learned from @mjenglish.
+  the ×N column).
 - Phrases: extract idiomatic multi-word expressions via
   `clipper.extract_phrases()` (matches against `idioms.txt`), e.g.
   "punch above your weight", "a walk in the park". Phrases get Chinese
   glosses but no phonetics. They appear in the panel interleaved with
-  words by frequency. Learned from @mjenglish.
+  words by frequency.
 
 ### 8. Sample frames before the full render
 
-### 7b. Vocab panel — @mjenglish two-line format (2026-10-16)
+### 7b. Vocab panel — two-line format (2026-10-16)
 
-Each vocab item uses TWO lines (learned from @mjenglish reference):
+Each vocab item uses TWO lines:
 - Line 1: English word (large, left) + ×count (right-aligned in its own
   column at PANEL_R — NEVER inline, fixes the 2026-10-16 ×n cutoff bug)
 - Line 2: Chinese gloss + phonetic /.../ (smaller, left)
@@ -362,16 +362,6 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   for Traditional cards and panel headers. (Source intro cancelled 2026-10-16.)
 - The Traditional version goes to TikTok; Simplified goes to Douyin.
 - Titles/descriptions/tags should also be in Traditional for TikTok.
-
-### 14c. Learned from @mjenglish (reference implementation)
-
-The channel @mjenglish produces similar English-learning videos from
-interviews. Techniques adopted into this skill:
-- Phrases: extract idiomatic multi-word expressions (not just single
-  words), e.g. "punch above your weight". See §7.
-- Phonetics: IPA symbols in the vocab panel. See §7.
-- Panel layout: vocab on top, subtitles at bottom (mobile vertical).
-- Credit illustrative images properly (they use Wikimedia Commons).
 
 ### 15. Publish
 
