@@ -172,7 +172,7 @@ def cmd_run(a):
               "handle episodes manually per SKILL.md.")
     else:
         badge = (input("       Account badge for outro card "
-                       "[RealTalk英语课]: ").strip() or "RealTalk英语课")
+                       "[RealTalk英语精选]: ").strip() or "RealTalk英语精选")
         outro = os.path.join(WORK, "outro.mp4")
         clipper.make_outro(len(vocab), outro, badge)
         final_out = os.path.join(WORK, "final_with_cards.mp4")
