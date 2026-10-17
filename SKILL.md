@@ -57,6 +57,10 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   source there. Drop or clamp any subtitle segments beyond the cut point.
 - This is the user's explicit copyright requirement: no third-party
   logos or idents in the first OR last seconds.
+- **Re-extract vocab after any trim** (2026-10-17 user rule): if the video
+  start/end changes (e.g. trimming the opening), re-run vocab extraction on
+  the new segment range and drop words that no longer appear. Do not ship a
+  vocab panel containing words from cut footage.
 
 ### 3. Burned-in corner logos — keep them visible
 
@@ -96,6 +100,24 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
 - `clipper.translate_batch()`: English → Simplified Chinese, one line per
   segment, spoken subtitle style. Review the output; fix any mistranslated
   key terms by hand before composing.
+- **Accuracy first** (2026-10-17 user rule): "尽量让用户看着不累，但要保证
+  中英文翻译正确" — translation accuracy outranks brevity. Do NOT hard-truncate
+  Chinese to a character limit at the cost of meaning. Keep translations
+  natural and complete; the 24-char guideline is a comfort target, not a
+  hard ceiling.
+- **Proactive self-check** (2026-10-17 user rule "举一反三"): when the user
+  points out one translation error, audit ALL segments for the same class of
+  error (misalignment, dropped content, wrong segment assignment) and fix
+  them in one batch — do not make the user hunt for more.
+
+### 5a. Fix subtitle overlaps — mandatory (2026-10-17)
+
+- YouTube auto-subs frequently have `end > next start`, causing two
+  subtitles to display simultaneously (user sees duplicate overlapping
+  translations).
+- Run `clipper.fix_overlaps(segments)` after loading segments and before
+  composing. This clamps each segment's end to the next segment's start,
+  so each translation displays exactly once.
 
 ### 6. Content screening — mandatory
 
@@ -163,7 +185,10 @@ product spec, do not weaken them:
   words must equal the vocab size.
 - Phonetics: every single word gets an IPA phonetic symbol from
   `phonetics.json` (via `clipper.add_phonetics()`), displayed in the
-  panel as `word /phonetic/ 中文`. Learned from @mjenglish.
+  panel as `中文 /phonetic/` — a SINGLE slash pair AFTER the Chinese
+  gloss, never before it (2026-10-17 user rule: `//` double slashes
+  banned; phonetic-after-gloss keeps long phonetics from overlapping
+  the ×N column). Learned from @mjenglish.
 - Phrases: extract idiomatic multi-word expressions via
   `clipper.extract_phrases()` (matches against `idioms.txt`), e.g.
   "punch above your weight", "a walk in the park". Phrases get Chinese
