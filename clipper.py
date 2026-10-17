@@ -876,19 +876,19 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
                 gloss = w.get("gloss", "")
                 count = w["count"]
                 is_phrase = w.get("is_phrase", False)
-                phon_str = f" /{phon}/" if phon and not is_phrase else ""
-                # EN line
+                # EN line: word only (phonetic moved to ZH line per 2026-10-17 user request)
                 st_en = "VEC" if is_cur else "VE"
                 L.append(f"Dialogue: 0,{a},{b},{st_en},,0,0,0,,"
-                         f"{{\\pos({PANEL_L},{y_en})\\an1}}{word}{phon_str}")
+                         f"{{\\pos({PANEL_L},{y_en})\\an1}}{word}")
                 # xn (right)
                 st_ct = "VWctCur" if is_cur else "VWct"
                 L.append(f"Dialogue: 0,{a},{b},{st_ct},,0,0,0,,"
                          f"{{\\pos({PANEL_R},{y_en})\\an3}}×{count}")
-                # ZH line (gloss)
+                # ZH line: gloss + phonetic (so long phonetics don't overlap ×N)
+                phon_str = f" /{phon}/" if phon and not is_phrase else ""
                 st_zh = "VWzhCur" if is_cur else "VWzh"
                 L.append(f"Dialogue: 0,{a},{b},{st_zh},,0,0,0,,"
-                         f"{{\\pos({PANEL_L},{y_zh})\\an1}}{gloss}")
+                         f"{{\\pos({PANEL_L},{y_zh})\\an1}}{gloss}{phon_str}")
     else:
         hdr_txt = "本集生詞" if traditional else "本集生词"
         unit_txt = "個" if traditional else "个"
@@ -966,6 +966,20 @@ def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280
         if os.path.exists(p):
             os.remove(p)
     return out_path
+
+
+def fix_overlaps(segments: list[dict]) -> list[dict]:
+    """Clamp overlapping subtitle time ranges.
+
+    YouTube auto-subs often have end > next start, causing two subtitles
+    to display simultaneously. This sets each segment's end to the next
+    segment's start, so each translation shows exactly once.
+    (Added 2026-10-17: user reported duplicate overlapping subtitles.)
+    """
+    for i in range(len(segments) - 1):
+        if segments[i]["end"] > segments[i + 1]["start"]:
+            segments[i]["end"] = segments[i + 1]["start"]
+    return segments
 
 
 def compose(source: str, segments: list[dict], vocab: list[dict],
@@ -1198,10 +1212,7 @@ def make_covers(frame_png: str, title_lines: list, kicker: str,
     fb = font_bold or "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
     fr = font_reg or "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
     src = Image.open(frame_png).convert("RGB")
-    # blur any burned-in corner logo before using the frame
-    w0, h0 = src.size
-    lg = src.crop((w0 - 175, 0, w0, 130)).filter(ImageFilter.GaussianBlur(14))
-    src.paste(lg, (w0 - 175, 0))
+    # v13: no corner blur - source already clean (symmetric crop removed logo)
     os.makedirs(out_dir, exist_ok=True)
 
     def base(W, H, fg_w, fg_h, fg_y):
