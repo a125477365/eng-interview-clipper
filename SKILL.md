@@ -62,31 +62,18 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   the new segment range and drop words that no longer appear. Do not ship a
   vocab panel containing words from cut footage.
 
-### 3. Burned-in corner logos — keep them visible
+### 3. Burned-in logos — per-video decision (2026-10-17 user rule)
 
-- If the source has a burned-in logo/watermark, LEAVE IT VISIBLE. Do NOT
-  blur, cover, or remove it. Obscuring rights-management information can
-  aggravate liability and looks like hiding the source; a clear source
-  attribution (§3a) is the correct approach. `clipper.compose()` no longer
-  blurs anything — this is deliberate.
+- Whether to remove a burned-in logo/watermark, whether to crop the video,
+  and whether to use AI inpainting are decided PER VIDEO with the user.
+  Do NOT put fixed logo/crop/AI-edit rules in the skill.
+- `clipper.compose()` does not blur anything by default.
 
-### 3a. Source card — 2 s full-screen (mandatory)
+### 3a. Source card — CANCELLED (2026-10-16 user decision)
 
-- Every video OPENS with a dedicated 2-second full-screen card (1080x1920),
-  NOT a small overlay line. It declares the source AND the educational
-  purpose, e.g.:
-
-  ```
-  视频来源
-  Korea Society
-  本视频仅作英语学习教育用途
-  中英逐句翻译 · 生词精讲
-  ```
-
-- Build it with `clipper.make_source_card(source_name, out_png)` then
-  `clipper.make_source_intro(source_name, out_mp4)` (2 s, silent audio
-  for concat). Prepend with `clipper.concat_mp4s([intro, main, outro])`.
-  Never ship a video without it.
+- User cancelled the 2-second source/usage intro card. Videos now open
+  directly with the main content (no intro card). Do NOT generate or
+  prepend it. Final structure: main video + 4 s fan-group outro (§14).
 
 ### 4. Transcribe
 
@@ -172,8 +159,8 @@ Reposting an interview with subtitles is reproduction + adaptation of
 someone else's copyrighted work. Subtitles and vocab panels do not make it
 yours. Practical rules (not legal advice):
 
-- ALWAYS credit the source (§3a, never skipped) and NEVER obscure, blur,
-  or remove source logos or watermarks (§3).
+- Credit the source in the video title/description; NEVER blur or mosaic
+  source logos — crop them out via §9a instead (§3).
 - BEFORE downloading, run the redistribution check (§0): if the source
   explicitly prohibits rebroadcasting, STOP and tell the user — do not
   generate the video.
@@ -288,18 +275,12 @@ transparent. 5-row scrolling window follows speech. Implemented in
   crop's top offset must be 0 (not 85px). Verify with frame extraction at
   talking-head timestamps before full render.
 
-### 9a. Logo exclusion by symmetric crop (mandatory)
+### 9a. Logo exclusion — per-video decision (2026-10-17 user rule)
 
-Burned-in source logos/watermarks must be cropped OUT of the frame —
-NEVER blurred or mosaicked (user requirement 2026-10-16).
-
-Method: symmetric center crop. Crop equal amounts from left and right
-(towards the center) so the logo falls outside the frame while both
-speakers stay fully visible and the image stays balanced.
-
-For 1280x720 source (Korea Society, logo top-right at x>1130):
-`crop=980:551:150:85` — 150px from each side, 16:9 preserved, scaled to
-1080x608. Both Jensen and Juju fully visible, no logo.
+- How to handle burned-in logos (crop / inpaint / leave) is decided per
+  video with the user — see §3. No fixed method in the skill.
+- If cropping is chosen: keep top offset=0 to preserve speakers' heads
+  (2026-10-17 lesson: top=85 cut off heads).
 
 Do NOT use tight per-speaker crops — they don't suit vertical display
 (user feedback 2026-10-16: "裁剪的话不适合竖屏显示").
@@ -358,12 +339,11 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   account badge at the bottom. Silent audio.
 - The 4 s is appended AFTER the 59-minute content: episode = 59:00 + 0:04.
 
-### 14a. Final assembly — always card + main + outro
+### 14a. Final assembly — main + outro (source card cancelled 2026-10-16)
 
-- The finished video is ALWAYS: 2 s source card (§3a) + main video (§9) +
-  4 s outro (§14), joined with
-  `clipper.concat_mp4s([intro_mp4, main_mp4, outro_mp4], final_mp4)`.
-- Total must stay under the platform limit (§12). If main + 6 s exceeds
+- The finished video is: main video (§9) + 4 s outro (§14), joined with
+  `clipper.concat_mp4s([main_mp4, outro_mp4], final_mp4)`.
+- Total must stay under the platform limit (§12). If main + 4 s exceeds
   1 h, split into episodes FIRST (§12), then assemble each episode.
 
 ### 14b. Traditional Chinese version (for TikTok)
@@ -373,8 +353,8 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   vocab glosses) via `clipper.to_traditional()` (OpenCC s2t) BEFORE
   composing. Use `clipper.vocab_to_traditional(vocab)` and
   `clipper.segments_to_traditional(segments)`.
-- Pass `traditional=True` to `clipper.compose()`, `make_source_intro()`,
-  and `make_outro()` for Traditional cards and panel headers.
+- Pass `traditional=True` to `clipper.compose()` and `make_outro()`
+  for Traditional cards and panel headers. (Source intro cancelled 2026-10-16.)
 - The Traditional version goes to TikTok; Simplified goes to Douyin.
 - Titles/descriptions/tags should also be in Traditional for TikTok.
 
@@ -416,12 +396,37 @@ interviews. Techniques adopted into this skill:
   `python run.py --build-exam-words`: one-time exam-word build.
 - `requirements.txt` — Python dependencies.
 
-### 9b. v12 定稿布局（2026-10-16 用户确认）
+### 9b. v12 定稿布局（2026-10-16 用户确认，仅适用于该视频）
 
-- 生词栏：4 行（非 5 行），中英同字号 52，选中时中英×n 全部变金色，无背景高亮条
+- 生词栏：4 行（非 5 行），中英同字号 52，选中时中英×n 全部变金色，无背景高亮条；未选中词白色、小一号（44 vs 选中 52）
 - 视频居中：横中线在 y=960（VID_Y=656）
 - 字幕：EN y=1330，ZH y=1430（间距 100）
-- 开场 0-20s（姓名条时段）：不裁剪，用 AI inpainting 去 logo，姓名完整保留
-- 20s 后：对称裁剪（crop=980:551:150:85）去 logo
-- 无 2 秒来源卡（logo 已去）；片尾保留 4 秒进群卡
+- （该视频的 logo 处理方案，用户单独决定：开场 0-20s 姓名条时段用 AI inpainting 去 logo；20s 后对称裁剪去 logo，top offset=0 保头部）
+- 无 2 秒来源卡；片尾保留 4 秒进群卡
 - 输出 <1GB
+
+### 9c. 长期规则补遗（2026-10-16/17 用户立下，之前漏记）
+
+- **核实截图必须带字幕**：发布前的开始/中间/结束 3 张截图必须含字幕区+生词栏完整界面，无字幕用户无法审批布局
+- **插图可放生词界面左侧**：独立于裁剪方案的长期要求
+- **不压制画质**：成片在 1GB 上限内用原画质直接发布，不为上传压缩（2026-10-17 用户否决压缩提议）
+- **生词栏标题**（"本集生词 N 个"）：与生词列表左对齐并拉开距离，不得重叠
+- **面板位置**：y=180，接近灵动岛但不被覆盖（v13 定版）
+- **剪辑范围变化后生词重梳**：重剪后生词表按新范围重新提取
+- **封面用户图零修改**：用户提供的封面截图一像素不能改，只能在文字区等背景元素叠加，前景零遮挡
+
+### 9d. MEMORY–SKILL 同步铁律（2026-10-17 教训）
+
+- 用户关于视频制作的任何新要求/取消/修改，**同一 turn 内必须同时更新 MEMORY.md 和 SKILL.md**，做完前者不许开始干活
+- SKILL 是唯一执行依据：渲染前对照 SKILL 逐项检查，不凭记忆
+- MEMORY 与 SKILL 不一致时，以用户最新指示为准，并立即修正落后的一方
+
+### 9e. Skill 维护规则（2026-10-17 用户立下）
+
+- 用户提新要求时：skill 里已有 → 不动；没有 → 补上；有冲突 → 用最终选择的要求，把冲突的旧条删掉
+- 目标：skill 里没有重复、没有冲突的要求
+
+### 9f. 渲染中自核（2026-10-17 用户立下）
+
+- 渲染过程中必须自己核对：抽帧检查声音与字幕是否一致（随机抽 3-5 处，听音频对字幕）
+- 发现不一致立即停渲修复，不把问题留给用户发现
