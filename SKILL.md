@@ -216,6 +216,11 @@ product spec, do not weaken them:
   `-`/`'` silently drops such words and the panel progress stalls
   (the 72/108 incident). Verify with `_occurrences()`: unique matched
   words must equal the vocab size.
+- **Progress must reach N** (2026-10-17 user rule): if the panel says
+  "本集生词 100 个", all 100 words must actually appear during playback —
+  the video must not end with the counter stuck at 90/100. After composing,
+  verify the max progress reached equals the vocab size. If any word never
+  triggers, fix the occurrence matching before shipping.
 - Phonetics: every single word gets an IPA phonetic symbol from
   `phonetics.json` (via `clipper.add_phonetics()`), displayed in the
   panel as `中文 /phonetic/` — a SINGLE slash pair AFTER the Chinese
@@ -430,3 +435,10 @@ interviews. Techniques adopted into this skill:
 
 - 渲染过程中必须自己核对：抽帧检查声音与字幕是否一致（随机抽 3-5 处，听音频对字幕）
 - 发现不一致立即停渲修复，不把问题留给用户发现
+
+### 9g. 要求分类规则（2026-10-17 用户立下）
+
+- 用户每提一条要求，先自行判断是**通用要求**还是**仅适用于该视频**：
+  - 通用要求 → 按 §9e 规则更新到 skill（已有→不动，没有→补上，冲突→用最终版删旧条，保证无重复无冲突）
+  - 仅适用于该视频 → 不更新到 skill，只在该视频执行
+- 本条元规则本身是通用要求，已记入 skill
