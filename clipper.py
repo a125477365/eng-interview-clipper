@@ -561,7 +561,7 @@ def gloss(vocab: list[dict], translate_fn) -> list[dict]:
 def add_phonetics(vocab: list[dict], phon_path: str | None = None) -> list[dict]:
     """Add IPA phonetic symbols to vocab entries from phonetics.json.
 
-    Learned from @mjenglish: phonetics help learners pronounce correctly.
+    Phonetics help learners pronounce correctly.
     Words without a phonetic entry get an empty string (panel skips it).
     """
     import json as _json
@@ -582,7 +582,7 @@ def extract_phrases(segments: list[dict], idiom_path: str | None = None,
                     min_count: int = 1) -> list[dict]:
     """Extract idiomatic phrases (not just single words) from the transcript.
 
-    Learned from @mjenglish: phrases like "punch above your weight" and
+    Phrases like "punch above your weight" and
     "a walk in the park" are high-value for learners. Matches against a
     curated idiom list (idioms.txt). Returns [{word, count, is_phrase=True}].
     """
