@@ -109,6 +109,35 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   points out one translation error, audit ALL segments for the same class of
   error (misalignment, dropped content, wrong segment assignment) and fix
   them in one batch — do not make the user hunt for more.
+- **Faithful translation, no paraphrasing** (2026-10-17 user rule, for
+  educational use): translate what the English SAYS, not what you think it
+  should say. Rules:
+  - No added content (e.g. don't insert "工程师" if English doesn't say it)
+  - No dropped content (e.g. keep "incredible" if English says it)
+  - No invented meaning for fragments — translate fragments literally,
+    don't fabricate complete sentences from them
+  - If Chinese is slightly stiff but accurate, prefer accuracy over fluency
+  - Students use these videos to learn; every mismatch erodes trust
+
+### 5b. Proofread the English transcription — mandatory (2026-10-17)
+
+- YouTube auto-transcription has systematic errors. Before translating,
+  proofread the FULL English text and fix:
+  - Proper nouns: names (Franz not Fron), places, brands
+  - Technical terms: "Mach diamonds" not "mock diamonds", "yoke" not "yolk",
+    "carbon overwrapped" not "carbon overlay"
+  - Homophones in context: "coy" not "koi", "Roadster" not "roster",
+    "top speed" not "tough speed"
+  - Numbers: "0.81 seconds" not "081 seconds"
+- When uncertain, flag the segment for the user to verify against the audio.
+  Never guess silently on educational content.
+- **Re-extract vocab AFTER fixing English** (2026-10-17): vocab extracted
+  from uncorrected transcription will contain ghost words (e.g. "mock",
+  "yolk") that don't exist in the real speech. Always run vocab extraction
+  on the CORRECTED English text.
+- **Vocab count must match cover** (2026-10-17): if the final vocab count
+  differs from the number on the cover (e.g. 63 vs 64), update the cover
+  text. Never ship a mismatch.
 
 ### 5a. Fix subtitle overlaps — mandatory (2026-10-17)
 
