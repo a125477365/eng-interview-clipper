@@ -778,6 +778,132 @@ def _highlight_vocab(text: str, vocab_words: list[str]) -> str:
     return pat.sub(_rep, text)
 
 
+def _strip_ass_tags(text: str) -> str:
+    """Remove ASS override tags {...} for width measurement."""
+    return re.sub(r"\{[^}]*\}", "", text)
+
+
+def _dwidth_char(ch: str) -> float:
+    """Display width: CJK full-width = 1.0, ASCII half-width = 0.5."""
+    o = ord(ch)
+    # CJK Unified Ideographs, CJK punctuation, fullwidth forms
+    if (0x4E00 <= o <= 0x9FFF or 0x3400 <= o <= 0x4DBF or
+            0x3000 <= o <= 0x303F or 0xFF00 <= o <= 0xFFEF):
+        return 1.0
+    return 0.5
+
+
+def _text_dwidth(text: str) -> float:
+    """Total display width in full-width units (tags excluded)."""
+    return sum(_dwidth_char(c) for c in _strip_ass_tags(text))
+
+
+# Punctuation after which a Chinese line may break (break AFTER these)
+_ZH_BREAK_AFTER = "，。！？；：、）】」』…·—～"
+
+
+def _wrap_zh(text: str, max_units: float = 17.0) -> list[str]:
+    """Wrap Chinese subtitle into lines.
+
+    Movie convention: break after punctuation, balance line lengths,
+    never break a character, NEVER truncate. Prefers 2 lines; uses 3
+    for very long text rather than dropping characters. If a single
+    "sentence" needs 3+ lines, the source segment is too long and
+    should be split upstream (but we never drop text here).
+    """
+    text = text.strip()
+    if not text or _text_dwidth(text) <= max_units:
+        return [text]
+
+    def _split_once(t: str) -> list[str]:
+        """Split into 2 at the best punctuation boundary."""
+        total = _text_dwidth(t)
+        cands = []
+        w = 0.0
+        for i, ch in enumerate(t):
+            w += _dwidth_char(ch)
+            if ch in _ZH_BREAK_AFTER and 0 < w < total:
+                cands.append((i + 1, w))
+        if cands:
+            half = total / 2
+            best_pos, _ = min(cands, key=lambda p: abs(p[1] - half))
+            return [t[:best_pos].strip(), t[best_pos:].strip()]
+        # Fallback: balanced character split
+        w = 0.0
+        half = total / 2
+        best_i, best_d = 1, float("inf")
+        for i in range(1, len(t)):
+            w += _dwidth_char(t[i - 1])
+            d = abs(w - half)
+            if d < best_d:
+                best_d, best_i = d, i
+        return [t[:best_i].strip(), t[best_i:].strip()]
+
+    lines = [text]
+    # Recursively split the longest line until all fit (max 4 iterations)
+    for _ in range(4):
+        # Find the longest line
+        idx = max(range(len(lines)), key=lambda i: _text_dwidth(lines[i]))
+        if _text_dwidth(lines[idx]) <= max_units:
+            break
+        parts = _split_once(lines[idx])
+        lines = lines[:idx] + parts + lines[idx + 1:]
+    return [l for l in lines if l]
+
+
+def _wrap_en(text: str, max_units: float = 30.0) -> list[str]:
+    """Wrap English subtitle into at most 2 lines at word boundaries.
+
+    Never breaks a word, NEVER truncates. Balances the two lines.
+    """
+    text = re.sub(r"\s+", " ", text).strip()
+    if not text or _text_dwidth(text) <= max_units:
+        return [text]
+    words = text.split(" ")
+    # Try every split point, pick the most balanced one where
+    # both lines fit within max_units
+    total = _text_dwidth(text)
+    best = None
+    best_d = float("inf")
+    for i in range(1, len(words)):
+        l1 = " ".join(words[:i])
+        l2 = " ".join(words[i:])
+        w1, w2 = _text_dwidth(l1), _text_dwidth(l2)
+        if w1 <= max_units and w2 <= max_units:
+            d = abs(w1 - w2)
+            # Prefer splits near the middle and not too lopsided
+            if d < best_d:
+                best_d, best = d, (l1, l2)
+    if best:
+        return list(best)
+    # Fallback: greedy fill line 1 (should be rare)
+    l1_words, w = [], 0.0
+    for wd in words:
+        ww = _text_dwidth(wd) + (0.5 if l1_words else 0)
+        if w + ww <= max_units:
+            l1_words.append(wd)
+            w += ww
+        else:
+            break
+    if not l1_words:
+        l1_words = [words[0]]
+    rest = words[len(l1_words):]
+    # If rest still too long, hard-split remaining words across (never drop)
+    lines = [" ".join(l1_words)]
+    cur, cw = [], 0.0
+    for wd in rest:
+        ww = _text_dwidth(wd) + (0.5 if cur else 0)
+        if cw + ww <= max_units:
+            cur.append(wd)
+            cw += ww
+        else:
+            lines.append(" ".join(cur))
+            cur, cw = [wd], _text_dwidth(wd)
+    if cur:
+        lines.append(" ".join(cur))
+    return lines
+
+
 def build_ass(segments: list[dict], vocab: list[dict], total: float,
               out_path: str, max_rows: int = 4, traditional: bool = False):
     """ASS with: EN/ZH subtitles (explicit positions) + scrolling vocab panel.
@@ -827,13 +953,33 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
              "Effect, Text")
 
     # ---- subtitles: one segment at a time, EN close above ZH ----
+    # Movie convention (2026-10-17): try one line per language; if a line
+    # overflows, wrap to 2 lines at natural boundaries (punctuation for ZH,
+    # word boundaries for EN). NEVER truncate/drop characters. When a
+    # language wraps to 2 lines, shift the block to keep EN/ZH from touching
+    # (四不接触) and from touching the video.
     for s in segments:
         a, b = _ass_time(s["start"]), _ass_time(s["end"])
-        en = _highlight_vocab(s["text"].replace("\n", " "), vocab_words)
-        zh = s.get("zh", "").replace("\n", " ")
-        L.append(f"Dialogue: 0,{a},{b},EN,,0,0,0,,{{\\pos(540,{SUB_EN_Y})}}{en}")
-        if zh:
-            L.append(f"Dialogue: 0,{a},{b},ZH,,0,0,0,,{{\\pos(540,{SUB_ZH_Y})}}{zh}")
+        en_plain = re.sub(r"\s+", " ", s["text"]).strip()
+        zh_plain = re.sub(r"\s+", " ", s.get("zh", "")).strip()
+        en_lines = _wrap_en(en_plain)
+        zh_lines = _wrap_zh(zh_plain) if zh_plain else []
+        # Highlight vocab on EN (tags don't affect \N line breaks)
+        en_tagged = _highlight_vocab(r"\N".join(en_lines), vocab_words)
+        zh_tagged = r"\N".join(zh_lines)
+        n_en, n_zh = len(en_lines), len(zh_lines)
+        # Vertical layout: keep EN above ZH, no touching (四不接触).
+        # Each extra line shifts the block center by half a line height.
+        # EN line height ~80px (64pt), ZH line height ~75px (60pt).
+        en_y = SUB_EN_Y - (n_en - 1) * 40
+        zh_y = SUB_ZH_Y + (n_zh - 1) * 38
+        # If both are multi-line, add extra separation to avoid EN/ZH touching
+        if n_en > 1 and n_zh > 1:
+            en_y -= 20
+            zh_y += 20
+        L.append(f"Dialogue: 0,{a},{b},EN,,0,0,0,,{{\\pos(540,{en_y})}}{en_tagged}")
+        if zh_tagged:
+            L.append(f"Dialogue: 0,{a},{b},ZH,,0,0,0,,{{\\pos(540,{zh_y})}}{zh_tagged}")
 
     # ---- vocab panel: 4-row window, EN+ZH two lines, no highlight bar ----
     occs = _occurrences(segments, vocab_index)
@@ -906,7 +1052,7 @@ def make_panel_bg(out_path: str):
 
 
 def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280, 180),
-                   name_end: float = 20.0, crop: tuple = (150, 85, 980, 551)) -> str:
+                   name_end: float = 20.0, crop: tuple = (150, 0, 980, 551)) -> str:
     """Prepare source with two-part logo removal (SKILL.md 9b).
 
     0..name_end (name titles visible): NO crop, logo removed via OpenCV
@@ -914,6 +1060,10 @@ def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280
     After name_end: symmetric crop to exclude logo.
     Both parts scaled to 1080x608 and concatenated.
     logo_box: (x1,y1,x2,y2) of burned-in logo in 1280x720 source.
+    crop: (x,y,w,h) in 1280x720 space. y=0 keeps heads fully visible
+    (2026-10-17 fix: y=85 was cutting off speakers' heads).
+    Input is normalized to 1280x720 first so logo_box/crop stay valid
+    regardless of source resolution (2026-10-17 fix).
     Returns out_path.
     """
     import cv2
@@ -921,6 +1071,21 @@ def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280
     import tempfile
     workdir = os.path.abspath(os.path.dirname(out_path) or ".")
     out_path = os.path.abspath(out_path)
+    # Normalize input to 1280x720: logo_box and crop are defined in this
+    # coordinate space. Without this, a 1920x1080 source breaks
+    # cv2.inpaint (mask size mismatch) and shifts the crop.
+    _norm = None
+    cap0 = cv2.VideoCapture(source)
+    _iw = int(cap0.get(cv2.CAP_PROP_FRAME_WIDTH))
+    _ih = int(cap0.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    cap0.release()
+    if (_iw, _ih) != (1280, 720):
+        _norm = os.path.join(workdir, "_src_norm.mp4")
+        subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", source,
+                        "-vf", "scale=1280:720,setsar=1",
+                        "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                        "-c:a", "aac", _norm], check=True)
+        source = _norm
     # Use workdir for temp files (not /tmp which is a small tmpfs)
     part1 = os.path.join(workdir, "_src_part1.mp4")
     part2 = os.path.join(workdir, "_src_part2.mp4")
@@ -965,6 +1130,8 @@ def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280
     for p in (part1, part2, lst):
         if os.path.exists(p):
             os.remove(p)
+    if _norm and os.path.exists(_norm):
+        os.remove(_norm)
     return out_path
 
 
