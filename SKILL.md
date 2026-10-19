@@ -159,6 +159,14 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   positive or neutral. These trigger Douyin moderation regardless of
   sentiment. Do NOT auto-cut; present the flagged ranges to the user
   with timestamps and let them decide keep vs cut before rendering.
+- **Source & person background check** (2026-10-20 user rule): review is
+  not limited to dialogue content. Before producing, also check:
+  (a) the source media/outlet — is it one with a history of anti-China
+  reporting or officially criticized by mainland authorities;
+  (b) every identifiable person in the video (host, guest, callers) —
+  has mainland China explicitly opposed, sanctioned, or condemned them.
+  If either hits, report to the user with specifics and do NOT proceed
+  until they approve.
 
 ### 6a. Copyright — read before you publish
 
