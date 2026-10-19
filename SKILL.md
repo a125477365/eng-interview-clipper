@@ -164,8 +164,13 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   (a) the source media/outlet — is it one with a history of anti-China
   reporting or officially criticized by mainland authorities;
   (b) every identifiable person in the video (host, guest, callers) —
-  has mainland China explicitly opposed, sanctioned, or condemned them.
-  If either hits, report to the user with specifics and do NOT proceed
+  has mainland China explicitly opposed, sanctioned, or condemned them;
+  (c) the same persons' track record in OTHER programs/episodes —
+  problematic statements elsewhere (e.g. advocating bans on Chinese
+  models, hostile China rhetoric in other episodes) count the same as
+  if said in this video, because platform review judges the person,
+  not the episode.
+  If any hits, report to the user with specifics and do NOT proceed
   until they approve.
 - **Cross-platform precedent check** (2026-10-20 user rule): before
   producing, search both Douyin and Bilibili for the same source video.
