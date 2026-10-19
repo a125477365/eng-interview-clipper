@@ -221,6 +221,15 @@ product spec, do not weaken them:
   the video must not end with the counter stuck at 90/100. After composing,
   verify the max progress reached equals the vocab size. If any word never
   triggers, fix the occurrence matching before shipping.
+- **Panel timing** (2026-10-19): the vocab panel appears exactly when its
+  word is spoken, never from t=0 — a cold-open/hook would otherwise show a
+  "current" word long before it is actually said.
+- **Surface-form matching** (2026-10-19): the panel index and subtitle
+  highlight must match inflected forms actually spoken (predictions,
+  disrupted, fabs...), not just the dictionary base form — otherwise
+  progress stalls and highlights miss. `build_ass()` derives the spoken
+  surface forms from the segment text itself (no blind stemming).
+  The displayed ×N count must equal the actually matched occurrences.
 - Phonetics: every single word gets an IPA phonetic symbol from
   `phonetics.json` (via `clipper.add_phonetics()`), displayed in the
   panel as `中文 /phonetic/` — a SINGLE slash pair AFTER the Chinese
@@ -289,12 +298,26 @@ transparent. 5-row scrolling window follows speech. Implemented in
 
 Do NOT use tight per-speaker crops — they don't suit vertical display
 (user feedback 2026-10-16: "裁剪的话不适合竖屏显示").
+- **Evaluate whether to crop at all** (2026-10-19 user rule): for
+  multi-person interviews / talk shows (hosts + guest on couches),
+  a fixed center crop inevitably cuts speakers out of frame — sometimes
+  the speaker is invisible, sometimes a wide shot becomes a corner.
+  Per video, assess: if nobody in frame needs hiding (no anti-China
+  individuals, no content requiring removal), prefer NO crop —
+  letterbox the full 16:9 frame instead of cropping. Blur (don't crop)
+  any small corner logo that the crop used to hide.
 
 ### 10. QC the render
 
 - Frame 0: no logo, no ident, clean interview picture.
 - Spot-check 3 subtitle sync points (beginning / middle / end).
 - Audio present, 30fps, yuv420p, `+faststart`.
+- **Trim precisely at user-visible cut points** (2026-10-19 lesson):
+  NEVER use stream copy (`-c copy`) with `-ss` before `-i` for the
+  video start/end — the cut snaps to the nearest keyframe and leaves
+  a sub-second residue of the removed footage. For any cut the viewer
+  will see, re-encode (`-ss` before `-i` + libx264 is both fast AND
+  frame-accurate); reserve `-c copy` for mid-video joins only.
 
 ### 11. Covers — two ratios
 
@@ -405,6 +428,7 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
 - **核实截图必须带字幕**：发布前的开始/中间/结束 3 张截图必须含字幕区+生词栏完整界面，无字幕用户无法审批布局
 - **插图可放生词界面左侧**：独立于裁剪方案的长期要求
 - **不压制画质**：成片在 1GB 上限内用原画质直接发布，不为上传压缩（2026-10-17 用户否决压缩提议）
+- **发后不删改重传**：标题、描述、封面、标签发布前一次弄对，发出去就别动——同一视频删掉原样重传会被平台去重机制判"重复/搬运"压推荐，已跑起来的版本删掉等于浪费推荐 momentum（2026-10-18 v13 教训）
 - **生词栏标题**（"本集生词 N 个"）：与生词列表左对齐并拉开距离，不得重叠
 - **面板位置**：y=180，接近灵动岛但不被覆盖（v13 定版）
 - **剪辑范围变化后生词重梳**：重剪后生词表按新范围重新提取

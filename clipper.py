@@ -273,18 +273,18 @@ import urllib.request
 
 BASE_URL = os.environ.get("TRANSLATE_BASE_URL", "").rstrip("/")
 API_KEY = os.environ.get("TRANSLATE_API_KEY", "")
-MODEL = os.environ.get("TRANSLATE_MODEL", "gpt-4o-mini")
+TRANSLATE_MODEL = os.environ.get("TRANSLATE_MODEL", "gpt-4o-mini")
 
 
 def configure(base_url: str = "", api_key: str = "", model: str = ""):
     """Runtime reconfiguration (e.g. from management UI settings)."""
-    global BASE_URL, API_KEY, MODEL
+    global BASE_URL, API_KEY, TRANSLATE_MODEL
     if base_url is not None:
         BASE_URL = base_url.rstrip("/")
     if api_key:
         API_KEY = api_key
     if model:
-        MODEL = model
+        TRANSLATE_MODEL = model
 
 SYSTEM_PROMPT = (
     "You translate English interview subtitles into Simplified Chinese. "
@@ -296,7 +296,7 @@ SYSTEM_PROMPT = (
 
 def _openai_translate(texts: list[str]) -> list[str]:
     payload = {
-        "model": MODEL,
+        "model": TRANSLATE_MODEL,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": "\n".join(texts)},
@@ -342,7 +342,7 @@ def _argos_translate(texts: list[str]) -> list[str]:
 
 def provider_name() -> str:
     if BASE_URL and API_KEY:
-        return f"openai-compatible ({MODEL})"
+        return f"openai-compatible ({TRANSLATE_MODEL})"
     return "argos-offline"
 
 
@@ -913,8 +913,23 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
     current word. EN and ZH same size (52). Selected: EN+ZH+xn all gold,
     no background highlight bar. Header shows progress i/N.
     """
-    vocab_index = {v["word"]: v for v in vocab}
-    vocab_words = [v["word"] for v in vocab]
+    # v13.1: surface-form-aware index — a vocab word must also match its
+    # inflected forms actually spoken (predictions, disrupted, fabs...),
+    # otherwise the panel progress stalls and subtitle highlights miss.
+    # Forms are derived from the segments text itself (no blind stemming).
+    _fulltext = " ".join(s.get("text", "") for s in segments).lower()
+    vocab_index = {}
+    _forms = []  # surface forms for subtitle highlighting (longest first)
+    for v in vocab:
+        w = v["word"].lower()
+        vocab_index[w] = v
+        _forms.append(v["word"])
+        for m in set(re.findall(r"\b" + re.escape(w) + r"(?:s|es|d|ed|ing)?\b",
+                                _fulltext)):
+            if m != w:
+                vocab_index.setdefault(m, v)
+                _forms.append(m)
+    vocab_words = sorted(set(_forms), key=len, reverse=True)
     L = []
     L.append("[Script Info]")
     L.append("ScriptType: v4.00+")
@@ -987,7 +1002,10 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
     if occs:
         seen_total = set()
         for i, o in enumerate(occs):
-            a = _ass_time(o["start"] if i > 0 else 0.0)
+            # v13.2: panel appears exactly when its word is spoken — never
+            # from t=0 (a cold-open/hook would otherwise show a "current"
+            # word long before it is actually said).
+            a = _ass_time(o["start"])
             b = _ass_time(occs[i + 1]["start"] if i + 1 < len(occs) else total)
             seen_total.add(o["word"])
             # 4-row window: 2 before + current + 1 after
