@@ -333,6 +333,14 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   a sub-second residue of the removed footage. For any cut the viewer
   will see, re-encode (`-ss` before `-i` + libx264 is both fast AND
   frame-accurate); reserve `-c copy` for mid-video joins only.
+- **Find the TRUE start of a segment to cut** (2026-10-20 lesson):
+  when locating a segment for removal, do NOT cut at the first keyword
+  hit. The audible/visible start is often much earlier — e.g. a phone
+  call begins when the phone rings / "we know who it is", not at
+  "put POTUS on speaker" 71 seconds later. After keyword search,
+  walk BACKWARDS through the transcript AND spot-check frames to find
+  where the segment actually begins, then verify the cut by watching
+  the first 10 seconds after the junction.
 
 ### 11. Covers — two ratios
 
