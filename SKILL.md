@@ -149,9 +149,16 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
 ### 6. Content screening — mandatory
 
 - Read every segment. If any segment contains negative remarks about
-  China (or other politically sensitive content unsuitable for a mainland
-  audience), cut that segment's time range from both video and subtitles
+  China, cut that segment's time range from both video and subtitles
   before composing. When in doubt, cut it. Record what was cut and why.
+- **Political sensitivity review** (2026-10-20 lesson from All-In Huang
+  episode): separately flag any segment involving (a) current/former
+  foreign political figures by name (e.g. Trump, Biden), (b) US domestic
+  politics, (c) international political commentary (e.g. US-China tech
+  rivalry framing, "communists" rhetoric) — even when the remarks are
+  positive or neutral. These trigger Douyin moderation regardless of
+  sentiment. Do NOT auto-cut; present the flagged ranges to the user
+  with timestamps and let them decide keep vs cut before rendering.
 
 ### 6a. Copyright — read before you publish
 
