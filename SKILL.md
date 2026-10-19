@@ -119,12 +119,23 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
 - **Final AI review of all subtitles** (2026-10-20 user rule): after EN
   proofreading and ZH translation are both done, run one more full
   review pass with the most capable AI model available. The reviewer
-  checks every segment pair for: (a) EN transcription errors missed in
-  proofreading (names, terms, numbers, homophones); (b) ZH fidelity —
-  no added words, no dropped words, no paraphrasing, literal fragments
-  kept literal; (c) EN-ZH alignment — every EN segment has exactly one
-  matching ZH line, no misalignment or swapped segments. Fix all issues
-  found before vocab extraction and composing.
+  does two jobs in one pass:
+  (a) Quality — check every segment pair for: EN transcription errors
+  missed in proofreading (names, terms, numbers, homophones); ZH
+  fidelity — no added words, no dropped words, no paraphrasing,
+  literal fragments kept literal; EN-ZH alignment — every EN segment
+  has exactly one matching ZH line, no misalignment or swapped
+  segments. Fix all quality issues found.
+  (b) Political flags — separately list every segment involving:
+  foreign political figures by name (e.g. Trump, Biden); US domestic
+  politics; international political commentary (e.g. US-China tech
+  rivalry framing, "communists" rhetoric) — regardless of sentiment,
+  positive or negative. (Anti-China remarks are auto-cut per the rule
+  above; anything the earlier pass missed gets cut here too.) For the
+  non-anti-China political flags, do NOT auto-cut; present the list
+  with timestamps to the user and ask whether to cut or publish as-is.
+  Only proceed to vocab extraction and composing after quality fixes
+  are done AND the user has decided on every political flag.
 
 ### 5b. Proofread the English transcription — mandatory (2026-10-17)
 
@@ -160,14 +171,7 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
 - Read every segment. If any segment contains negative remarks about
   China, cut that segment's time range from both video and subtitles
   before composing. When in doubt, cut it. Record what was cut and why.
-- **Political sensitivity review** (2026-10-20 lesson from All-In Huang
-  episode): separately flag any segment involving (a) current/former
-  foreign political figures by name (e.g. Trump, Biden), (b) US domestic
-  politics, (c) international political commentary (e.g. US-China tech
-  rivalry framing, "communists" rhetoric) — even when the remarks are
-  positive or neutral. These trigger Douyin moderation regardless of
-  sentiment. Do NOT auto-cut; present the flagged ranges to the user
-  with timestamps and let them decide keep vs cut before rendering.
+  (Anti-China auto-cut stays as-is per 2026-10-20 user rule.)
 - **Source & person background check** (2026-10-20 user rule): review is
   not limited to dialogue content. Before producing, also check:
   (a) the source media/outlet — is it one with a history of anti-China
