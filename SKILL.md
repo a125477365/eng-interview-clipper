@@ -126,14 +126,18 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   literal fragments kept literal; EN-ZH alignment — every EN segment
   has exactly one matching ZH line, no misalignment or swapped
   segments. Fix all quality issues found.
-  (b) Political flags — separately list every segment involving:
+  (b) Political flags — the AI reviewer reads every segment IN CONTEXT
+  (not keyword matching) and separately lists every segment involving:
   foreign political figures by name (e.g. Trump, Biden); US domestic
   politics; international political commentary (e.g. US-China tech
   rivalry framing, "communists" rhetoric) — regardless of sentiment,
-  positive or negative. (Anti-China remarks are auto-cut per the rule
+  positive or negative. Keywords are only for locating candidates;
+  the AI judges by meaning and context whether a segment truly carries
+  political risk. (Anti-China remarks are auto-cut per the rule
   above; anything the earlier pass missed gets cut here too.) For the
   non-anti-China political flags, do NOT auto-cut; present the list
-  with timestamps to the user and ask whether to cut or publish as-is.
+  with timestamps and a one-line reason per flag to the user and ask
+  whether to cut or publish as-is.
   Only proceed to vocab extraction and composing after quality fixes
   are done AND the user has decided on every political flag.
 
@@ -173,16 +177,19 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   before composing. When in doubt, cut it. Record what was cut and why.
   (Anti-China auto-cut stays as-is per 2026-10-20 user rule.)
 - **Source & person background check** (2026-10-20 user rule): review is
-  not limited to dialogue content. Before producing, also check:
-  (a) the source media/outlet — is it one with a history of anti-China
-  reporting or officially criticized by mainland authorities;
+  not limited to dialogue content. Before producing, the AI researches
+  (not keyword matching — read actual reporting and context):
+  (a) the source media/outlet — does it have a history of anti-China
+  reporting or has it been officially criticized by mainland
+  authorities;
   (b) every identifiable person in the video (host, guest, callers) —
   has mainland China explicitly opposed, sanctioned, or condemned them;
   (c) the same persons' track record in OTHER programs/episodes —
   problematic statements elsewhere (e.g. advocating bans on Chinese
   models, hostile China rhetoric in other episodes) count the same as
   if said in this video, because platform review judges the person,
-  not the episode.
+  not the episode. Distinguish what the person said IN THIS video from
+  what they said ELSEWHERE when reporting.
   If any hits, report to the user with specifics and do NOT proceed
   until they approve.
 - **Cross-platform precedent check** (2026-10-20 user rule): before
