@@ -167,6 +167,11 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   has mainland China explicitly opposed, sanctioned, or condemned them.
   If either hits, report to the user with specifics and do NOT proceed
   until they approve.
+- **Cross-platform precedent check** (2026-10-20 user rule): before
+  producing, search both Douyin and Bilibili for the same source video.
+  If an identical or near-identical version already exists and survives
+  on both platforms, the content has passed their reviews — safer to
+  publish. Report what was found (or not found) to the user.
 
 ### 6a. Copyright — read before you publish
 
