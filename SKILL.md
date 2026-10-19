@@ -116,6 +116,15 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   review pass checking for: missed translations (EN content absent in ZH),
   wrong translations (ZH meaning ≠ EN meaning), and over-paraphrasing.
   Fix all before composing.
+- **Final AI review of all subtitles** (2026-10-20 user rule): after EN
+  proofreading and ZH translation are both done, run one more full
+  review pass with the most capable AI model available. The reviewer
+  checks every segment pair for: (a) EN transcription errors missed in
+  proofreading (names, terms, numbers, homophones); (b) ZH fidelity —
+  no added words, no dropped words, no paraphrasing, literal fragments
+  kept literal; (c) EN-ZH alignment — every EN segment has exactly one
+  matching ZH line, no misalignment or swapped segments. Fix all issues
+  found before vocab extraction and composing.
 
 ### 5b. Proofread the English transcription — mandatory (2026-10-17)
 
