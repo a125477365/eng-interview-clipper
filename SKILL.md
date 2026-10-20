@@ -381,24 +381,31 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   and the account badge. Title text must be large, centered, high
   contrast.
 
-### 12. Episode splitting (final video over 60 minutes)
+### 12. Episode splitting (content over 59 minutes)
 
-- If the finished video is 60 minutes or shorter: single episode, no split.
-- If longer: split into episodes of about 59 minutes each, using
-  `clipper.split_episodes(total_seconds, segments)`:
-  cuts snap to subtitle segment boundaries (never mid-sentence — each cut
-  is the segment end nearest the 59-minute mark). The 59 minutes is a soft
-  target, not a rigid cap.
+Splitting rule (user, 2026-10-20 — replaces the old "greedy 59-minute
+chunks" rule): decide the episode COUNT first, then divide the total
+duration EVENLY. Never fill the early episodes to 59 minutes and leave a
+stub of a few minutes at the end.
+
+- Per-episode content cap: 59 minutes. The 4 s outro (§14) does NOT count
+  toward the cap; it is appended after the content.
+- Episode count: `n = ceil(content_seconds / 3540)`. If `n == 1`, single
+  episode, no split.
+- If `n >= 2`: per-episode target = `content_seconds / n`. Cut at the
+  subtitle segment boundaries (never mid-sentence) nearest the cumulative
+  targets `target, 2*target, ...`.
+  Example: 121 minutes → `n = ceil(121/59) = 3` → 3 episodes of about
+  40.3 minutes each (NOT 59 + 59 + 3).
 - Every published episode then gets the 4 s fan-group outro appended
   (§14). Hard rule: content + outro must stay under 1 hour total.
-- The last episode must be longer than 2 minutes. If the naive split would
-  leave a shorter tail, move the cut point earlier so the tail is absorbed
-  into the final episode; if that would exceed the platform's duration cap,
-  split the remainder evenly in two instead. Never ship a < 2-minute
-  orphan episode.
+- Each episode's vocab is computed INDEPENDENTLY from that episode's own
+  segments only (re-ranked, top 108, each with a Chinese gloss) — never
+  shared or pooled across episodes. This isolates rework: if one episode
+  has a problem, only that episode is re-processed; the others are
+  untouched.
 - Each episode is rendered as its own video (compose per episode range)
-  with its own vocab panel: only words occurring in that episode, re-ranked,
-  top 108, each with a Chinese gloss. Own covers per episode too.
+  with its own vocab panel. Own covers per episode too.
 - Title suffix per episode: （上）/（中）/（下） or 第1集/第2集…,
   e.g. `黄仁勋：AI没有知觉，不比宠物石头更有生命｜英文精听（上）`.
   Tags stay the same on every episode. Publish episodes in order.
@@ -418,7 +425,8 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
 - Card design (1080x1920, brand style): gold speech-bubble icon,
   `加入粉丝群` / `领取本集生词清单` / `{N} 个生词 · 中英对照 Excel`,
   account badge at the bottom. Silent audio.
-- The 4 s is appended AFTER the 59-minute content: episode = 59:00 + 0:04.
+- The 4 s is appended AFTER the episode's content (content length per §12);
+  it does not count toward the 59-minute per-episode cap.
 
 ### 14a. Final assembly — main + outro (source card cancelled 2026-10-16)
 

@@ -1324,39 +1324,30 @@ def split_episodes(total: float, segments: list, ep_len: float = 59 * 60,
                    min_last: float = 2 * 60, hard_cap: float = 60 * 60):
     """Split a long video into episode (start, end) ranges in seconds.
 
-    - No split when total <= hard_cap (60 min): returns [(0, total)].
-    - Cuts snap to subtitle segment boundaries — never mid-sentence:
-      each cut is the segment end nearest to the 59-minute mark.
-    - The last episode must be longer than min_last (2 min). If the naive
-      split would leave a shorter tail, the cut point moves earlier
-      ("cutting" adjustment): the tail is absorbed into the final episode.
-      If that would exceed hard_cap, the remainder is split evenly in two
-      instead — a < 2-minute orphan episode is never shipped.
+    Rule (user, 2026-10-20 — SKILL.md section 12): decide the episode
+    COUNT first, then divide the total duration EVENLY. Never fill the
+    early episodes to the cap and leave a stub at the end.
+
+    - n = ceil(total / ep_len); if n == 1: returns [(0, total)].
+    - Per-episode target = total / n. Cuts snap to subtitle segment
+      boundaries — never mid-sentence: each cut is the segment end
+      nearest the cumulative target (target, 2*target, ...).
+      Example: 121 min -> n = 3 -> about 40.3 min per episode.
     Returns [(start_sec, end_sec), ...].
     """
-    if total <= hard_cap:
+    import math as _math
+    n = _math.ceil(total / ep_len)
+    if n <= 1:
         return [(0.0, total)]
+    step = total / n
     bounds = [0.0]
-    while True:
-        start = bounds[-1]
-        remaining = total - start
-        if remaining <= hard_cap:
-            bounds.append(total)
-            break
-        cut = _nearest_end(segments, start + ep_len)
-        if cut <= start:  # no valid cut ahead; force close
-            bounds.append(total)
-            break
-        if 0 < total - cut < min_last:
-            if total - start <= hard_cap:
-                bounds.append(total)  # absorb the short tail
-            else:
-                mid = _nearest_end(segments, (start + total) / 2)
-                bounds.append(mid if mid > start else (start + total) / 2)
-                bounds.append(total)
-            break
+    for k in range(1, n):
+        cut = _nearest_end(segments, k * step)
+        if cut <= bounds[-1]:  # no valid cut ahead; force to target
+            cut = k * step
         bounds.append(cut)
-    return list(zip(bounds[:-1], bounds[1:]))
+    bounds.append(total)
+    return [(bounds[i], bounds[i + 1]) for i in range(n)]
 
 
 def flag_sensitive(segments: list) -> list:
