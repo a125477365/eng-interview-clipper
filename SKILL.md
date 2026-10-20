@@ -62,11 +62,17 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   the new segment range and drop words that no longer appear. Do not ship a
   vocab panel containing words from cut footage.
 
-### 3. Burned-in logos — per-video decision (2026-10-17 user rule)
+### 3. Burned-in logos — KEEP by default (2026-10-20 user rule,
+supersedes the 2026-10-17 per-video stance)
 
-- Whether to remove a burned-in logo/watermark, whether to crop the video,
-  and whether to use AI inpainting are decided PER VIDEO with the user.
-  Do NOT put fixed logo/crop/AI-edit rules in the skill.
+- DEFAULT: keep the source video's burned-in logo/watermark VISIBLE.
+  Do NOT AI-erase, inpaint, or blur it — altering the original creator's
+  mark raises copyright problems.
+- Exception: if the logo appears only RARELY/briefly, it may be removed
+  (crop or inpaint). If it is present throughout the video, leave it
+  exactly as-is.
+- Cropping the frame itself (for layout, not logo removal) is still
+  possible, but NEVER cut off speakers' heads (§9).
 - `clipper.compose()` does not blur anything by default.
 
 ### 3a. Source card — CANCELLED (2026-10-16 user decision)
@@ -353,12 +359,12 @@ transparent. 5-row scrolling window follows speech. Implemented in
   crop's top offset must be 0 (not 85px). Verify with frame extraction at
   talking-head timestamps before full render.
 
-### 9a. Logo exclusion — per-video decision (2026-10-17 user rule)
+### 9a. Logo exclusion — keep by default (2026-10-20 user rule)
 
-- How to handle burned-in logos (crop / inpaint / leave) is decided per
-  video with the user — see §3. No fixed method in the skill.
-- If cropping is chosen: keep top offset=0 to preserve speakers' heads
-  (2026-10-17 lesson: top=85 cut off heads).
+- Burned-in logos stay VISIBLE by default — see §3. Removal (crop /
+  inpaint) only when the logo appears rarely/briefly; never blur it.
+- If cropping is chosen (rare-logo case): keep top offset=0 to preserve
+  speakers' heads (2026-10-17 lesson: top=85 cut off heads).
 
 Do NOT use tight per-speaker crops — they don't suit vertical display
 (user feedback 2026-10-16: "裁剪的话不适合竖屏显示").
@@ -368,8 +374,8 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   the speaker is invisible, sometimes a wide shot becomes a corner.
   Per video, assess: if nobody in frame needs hiding (no anti-China
   individuals, no content requiring removal), prefer NO crop —
-  letterbox the full 16:9 frame instead of cropping. Blur (don't crop)
-  any small corner logo that the crop used to hide.
+  letterbox the full 16:9 frame instead of cropping. Leave any corner
+  logo visible (§3); do not blur it.
 
 ### 10. QC the render
 
