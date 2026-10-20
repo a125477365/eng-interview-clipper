@@ -52,6 +52,14 @@ IELTS learners, auto-generated covers, and publishing to Douyin.
   a residual ghost on the first frames — trim further until frame 0 is
   clean interview footage. Shift every subtitle timestamp by the trimmed
   amount (clamp at 0).
+- **Verify frame 0 on the RENDERED file, not the source** (2026-10-20
+  lesson): ffmpeg input seeking (`-ss` before `-i`) can land ~0.25s
+  EARLIER than requested, so a start point verified clean in the source
+  can still open on the tail of a title card / ident. After EVERY
+  render, extract the literal frames t=0, 0.1, 0.3 from the output and
+  confirm zero residue of any previous scene; when cutting right after
+  an ident, leave safety margin past it (the scene's first clean frame
+  + ~0.3s) rather than cutting at the exact transition.
 - End cards / logo outros (e.g. "THE KOREA SOCIETY / Watch more like
   this") must be cut too: find where the end card starts and trim the
   source there. Drop or clamp any subtitle segments beyond the cut point.
