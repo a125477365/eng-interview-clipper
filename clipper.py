@@ -1333,6 +1333,10 @@ def split_episodes(total: float, segments: list, ep_len: float = 59 * 60,
       boundaries — never mid-sentence: each cut is the segment end
       nearest the cumulative target (target, 2*target, ...).
       Example: 121 min -> n = 3 -> about 40.3 min per episode.
+    - These cuts are STARTING POINTS only: the agent must read the
+      transcript around each cut and delay it (guide: <= ~60 s) to where
+      the speaker's topic/answer actually completes (SKILL.md section 12,
+      smooth cuts). Never chop a speaker off mid-thought.
     Returns [(start_sec, end_sec), ...].
     """
     import math as _math

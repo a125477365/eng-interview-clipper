@@ -397,13 +397,25 @@ stub of a few minutes at the end.
   targets `target, 2*target, ...`.
   Example: 121 minutes → `n = ceil(121/59) = 3` → 3 episodes of about
   40.3 minutes each (NOT 59 + 59 + 3).
+- Smooth cuts (user, 2026-10-20): a segment boundary is necessary but NOT
+  sufficient — the speaker must have finished the thought. After picking
+  the naive boundary, the agent must READ the transcript around it. If the
+  sentence ends but the topic clearly continues (the speaker is mid-answer,
+  enumerating, or building an argument), DELAY the cut to the point where
+  the topic/answer actually completes. Keep the delay modest — tens of
+  seconds, as a guide ≤ ~60 s — and accept slightly uneven episode lengths;
+  never chop a speaker off mid-thought, and never let the delay push an
+  episode over the 59-minute cap.
 - Every published episode then gets the 4 s fan-group outro appended
   (§14). Hard rule: content + outro must stay under 1 hour total.
 - Each episode's vocab is computed INDEPENDENTLY from that episode's own
   segments only (re-ranked, top 108, each with a Chinese gloss) — never
   shared or pooled across episodes. This isolates rework: if one episode
   has a problem, only that episode is re-processed; the others are
-  untouched.
+  untouched. Count verification per episode (user, 2026-10-20): zero
+  ghost words, and every displayed ×N must equal the panel's actual
+  matchable occurrences (inflected forms count). Any word that never
+  triggers in its episode is dropped before composing.
 - Each episode is rendered as its own video (compose per episode range)
   with its own vocab panel. Own covers per episode too.
 - Title suffix per episode: （上）/（中）/（下） or 第1集/第2集…,
