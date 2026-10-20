@@ -1101,6 +1101,41 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
         f.write("\n".join(L) + "\n")
 
 
+def audit_ass_coverage(ass_path: str, total: float, thresh: float = 0.3):
+    """Full-duration coverage audit (SKILL.md §7, 2026-10-20 user rule).
+
+    Returns (panel_gaps, subtitle_gaps): lists of (start, end) spans in
+    [0, total] with NO vocab-panel event / NO EN subtitle event. Any panel
+    gap is a defect. Subtitle gaps are normal between sentences; review
+    any that overlap speech. Run on every episode ASS before composing,
+    and also scan the rendered file's panel band — ASS alone once let a
+    19.7s head gap ship."""
+    def _sec(t):
+        h, m, s = t.split(":")
+        return int(h) * 3600 + int(m) * 60 + float(s)
+    panel, subs = [], []
+    for line in open(ass_path, encoding="utf-8"):
+        if not line.startswith("Dialogue:"):
+            continue
+        p = line.split(",", 9)
+        a, b, style = _sec(p[1]), _sec(p[2]), p[3]
+        if style in ("VH", "VE", "VEC", "VWzh", "VWzhCur", "VWct", "VWctCur"):
+            panel.append((a, b))
+        elif style == "EN":
+            subs.append((a, b))
+
+    def _gaps(ivs):
+        out, cur = [], 0.0
+        for a, b in sorted(ivs):
+            if a - cur > thresh:
+                out.append((round(cur, 2), round(a, 2)))
+            cur = max(cur, b)
+        if total - cur > thresh:
+            out.append((round(cur, 2), round(total, 2)))
+        return out
+    return _gaps(panel), _gaps(subs)
+
+
 def make_panel_bg(out_path: str):
     from PIL import Image
     img = Image.new("RGBA", (W, PANEL_H), (10, 12, 18, 200))

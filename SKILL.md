@@ -275,6 +275,19 @@ product spec, do not weaken them:
   PRE-SELECTED (gold) — it stays selected until it is actually spoken,
   where its occurrence window takes over with the same word still
   selected. Each occurrence window starts exactly when its word is spoken.
+- **Full-duration coverage — panel AND subtitles** (2026-10-20 user rule):
+  across the WHOLE video there must never be a moment with speech but no
+  subtitle, nor a moment with subtitles but no vocab panel. Panel events
+  must chain continuously over [0, total] with no gap (>0.3s = defect);
+  every speech segment must have its subtitle events. Before delivery,
+  audit the episode ASS for panel gaps AND scan the rendered file's panel
+  band at fine intervals (head, seams, tail) — a spot check at 3 frames
+  is NOT sufficient (a 19.7s panel gap at an episode head once shipped
+  unnoticed). Watch the timestamps: per-episode subtitle files may carry
+  ABSOLUTE source timestamps (e.g. episode 2 starting at 1922s) — always
+  convert to episode-local time (first segment ≈ 0.0) before build_ass;
+  feeding absolute times silently yields a head with panel but no
+  subtitles.
 - **Surface-form matching** (2026-10-19): the panel index and subtitle
   highlight must match inflected forms actually spoken (predictions,
   disrupted, fabs...), not just the dictionary base form — otherwise
