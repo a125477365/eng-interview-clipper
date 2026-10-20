@@ -1007,7 +1007,9 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
         # Panel visible from the FIRST FRAME (user, 2026-10-20 — overrides
         # the v13.2 "appears when first word is spoken" behavior): before
         # the first occurrence, show the first window of upcoming words
-        # with progress 0/N and NO word selected.
+        # with progress 0/N and the FIRST word pre-selected (gold) — it
+        # stays selected until it is actually spoken, where the regular
+        # occurrence window takes over with the same word still selected.
         if occs[0]["start"] > 0.01:
             a0, b0 = _ass_time(0), _ass_time(occs[0]["start"])
             hdr0 = "本集生詞" if traditional else "本集生词"
@@ -1028,12 +1030,15 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
                 phon = w.get("phonetic", "")
                 gloss = w.get("gloss", "")
                 is_phrase = w.get("is_phrase", False)
-                L.append(f"Dialogue: 0,{a0},{b0},VE,,0,0,0,,"
+                st_en0 = "VEC" if j == 0 else "VE"
+                st_ct0 = "VWctCur" if j == 0 else "VWct"
+                st_zh0 = "VWzhCur" if j == 0 else "VWzh"
+                L.append(f"Dialogue: 0,{a0},{b0},{st_en0},,0,0,0,,"
                          f"{{\\pos({PANEL_L},{y_en})\\an1}}{w['word']}")
-                L.append(f"Dialogue: 0,{a0},{b0},VWct,,0,0,0,,"
+                L.append(f"Dialogue: 0,{a0},{b0},{st_ct0},,0,0,0,,"
                          f"{{\\pos({PANEL_R},{y_en})\\an3}}×{w['count']}")
                 phon_str = f" /{phon}/" if phon and not is_phrase else ""
-                L.append(f"Dialogue: 0,{a0},{b0},VWzh,,0,0,0,,"
+                L.append(f"Dialogue: 0,{a0},{b0},{st_zh0},,0,0,0,,"
                          f"{{\\pos({PANEL_L},{y_zh})\\an1}}{gloss}{phon_str}")
         seen_total = set()
         for i, o in enumerate(occs):
