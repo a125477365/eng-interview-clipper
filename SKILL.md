@@ -243,7 +243,9 @@ product spec, do not weaken them:
   words; this check exists because of that incident.)
 - Tier 0 = IELTS-tagged words (the exam sweet spot), tier 1 = everything
   else unfamiliar. Within a tier, rank by occurrences in the video,
-  most frequent first. Take the top N (default 108).
+  most frequent first. NO count cap (user, 2026-10-20): include EVERY
+  word that passes the filters — the old "top 108" was inherited from a
+  reference creator's format, never a user requirement.
 - Keep genuinely hard words even at count == 1 — never miss a hard word
   just because it appears once.
 - Treat `zipf == 0` with count < 3 as transcription noise and drop it.
@@ -409,7 +411,7 @@ stub of a few minutes at the end.
 - Every published episode then gets the 4 s fan-group outro appended
   (§14). Hard rule: content + outro must stay under 1 hour total.
 - Each episode's vocab is computed INDEPENDENTLY from that episode's own
-  segments only (re-ranked, top 108, each with a Chinese gloss) — never
+  segments only (re-ranked, no count cap, each with a Chinese gloss) — never
   shared or pooled across episodes. This isolates rework: if one episode
   has a problem, only that episode is re-processed; the others are
   untouched. Count verification per episode (user, 2026-10-20): zero

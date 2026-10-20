@@ -501,7 +501,7 @@ _CET4, _IELTS, _LEMMA = _load_exam_words()
 TOO_EASY_ZIPF = 4.6
 
 
-def extract(segments: list[dict], top_n: int = 150,
+def extract(segments: list[dict], top_n: int | None = None,
             min_len: int = 3) -> list[dict]:
     """CET-4 -> IELTS oriented vocab extraction.
 
@@ -545,7 +545,11 @@ def extract(segments: list[dict], top_n: int = 150,
         tier = 0 if lemma in _IELTS else 1
         scored.append((tier, -c, w))
     scored.sort()
-    return [{"word": w, "count": -negc} for tier, negc, w in scored[:top_n]]
+    # No count cap by default (user, 2026-10-20): every word passing the
+    # filters is kept. top_n stays available as an explicit override only.
+    if top_n is not None:
+        scored = scored[:top_n]
+    return [{"word": w, "count": -negc} for tier, negc, w in scored]
 
 
 def gloss(vocab: list[dict], translate_fn) -> list[dict]:
@@ -646,7 +650,7 @@ def save(vocab: list[dict], path: str):
 
 if __name__ == "__main__":
     segs = json.load(open(sys.argv[1], encoding="utf-8"))
-    vocab = extract(segs, top_n=int(sys.argv[2]) if len(sys.argv) > 2 else 120)
+    vocab = extract(segs, top_n=int(sys.argv[2]) if len(sys.argv) > 2 else None)
     print(f"{len(vocab)} words")
     for v in vocab[:20]:
         print(f"{v['word']:20s} x{v['count']}")
