@@ -268,9 +268,11 @@ product spec, do not weaken them:
   the video must not end with the counter stuck at 90/100. After composing,
   verify the max progress reached equals the vocab size. If any word never
   triggers, fix the occurrence matching before shipping.
-- **Panel timing** (2026-10-19): the vocab panel appears exactly when its
-  word is spoken, never from t=0 — a cold-open/hook would otherwise show a
-  "current" word long before it is actually said.
+- **Panel timing** (2026-10-20 user rule, supersedes the 2026-10-19
+  "appears when spoken" rule): the vocab panel is visible from the FIRST
+  FRAME to the end. Before the first word is spoken it shows the first
+  window of upcoming words with progress 0/N and no word selected; each
+  occurrence window still starts exactly when its word is spoken.
 - **Surface-form matching** (2026-10-19): the panel index and subtitle
   highlight must match inflected forms actually spoken (predictions,
   disrupted, fabs...), not just the dictionary base form — otherwise

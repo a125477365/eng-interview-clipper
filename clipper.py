@@ -1004,11 +1004,40 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
     occs = _occurrences(segments, vocab_index)
     n = len(vocab)
     if occs:
+        # Panel visible from the FIRST FRAME (user, 2026-10-20 — overrides
+        # the v13.2 "appears when first word is spoken" behavior): before
+        # the first occurrence, show the first window of upcoming words
+        # with progress 0/N and NO word selected.
+        if occs[0]["start"] > 0.01:
+            a0, b0 = _ass_time(0), _ass_time(occs[0]["start"])
+            hdr0 = "本集生詞" if traditional else "本集生词"
+            unit0 = "個" if traditional else "个"
+            L.append(f"Dialogue: 0,{a0},{b0},VH,,0,0,0,,"
+                     f"{{\\pos({PANEL_L},{PANEL_Y + 20})\\an1}}{hdr0} {n} {unit0}  "
+                     f"0/{n}")
+            _init_win, _init_seen = [], set()
+            for w in occs:
+                if w["word"] not in _init_seen:
+                    _init_seen.add(w["word"])
+                    _init_win.append(w)
+                    if len(_init_win) == max_rows:
+                        break
+            for j, w in enumerate(_init_win):
+                y_en = PANEL_Y + 60 + j * ROW_H
+                y_zh = y_en + 42
+                phon = w.get("phonetic", "")
+                gloss = w.get("gloss", "")
+                is_phrase = w.get("is_phrase", False)
+                L.append(f"Dialogue: 0,{a0},{b0},VE,,0,0,0,,"
+                         f"{{\\pos({PANEL_L},{y_en})\\an1}}{w['word']}")
+                L.append(f"Dialogue: 0,{a0},{b0},VWct,,0,0,0,,"
+                         f"{{\\pos({PANEL_R},{y_en})\\an3}}×{w['count']}")
+                phon_str = f" /{phon}/" if phon and not is_phrase else ""
+                L.append(f"Dialogue: 0,{a0},{b0},VWzh,,0,0,0,,"
+                         f"{{\\pos({PANEL_L},{y_zh})\\an1}}{gloss}{phon_str}")
         seen_total = set()
         for i, o in enumerate(occs):
-            # v13.2: panel appears exactly when its word is spoken — never
-            # from t=0 (a cold-open/hook would otherwise show a "current"
-            # word long before it is actually said).
+            # Each occurrence window starts exactly when its word is spoken.
             a = _ass_time(o["start"])
             b = _ass_time(occs[i + 1]["start"] if i + 1 < len(occs) else total)
             seen_total.add(o["word"])
