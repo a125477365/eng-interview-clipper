@@ -127,7 +127,7 @@ def cmd_run(a):
     print("       with clipper.cut_ranges() before continuing.")
     input("       Press Enter when screening is done...")
 
-    print("[6/9] extracting vocab (CET-4 -> IELTS, no cap)...")
+    print("[6/9] extracting vocab (beyond high-school level, no cap)...")
     vocab = clipper.extract(segs)
     print(f"       {len(vocab)} words, e.g.",
           ", ".join(v["word"] for v in vocab[:8]))

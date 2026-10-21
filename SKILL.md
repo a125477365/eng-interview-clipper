@@ -2,8 +2,9 @@
 
 Turn any YouTube interview (tech leaders, etc.) into a vertical 1080x1920
 learning video for mainland-China English learners: sentence-by-sentence
-Chinese/English subtitles, a scrolling vocabulary panel tuned for CET-4 →
-IELTS learners, auto-generated covers, and publishing to Douyin.
+Chinese/English subtitles, a scrolling vocabulary panel of every word
+beyond high-school level (CET-4 / CET-6 / IELTS and beyond), auto-generated
+covers, and publishing to Douyin.
 
 ## When to use
 
@@ -234,32 +235,47 @@ yours. Practical rules (not legal advice):
 
 ### 7. Vocabulary extraction — the core value
 
-Audience: learners who passed CET-4 and are preparing for IELTS.
-`clipper.extract_vocab()` implements this; the rules below are the
-product spec, do not weaken them:
+**Baseline rule (user, 2026-10-21; supersedes the old CET-4 baseline): a
+word counts as a NEW word iff it is beyond high-school vocabulary.**
+CET-4, CET-6 and IELTS words ALL count, and so do words that appear in
+no exam list at all. Only words at/below high-school level are excluded.
+`clipper.extract()` implements this; the rules below are the product
+spec, do not weaken them:
 
-- Build/use `exam_words.json`: CET-4 set (3849 words), IELTS set
-  (5040 words), inflection→lemma map — derived from ECDICT tags.
+- Build/use `exam_words.json` — derived from ECDICT tags: zk set
+  (1603 words), gk set (3677), CET-4 set (3849), CET-6 set (5407),
+  IELTS set (5040), inflection→lemma map. The "already known" baseline
+  is zk ∪ gk (≈3726 unique words).
 - Drop: stopwords, the BASIC common-word list, proper nouns (words
-  capitalized mid-sentence), brand/product names.
-- Drop: any word whose lemma is in the CET-4 set (already known).
-- Drop: any word with `wordfreq.zipf_frequency > 4.6` (known to any
-  CET-4 learner even if untagged).
-- **STRICT enforcement** (2026-10-17 user audit): the CET-4 exclusion must
-  be verified word by word. A lax pass once shipped "we'd", "demo",
-  "driver's", "manually" — all below CET-4 level — in a student-facing
-  video. After extraction, audit the final list: if any word is basic
-  enough that a CET-4 passer surely knows it, remove it. Never ship a
-  vocab panel with trivial words.
+  capitalized mid-sentence), brand/product names, and any token with an
+  apostrophe (contractions/possessives are never vocab).
+- Drop: any word whose lemma is in the zk ∪ gk baseline (already known
+  by high-school graduation).
+- NO zipf ceiling (removed 2026-10-21): corpus frequency cannot
+  separate high-school-known words from CET-4 words — their zipf bands
+  overlap completely (e.g. computer 4.97 vs available 5.28) — so the
+  word lists alone draw the line. The ECDICT lemma map must be built
+  with correct exchange direction ("0:X" = this entry's lemma is X;
+  other codes = inflections of this entry); a reversed map once let
+  base words slip past the baseline check.
+- **STRICT enforcement** (2026-10-17 user audit, standard updated
+  2026-10-21): the baseline exclusion must be verified word by word.
+  A lax pass once shipped "we'd", "demo", "driver's", "manually" in a
+  student-facing video. After extraction, audit the final list: the
+  exam lists have tagging gaps (e.g. best/actually/online carry no
+  school tag in ECDICT) — if any word is basic enough that a
+  high-school graduate surely knows it, remove it. Never ship a vocab
+  panel with trivial words.
 - **Hard rule: the Python running this stage MUST have `wordfreq`
-  installed. If the import fails, abort loudly — never silently skip the
-  zipf filter.** (A silent skip once shipped a whole video of trivial
-  words; this check exists because of that incident.)
-- Tier 0 = IELTS-tagged words (the exam sweet spot), tier 1 = everything
-  else unfamiliar. Within a tier, rank by occurrences in the video,
-  most frequent first. NO count cap (user, 2026-10-20): include EVERY
-  word that passes the filters — the old "top 108" was inherited from a
-  reference creator's format, never a user requirement.
+  installed. If the import fails, abort loudly — never silently skip
+  the noise check.** (A silent skip once shipped a whole video of
+  trivial words; this check exists because of that incident.)
+- Tier 0 = IELTS-tagged words, tier 1 = CET-4/CET-6-tagged words,
+  tier 2 = words in no exam list at all. Within a tier, rank by
+  occurrences in the video, most frequent first. NO count cap (user,
+  2026-10-20): include EVERY word that passes the filters — the old
+  "top 108" was inherited from a reference creator's format, never a
+  user requirement.
 - Keep genuinely hard words even at count == 1 — never miss a hard word
   just because it appears once.
 - Treat `zipf == 0` with count < 3 as transcription noise and drop it.

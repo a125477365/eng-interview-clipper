@@ -1,12 +1,12 @@
 """English Interview Clipper — full pipeline in one module.
 
 Stages: download (1080p-preferred) -> transcribe (faster-whisper) ->
-translate (EN->ZH) -> screen -> vocab (CET-4->IELTS) -> compose (1080x1920) ->
-covers (3:4 + 4:3).
+translate (EN->ZH) -> screen -> vocab (beyond high-school level) -> compose
+(1080x1920) -> covers (3:4 + 4:3).
 
 HARD RULE: the interpreter running the vocab stage MUST have `wordfreq`
-installed. extract_vocab() raises RuntimeError if it is missing — the zipf
-filter must never be silently skipped.
+installed. extract() raises RuntimeError if it is missing — the noise
+check must never be silently skipped.
 """
 
 
@@ -481,7 +481,11 @@ def _proper_nouns(segments: list[dict]) -> set[str]:
 
 
 def _load_exam_words():
-    """Load CET-4 / IELTS word sets + inflection->lemma map (ECDICT-derived)."""
+    """Load exam word sets + inflection->lemma map (ECDICT-derived).
+
+    Sets: gk （高中/高考）, zk （初中/中考）, cet4, cet6, ielts. The
+    "already known" baseline is zk ∪ gk (everything up to high school).
+    """
     import os
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         "exam_words.json")
@@ -489,28 +493,37 @@ def _load_exam_words():
         raise RuntimeError(
             "exam_words.json not found. Run one-time setup first: "
             "`python run.py --build-exam-words` (downloads ECDICT and "
-            "builds the CET-4/IELTS word lists).")
+            "builds the exam word lists).")
     with open(path, encoding="utf-8") as f:
         d = json.load(f)
-    return set(d["cet4"]), set(d["ielts"]), d["lemma"]
+    return (set(d["gk"]), set(d["zk"]), set(d["cet4"]), set(d["cet6"]),
+            set(d["ielts"]), d["lemma"])
 
 
-_CET4, _IELTS, _LEMMA = _load_exam_words()
+_GK, _ZK, _CET4, _CET6, _IELTS, _LEMMA = _load_exam_words()
 
-# words this frequent are known to any CET-4 learner even if untagged
-TOO_EASY_ZIPF = 4.6
+# "already known" baseline (user rule, 2026-10-21): anything at or below
+# high-school level is NOT a new word. zk ∪ gk ≈ 3.7k words.
+_BASE_KNOWN = _GK | _ZK
 
 
 def extract(segments: list[dict], top_n: int | None = None,
             min_len: int = 3) -> list[dict]:
-    """CET-4 -> IELTS oriented vocab extraction.
+    """Vocab extraction — baseline: high school (user rule, 2026-10-21).
 
-    Audience: passed CET-4, preparing for IELTS.
+    A word counts as a NEW word iff it is beyond high-school vocabulary:
+    CET-4, CET-6 and IELTS words all count, and so do words that appear
+    in no exam list at all. Only words at/below high-school level are
+    excluded.
     - lemma-aware: getting->get, daughters->daughter (via ECDICT exchange map)
-    - excludes anything a CET-4 learner already knows: stopwords, BASIC list,
-      proper nouns, brands, CET-4-tagged words, or zipf > 4.6
-    - tier 0: IELTS-tagged words (the exam sweet spot)
-    - tier 1: other unfamiliar words (CET-6/TOEFL/GRE level etc.)
+    - excludes: stopwords, BASIC list, proper nouns, brands, contractions /
+      possessives (tokens with an apostrophe), and any word whose lemma is
+      in the zk ∪ gk baseline sets
+    - NO zipf ceiling: corpus frequency cannot separate high-school-known
+      words from CET-4 words (their zipf bands overlap completely), so
+      the word lists alone draw the line; the final list is still audited
+      word by word before composing (see SKILL.md §7)
+    - tier 0: IELTS-tagged, tier 1: CET-4/CET-6-tagged, tier 2: off-list
     - within a tier, more frequent in the video ranks higher
     - keeps unfamiliar words even at count == 1 (never miss a hard word)
     Returns [{word, count}].
@@ -529,20 +542,24 @@ def extract(segments: list[dict], top_n: int | None = None,
         for w in WORD_RE.findall(s["text"]):
             w = w.lower().strip("-'")
             if (len(w) < min_len or w in SKIP or w in proper
+                    or "'" in w  # contractions / possessives are never vocab
                     or w.replace("-", "").replace("'", "").isdigit()):
                 continue
             counts[w] += 1
     scored = []
     for w, c in counts.items():
         lemma = _LEMMA.get(w, w)
-        if lemma in _CET4:
-            continue
+        if lemma in _BASE_KNOWN:
+            continue  # at/below high-school level — already known
         z = max(zipf_frequency(w, "en"), zipf_frequency(lemma, "en"))
         if z == 0.0 and c < 3:
             continue  # likely transcription noise
-        if z > TOO_EASY_ZIPF:
-            continue  # known to any CET-4 learner
-        tier = 0 if lemma in _IELTS else 1
+        if lemma in _IELTS:
+            tier = 0
+        elif lemma in _CET4 or lemma in _CET6:
+            tier = 1
+        else:
+            tier = 2  # in no exam list at all — still counts (user rule)
         scored.append((tier, -c, w))
     scored.sort()
     # No count cap by default (user, 2026-10-20): every word passing the
@@ -1517,8 +1534,9 @@ def make_covers(frame_png: str, title_lines: list, kicker: str,
 # ======================================================================
 """Download ECDICT and build exam_words.json.
 
-ECDICT tags used: 'cet4' (3849 words), 'ielts' (5040 words).
-Also builds inflection->lemma map from the 'exchange' field (~50k).
+ECDICT tags used: 'gk' (high-school/高考 baseline), 'cet4', 'cet6',
+'ielts'. Also builds inflection->lemma map from the 'exchange' field
+(~50k).
 """
 
 
@@ -1533,36 +1551,48 @@ def build_exam_words(out_path: str = "exam_words.json",
     if not os.path.exists(tmp):
         print("downloading ECDICT (~66MB)...", flush=True)
         urllib.request.urlretrieve(ecdict_url, tmp)
-    cet4, ielts, lemma = set(), set(), {}
+    gk, zk, cet4, cet6, ielts = set(), set(), set(), set(), set()
+    down, up = {}, {}  # down: inflection->lemma (from base entries)
+    # up: inflection->lemma (from the inflected entry's own "0:" pointer)
     with open(tmp, encoding="utf-8") as f:
         for row in csv.DictReader(f):
             w = (row.get("word") or "").strip().lower()
             if not w:
                 continue
-            tags = (row.get("tag") or "").lower()
+            tags = set((row.get("tag") or "").lower().split())
+            if "gk" in tags:
+                gk.add(w)
+            if "zk" in tags:
+                zk.add(w)
             if "cet4" in tags:
                 cet4.add(w)
+            if "cet6" in tags:
+                cet6.add(w)
             if "ielts" in tags:
                 ielts.add(w)
+            # ECDICT exchange semantics: "0:X" on entry w means w is an
+            # inflected form whose lemma is X; "k:Y" (k in p/d/i/3/s/r/t)
+            # on entry w means Y is an inflection OF w. (An earlier build
+            # had these directions mixed, producing base->inflection junk.)
             for ex in (row.get("exchange") or "").split("/"):
-                if ":" in ex:
-                    form, infl = ex.split(":", 1)
-                    if infl and form == "0":  # lemma:inflection
-                        lemma[infl.lower()] = w
-    # also map common inflections explicitly via the exchange pairs
-    with open(tmp, encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            w = (row.get("word") or "").strip().lower()
-            for ex in (row.get("exchange") or "").split("/"):
-                if ":" in ex:
-                    kind, form = ex.split(":", 1)
-                    form = form.lower()
-                    if form and form not in lemma:
-                        lemma[form] = w
-    json.dump({"cet4": sorted(cet4), "ielts": sorted(ielts), "lemma": lemma},
+                if ":" not in ex:
+                    continue
+                kind, form = ex.split(":", 1)
+                form = form.strip().lower()
+                if not form:
+                    continue
+                if kind == "0":
+                    up[w] = form
+                else:
+                    down.setdefault(form, w)
+    lemma = {**down, **up}  # explicit "0:" pointers win
+    lemma = {k: v for k, v in lemma.items() if k != v}
+    json.dump({"gk": sorted(gk), "zk": sorted(zk), "cet4": sorted(cet4),
+               "cet6": sorted(cet6), "ielts": sorted(ielts), "lemma": lemma},
               open(out_path, "w", encoding="utf-8"))
-    print(f"wrote {out_path}: cet4={len(cet4)} ielts={len(ielts)} "
-          f"lemma={len(lemma)}", flush=True)
+    print(f"wrote {out_path}: gk={len(gk)} zk={len(zk)} cet4={len(cet4)} "
+          f"cet6={len(cet6)} ielts={len(ielts)} lemma={len(lemma)}",
+          flush=True)
     return out_path
 
 # ======================================================================
