@@ -250,7 +250,19 @@ spec, do not weaken them:
   capitalized mid-sentence), brand/product names, and any token with an
   apostrophe (contractions/possessives are never vocab).
 - Drop: any word whose lemma is in the zk ∪ gk baseline (already known
-  by high-school graduation).
+  by high-school graduation) — UNLESS it is on the hard-word exemption
+  list.
+- **Hard-word exemptions** (user, 2026-10-21): a few words sit in the
+  school lists yet are genuinely beyond a high-school graduate (the
+  classic case: autonomous — a 高考 textbook word via "autonomous
+  region" — and breakthrough). Those still count as new words. The
+  curated list lives in `vocab_exemptions.json` next to clipper.py.
+  Growth rule: during the §7 audit, baseline-excluded words with
+  zipf ≤ 3.9 are exemption candidates; add the genuinely hard ones to
+  the list, mention additions in the delivery summary (the user can
+  veto), and commit the updated list with the skill. Everyday words
+  that are merely corpus-rare (anyhow, microwave, vocabulary) do NOT
+  qualify.
 - NO zipf ceiling (removed 2026-10-21): corpus frequency cannot
   separate high-school-known words from CET-4 words — their zipf bands
   overlap completely (e.g. computer 4.97 vs available 5.28) — so the

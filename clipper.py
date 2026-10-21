@@ -507,6 +507,25 @@ _GK, _ZK, _CET4, _CET6, _IELTS, _LEMMA = _load_exam_words()
 _BASE_KNOWN = _GK | _ZK
 
 
+def _load_exemptions():
+    """Hard-word exemptions (user rule, 2026-10-21): words that sit in the
+    school baseline lists yet are genuinely beyond a high-school graduate
+    (e.g. autonomous, breakthrough) still count as new words. The list is
+    curated in vocab_exemptions.json and grows through the §7 audit."""
+    import os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "vocab_exemptions.json")
+    if not os.path.exists(path):
+        raise RuntimeError(
+            "vocab_exemptions.json not found next to clipper.py — the "
+            "hard-word exemption list ships with the skill; restore it.")
+    with open(path, encoding="utf-8") as f:
+        return set(json.load(f)["exempt"])
+
+
+_EXEMPT = _load_exemptions()
+
+
 def extract(segments: list[dict], top_n: int | None = None,
             min_len: int = 3) -> list[dict]:
     """Vocab extraction — baseline: high school (user rule, 2026-10-21).
@@ -549,8 +568,9 @@ def extract(segments: list[dict], top_n: int | None = None,
     scored = []
     for w, c in counts.items():
         lemma = _LEMMA.get(w, w)
-        if lemma in _BASE_KNOWN:
+        if lemma in _BASE_KNOWN and lemma not in _EXEMPT:
             continue  # at/below high-school level — already known
+            # (unless exempted as a genuinely hard word, e.g. autonomous)
         z = max(zipf_frequency(w, "en"), zipf_frequency(lemma, "en"))
         if z == 0.0 and c < 3:
             continue  # likely transcription noise
