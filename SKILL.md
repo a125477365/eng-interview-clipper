@@ -1,7 +1,8 @@
 # English Interview Clipper
 
 Turn any YouTube interview (tech leaders, etc.) into a vertical 1080x1920
-learning video for mainland-China English learners: sentence-by-sentence
+(or horizontal 1920x1080, §9L) learning video for mainland-China English
+learners: sentence-by-sentence
 Chinese/English subtitles, a scrolling vocabulary panel of every word
 beyond high-school level (CET-4 / CET-6 / IELTS and beyond), auto-generated
 covers, and publishing to Douyin.
@@ -395,6 +396,63 @@ transparent. 5-row scrolling window follows speech. Implemented in
   crop's top offset must be 0 (not 85px). Verify with frame extraction at
   talking-head timestamps before full render.
 
+### 9L. Landscape scheme — 1920x1080 (2026-10-21 user rule)
+
+The user picks the orientation per video: **竖屏 = §9 as-is （不用修）;
+横屏 = this section.** Only the compose geometry differs. EVERY other
+rule applies identically to both orientations: redistribution gate
+(§0), opening/ending trims (§2), burned-in logos (§3/§9a), transcription
++ proofread + translation + the mandatory final AI review (§5),
+content screening (§6), ALL vocab rules (§7 — baseline, exemptions,
+first-frame panel, pre-selection, progress must reach N, full-duration
+coverage), episode splitting (§12), the vocab Excel (§13), the 4 s
+fan-group outro (§14), covers (§11 — same two ratios for landscape
+posts too), and publishing (§15).
+
+Functions: `clipper.build_ass_landscape()`,
+`clipper.compose_landscape()`, `clipper.make_outro_landscape()`. The
+vertical functions are NOT modified for landscape. Coverage audit for
+landscape: `audit_ass_coverage(path, total,
+panel_styles=clipper._LAND_PANEL_STYLES, sub_style="LEN")`.
+
+Geometry (from the user's 2026-10-21 reference frame):
+
+- Canvas 1920x1080. RIGHT column x=1150..1920 (770 px) is the vocab
+  panel on a dark (10,14,22) background, divider line at x=1150. LEFT
+  region x=0..1150 shows the source frame.
+- Video: fitted WHOLE into the left region (aspect preserved,
+  centered) — NEVER cropped or stretched, so whoever is speaking is
+  on screen COMPLETE (heads never cut, nobody hidden behind the
+  panel). The letterbox area is near-black (6,8,12). Note: the
+  reference frame overlays the panel on the picture; side-by-side
+  columns are used instead so the panel can never cover the speaker
+  （人物完整优先）.
+- Panel header: `本集生词 N 个` at the top-left of the column (x=1200),
+  progress `i/N` at the top-right (x=1870, gold), divider line below.
+- Panel rows: a 5-row window of distinct words ordered by most-recent
+  occurrence; the CURRENT word is the BOTTOM row, gold on EN+ZH+×N
+  (the account's standing highlight rule, same as vertical). Before
+  the first word is spoken, the first window is shown from frame 0
+  with the first word pre-selected gold (§7 panel-timing rule).
+- Each row: EN word (56 px, pale #C7D8C7; current word 66 px gold
+  bold; phrases / words over 14 chars render smaller) — ZH gloss +
+  phonetic below it (42 px; current 48 px gold), phonetic in a SINGLE
+  slash pair AFTER the gloss — ×N right-aligned at x=1870 (38 px
+  gray; current 44 px gold).
+- Dots row under each gloss: one dot per occurrence (capped at 14,
+  scaled proportionally) — filled gold = already occurred (for the
+  current word this includes the ongoing occurrence), hollow gray =
+  remaining. The ×N number stays authoritative.
+- Subtitles: centered on the VIDEO region (x=575), bottom area —
+  EN 64 px white bold at y≈872 (vocab words highlighted yellow-bold,
+  same as vertical), ZH 52 px gold at y≈968. One sentence at a time;
+  wrap-never-truncate (§9 rules; ZH wrap ≤19 units in this width).
+  All Chinese text is Simplified Chinese (the reference frame's
+  Traditional glyphs are NOT copied; §14b Traditional is TikTok-only).
+- Outro: `make_outro_landscape()` renders the same 4 s fan-group card
+  at 1920x1080 (same texts/brand); append with `concat_mp4s()` exactly
+  like vertical (§14a). The 4 s does not count toward the §12 cap.
+
 ### 9a. Logo exclusion — keep by default (2026-10-20 user rule)
 
 - Burned-in logos stay VISIBLE by default — see §3. Removal (crop /
@@ -540,6 +598,8 @@ stub of a few minutes at the end.
 - User sends a URL → run stages 1–7 → sample frames for approval →
   full render → user verifies the finished video → publish only on the
   user's explicit go-ahead.
+- Orientation: the user says 横屏 or 竖屏 per video (default 竖屏）;
+  横屏 uses §9L functions, everything else is identical.
 
 ## Files
 

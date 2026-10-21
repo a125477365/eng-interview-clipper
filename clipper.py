@@ -1138,7 +1138,9 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
         f.write("\n".join(L) + "\n")
 
 
-def audit_ass_coverage(ass_path: str, total: float, thresh: float = 0.3):
+def audit_ass_coverage(ass_path: str, total: float, thresh: float = 0.3,
+                       panel_styles: tuple | None = None,
+                       sub_style: str = "EN"):
     """Full-duration coverage audit (SKILL.md §7, 2026-10-20 user rule).
 
     Returns (panel_gaps, subtitle_gaps): lists of (start, end) spans in
@@ -1150,15 +1152,18 @@ def audit_ass_coverage(ass_path: str, total: float, thresh: float = 0.3):
     def _sec(t):
         h, m, s = t.split(":")
         return int(h) * 3600 + int(m) * 60 + float(s)
+    if panel_styles is None:
+        panel_styles = ("VH", "VE", "VEC", "VWzh", "VWzhCur", "VWct",
+                        "VWctCur")
     panel, subs = [], []
     for line in open(ass_path, encoding="utf-8"):
         if not line.startswith("Dialogue:"):
             continue
         p = line.split(",", 9)
         a, b, style = _sec(p[1]), _sec(p[2]), p[3]
-        if style in ("VH", "VE", "VEC", "VWzh", "VWzhCur", "VWct", "VWctCur"):
+        if style in panel_styles:
             panel.append((a, b))
-        elif style == "EN":
+        elif style == sub_style:
             subs.append((a, b))
 
     def _gaps(ivs):
@@ -1914,3 +1919,337 @@ def check_redistribution(url: str) -> dict:
     if result["flags"]:
         result["ok"] = False
     return result
+
+
+# ======================================================================
+# SECTION: landscape — 1920x1080 horizontal scheme (2026-10-21 user rule)
+# ======================================================================
+"""Landscape layout, parallel to the vertical one (SKILL.md §9L).
+
+The vertical functions above are NOT touched. Landscape has its own
+build_ass / compose / outro with its own geometry:
+
+- Canvas 1920x1080. LEFT region (x 0..1150) = the source frame fitted
+  WHOLE (never cropped — the speaker stays complete), centered on a
+  near-black background. RIGHT column (x 1150..1920) = vocab panel.
+- Panel: header 本集生词 N 个 + progress i/N, divider, 5-row window of
+  distinct words ordered by most-recent occurrence, current word LAST
+  (bottom row) and gold (EN+ZH+xn). Under each gloss, a dots row shows
+  occurrence progress (filled gold = already spoken, hollow = left).
+- Subtitles: centered on the VIDEO region (x=575), EN white above ZH
+  gold, bottom area — same one-sentence / wrap-never-truncate rules.
+"""
+LW, LH = 1920, 1080
+LPANEL_X = 1150            # panel column start; video area is 0..1150
+LPANEL_L = 1200            # panel text left edge
+LPANEL_R = 1870            # panel right edge (xn column)
+LROW_H = 178               # landscape panel row height (5 rows)
+LSUB_CX = 575              # subtitle center x = middle of video area
+
+_LAND_PANEL_STYLES = ("LHh", "LE", "LEC", "LEP", "LEPCur", "LZHn",
+                      "LZHCur", "LCt", "LCtCur", "LDots")
+
+
+def _dots_str(passed: int, total_n: int) -> str:
+    """Occurrence dots for the landscape panel: filled gold = already
+    occurred, hollow grey = remaining. Capped at 14 dots (the xn number
+    stays authoritative for large counts)."""
+    total_n = max(int(total_n), 1)
+    passed = max(0, min(int(passed), total_n))
+    if total_n > 14:
+        filled = round(14 * passed / total_n)
+        hollow = 14 - filled
+    else:
+        filled, hollow = passed, total_n - passed
+    s = ""
+    if filled:
+        s += r"{\1c&H7BD6F5&}" + "●" * filled
+    if hollow:
+        s += r"{\1c&H666666&}" + "○" * hollow
+    return s
+
+
+def build_ass_landscape(segments: list[dict], vocab: list[dict],
+                        total: float, out_path: str,
+                        traditional: bool = False):
+    """Landscape ASS: EN/ZH subtitles over the video region + right
+    vocab panel. Same event-chain semantics as build_ass (panel from
+    the first frame, first word pre-selected, windows chain with no
+    gaps); geometry and window order follow SKILL.md §9L."""
+    _fulltext = " ".join(s.get("text", "") for s in segments).lower()
+    vocab_index = {}
+    _forms = []
+    for v in vocab:
+        w = v["word"].lower()
+        vocab_index[w] = v
+        _forms.append(v["word"])
+        for m in set(re.findall(r"\b" + re.escape(w) + r"(?:s|es|d|ed|ing)?\b",
+                                _fulltext)):
+            if m != w:
+                vocab_index.setdefault(m, v)
+                _forms.append(m)
+    vocab_words = sorted(set(_forms), key=len, reverse=True)
+    L = []
+    L.append("[Script Info]")
+    L.append("ScriptType: v4.00+")
+    L.append(f"PlayResX: {LW}")
+    L.append(f"PlayResY: {LH}")
+    L.append("WrapStyle: 0")
+    L.append("ScaledBorderAndShadow: yes")
+    L.append("")
+    L.append("[V4+ Styles]")
+    L.append("Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, "
+             "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, "
+             "ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
+             "Alignment, MarginL, MarginR, MarginV, Encoding")
+    L.append(f"Style: LEN,{FONT},64,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,3,0,5,40,40,20,1")
+    L.append(f"Style: LZH,{FONT},52,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,3,0,5,40,40,20,1")
+    L.append(f"Style: LHh,{FONT},44,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,7,20,20,10,1")
+    L.append(f"Style: LE,{FONT},56,&H00D2D8C7,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
+    L.append(f"Style: LEC,{FONT},66,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
+    L.append(f"Style: LEP,{FONT},44,&H00D2D8C7,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
+    L.append(f"Style: LEPCur,{FONT},48,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
+    L.append(f"Style: LZHn,{FONT},42,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
+             "0,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
+    L.append(f"Style: LZHCur,{FONT},48,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
+    L.append(f"Style: LCt,{FONT},38,&H00A0A0A0,&H000019FF,&H00000000,&H80000000,"
+             "0,0,0,0,100,100,0,0,1,2,0,3,20,20,10,1")
+    L.append(f"Style: LCtCur,{FONT},44,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+             "-1,0,0,0,100,100,0,0,1,2,0,3,20,20,10,1")
+    L.append(f"Style: LDots,{FONT},30,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
+             "0,0,0,0,100,100,0,0,1,0,0,1,20,20,10,1")
+    L.append("")
+    L.append("[Events]")
+    L.append("Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
+             "Effect, Text")
+
+    # ---- subtitles over the video region ----
+    for s in segments:
+        a, b = _ass_time(s["start"]), _ass_time(s["end"])
+        en_plain = re.sub(r"\s+", " ", s["text"]).strip()
+        zh_plain = re.sub(r"\s+", " ", s.get("zh", "")).strip()
+        en_lines = _wrap_en(en_plain, 30.0)
+        zh_lines = _wrap_zh(zh_plain, 19.0) if zh_plain else []
+        en_tagged = _highlight_vocab(r"\N".join(en_lines), vocab_words)
+        zh_tagged = r"\N".join(zh_lines)
+        n_en, n_zh = len(en_lines), len(zh_lines)
+        en_y = 872 - (n_en - 1) * 40
+        zh_y = 968 + (n_zh - 1) * 36
+        if n_en > 1 and n_zh > 1:
+            en_y -= 16
+            zh_y += 16
+        L.append(f"Dialogue: 0,{a},{b},LEN,,0,0,0,,"
+                 f"{{\\pos({LSUB_CX},{en_y})}}{en_tagged}")
+        if zh_tagged:
+            L.append(f"Dialogue: 0,{a},{b},LZH,,0,0,0,,"
+                     f"{{\\pos({LSUB_CX},{zh_y})}}{zh_tagged}")
+
+    # ---- vocab panel (right column) ----
+    occs = _occurrences(segments, vocab_index)
+    n = len(vocab)
+    hdr_txt = "本集生詞" if traditional else "本集生词"
+    unit_txt = "個" if traditional else "个"
+    starts_by_word = {}
+    for o in occs:
+        starts_by_word.setdefault(o["word"], []).append(o["start"])
+
+    def passed(w, t):
+        return sum(1 for st in starts_by_word.get(w, []) if st <= t + 1e-9)
+
+    def emit_window(a, b, win, cur_word, t, seen_n):
+        L.append(f"Dialogue: 1,{a},{b},LHh,,0,0,0,,"
+                 f"{{\\pos({LPANEL_L},100)\\an1}}{hdr_txt} {n} {unit_txt}")
+        L.append(f"Dialogue: 1,{a},{b},LCtCur,,0,0,0,,"
+                 f"{{\\pos({LPANEL_R},100)\\an3}}{seen_n}/{n}")
+        for j, w in enumerate(win):
+            is_cur = (w["word"] == cur_word)
+            y_en = 210 + j * LROW_H
+            y_zh = y_en + 56
+            y_dots = y_en + 108
+            word = w["word"]
+            phon = w.get("phonetic", "")
+            gloss = w.get("gloss", "")
+            count = w["count"]
+            is_phrase = w.get("is_phrase", False)
+            long_word = is_phrase or len(word) > 14
+            if is_cur:
+                st_en = "LEPCur" if long_word else "LEC"
+            else:
+                st_en = "LEP" if long_word else "LE"
+            L.append(f"Dialogue: 1,{a},{b},{st_en},,0,0,0,,"
+                     f"{{\\pos({LPANEL_L},{y_en})\\an1}}{word}")
+            st_ct = "LCtCur" if is_cur else "LCt"
+            L.append(f"Dialogue: 1,{a},{b},{st_ct},,0,0,0,,"
+                     f"{{\\pos({LPANEL_R},{y_en})\\an3}}×{count}")
+            phon_str = f" /{phon}/" if phon and not is_phrase else ""
+            st_zh = "LZHCur" if is_cur else "LZHn"
+            L.append(f"Dialogue: 1,{a},{b},{st_zh},,0,0,0,,"
+                     f"{{\\pos({LPANEL_L},{y_zh})\\an1}}{gloss}{phon_str}")
+            dots = _dots_str(passed(word, t), count)
+            if dots:
+                L.append(f"Dialogue: 1,{a},{b},LDots,,0,0,0,,"
+                         f"{{\\pos({LPANEL_L},{y_dots})\\an1}}{dots}")
+
+    if occs:
+        if occs[0]["start"] > 0.01:
+            a0, b0 = _ass_time(0), _ass_time(occs[0]["start"])
+            win, seen_w = [], set()
+            for o in occs:
+                if o["word"] not in seen_w:
+                    seen_w.add(o["word"])
+                    win.append(o)
+                    if len(win) == 5:
+                        break
+            emit_window(a0, b0, win, win[0]["word"], -1.0, 0)
+        seen_total = set()
+        lastpos = {}
+        for i, o in enumerate(occs):
+            a = _ass_time(o["start"])
+            b = _ass_time(occs[i + 1]["start"] if i + 1 < len(occs) else total)
+            seen_total.add(o["word"])
+            lastpos[o["word"]] = i
+            ordered = sorted(lastpos, key=lambda w: lastpos[w])
+            win_words = ordered[-5:]
+            by_word = {}
+            for oo in occs:
+                by_word.setdefault(oo["word"], oo)
+            win = [by_word[w] for w in win_words]
+            emit_window(a, b, win, o["word"], o["start"], len(seen_total))
+    else:
+        L.append(f"Dialogue: 1,{_ass_time(0)},{_ass_time(total)},LHh,,0,0,0,,"
+                 f"{{\\pos({LPANEL_L},100)\\an1}}{hdr_txt} {n} {unit_txt}")
+
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(L) + "\n")
+
+
+def make_landscape_bg(out_path: str):
+    """1920x1080 background: near-black video side, dark panel column."""
+    from PIL import Image, ImageDraw
+    img = Image.new("RGB", (LW, LH), (6, 8, 12))
+    d = ImageDraw.Draw(img)
+    d.rectangle([LPANEL_X, 0, LW, LH], fill=(10, 14, 22))
+    d.rectangle([LPANEL_X - 1, 0, LPANEL_X + 1, LH], fill=(60, 70, 90))
+    d.line([(LPANEL_L, 122), (LPANEL_R, 122)], fill=(50, 58, 74), width=2)
+    img.save(out_path)
+    return out_path
+
+
+def compose_landscape(source: str, segments: list[dict], vocab: list[dict],
+                      out_path: str, total: float | None = None,
+                      preset: str | None = None, traditional: bool = False):
+    """Assemble the landscape (1920x1080) video. segments need 'zh'.
+
+    The source frame is fitted WHOLE into the left region — never
+    cropped — so the speaker is always complete (SKILL.md §9L).
+    """
+    preset = preset or os.environ.get("CLIP2VERTICAL_PRESET", "medium")
+    missing = sum(1 for v in vocab if not v.get("gloss"))
+    if missing:
+        raise RuntimeError(
+            f"{missing}/{len(vocab)} vocab words have no Chinese gloss. "
+            "The vocab panel must be bilingual (word + Chinese gloss + "
+            "count). Fill the glosses with gloss_vocab() before composing; "
+            "refusing to render an English-only panel.")
+    r = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", source],
+        capture_output=True, text=True)
+    src_dur = float(r.stdout.strip())
+    total = total or src_dur
+
+    workdir = os.path.dirname(out_path)
+    ass_path = os.path.join(workdir, "_compose_land.ass")
+    bg_path = os.path.join(workdir, "_bg_land.png")
+    build_ass_landscape(segments, vocab, total, ass_path,
+                        traditional=traditional)
+    make_landscape_bg(bg_path)
+    vf = (
+        f"[1:v]scale={LPANEL_X}:{LH}:force_original_aspect_ratio=decrease,"
+        f"setsar=1,fps=30[vid];"
+        f"[0:v][vid]overlay=x=({LPANEL_X}-overlay_w)/2:y=({LH}-overlay_h)/2[vp];"
+        f"[vp]subtitles={ass_path}:fontsdir=/usr/share/fonts,format=yuv420p[out]"
+    )
+    cmd = ["ffmpeg", "-y", "-v", "error",
+           "-loop", "1", "-framerate", "30", "-i", bg_path,
+           "-i", source,
+           "-filter_complex", vf,
+           "-map", "[out]", "-map", "1:a?",
+           "-c:v", "libx264", "-preset", preset, "-crf", "20",
+           "-pix_fmt", "yuv420p", "-r", "30",
+           "-c:a", "aac", "-b:a", "128k",
+           "-t", f"{total:.3f}", "-movflags", "+faststart", out_path]
+    subprocess.run(cmd, check=True)
+    return out_path
+
+
+def make_outro_card_landscape(vocab_count: int, out_png: str, badge: str = "",
+                              traditional: bool = False):
+    """Landscape (1920x1080) version of the 4 s fan-group end card.
+    Same texts and brand style as the vertical card (§14)."""
+    from PIL import Image, ImageDraw, ImageFont, ImageFilter
+    fb = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
+    fr = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+    W, H = LW, LH
+    img = Image.new("RGB", (W, H), (8, 14, 38))
+    d = ImageDraw.Draw(img)
+    for y in range(H):
+        r = int(8 + (26 - 8) * y / H); g = int(14 + (44 - 14) * y / H)
+        b = int(38 + (96 - 38) * y / H)
+        d.line([(0, y), (W, y)], fill=(r, g, b))
+    d = ImageDraw.Draw(img, "RGBA")
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow)
+    gd.ellipse([760, 110, 1160, 430], fill=(255, 200, 70, 30))
+    img = Image.alpha_composite(img.convert("RGBA"),
+                                glow.filter(ImageFilter.GaussianBlur(40))
+                                ).convert("RGB")
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([810, 180, 1110, 360], radius=45, fill=(255, 200, 70))
+    d.polygon([(890, 350), (860, 420), (980, 350)], fill=(255, 200, 70))
+    f = ImageFont.truetype(fb, 64)
+    bb = d.textbbox((0, 0), "群", font=f)
+    d.text(((W - (bb[2] - bb[0])) / 2, 232), "群", font=f, fill=(12, 18, 44))
+
+    def tc(y, s, size, fill, fp=fb):
+        f2 = ImageFont.truetype(fp, size)
+        bb2 = d.textbbox((0, 0), s, font=f2)
+        d.text(((W - (bb2[2] - bb2[0])) / 2, y), s, font=f2, fill=fill)
+    if traditional:
+        tc(480, "加入粉絲群", 104, (255, 200, 70))
+        tc(630, "領取本集生詞清單", 68, (255, 255, 255))
+        tc(724, f"{vocab_count} 個生詞 · 中英對照 Excel", 46,
+           (255, 200, 70), fr)
+    else:
+        tc(480, "加入粉丝群", 104, (255, 200, 70))
+        tc(630, "领取本集生词清单", 68, (255, 255, 255))
+        tc(724, f"{vocab_count} 个生词 · 中英对照 Excel", 46,
+           (255, 200, 70), fr)
+    if badge:
+        tc(H - 110, badge, 44, (255, 255, 255), fr)
+    img.save(out_png)
+    return out_png
+
+
+def make_outro_landscape(vocab_count: int, out_mp4: str, badge: str = "",
+                         duration: float = 4.0, fps: int = 30,
+                         traditional: bool = False) -> str:
+    """Render the landscape 4 s end card to mp4 (silent audio)."""
+    png = out_mp4 + ".card.png"
+    make_outro_card_landscape(vocab_count, png, badge,
+                              traditional=traditional)
+    subprocess.run(
+        ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
+         "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+         "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p",
+         "-r", str(fps), "-c:a", "aac", "-shortest", out_mp4],
+        check=True)
+    return out_mp4
