@@ -188,6 +188,15 @@ supersedes the 2026-10-17 per-video stance)
 
 ### 6. Content screening — mandatory
 
+- **Taiwan — zero tolerance** (2026-10-21 user rule): if the source
+  video involves ANY Taiwan-related topic (Taiwan itself, TSMC /
+  Taiwan supply chains framed around Taiwan, visiting Taiwan, Taiwan
+  politics or society) — regardless of sentiment or how brief the
+  mention — do NOT produce the video at all. This is a source-level
+  rejection, not a segment cut. Check at selection time (title,
+  description, topic list) AND again on the full transcript before
+  composing; a transcript hit kills the whole video: report it and
+  stop.
 - Read every segment. If any segment contains negative remarks about
   China, cut that segment's time range from both video and subtitles
   before composing. When in doubt, cut it. Record what was cut and why.
