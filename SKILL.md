@@ -40,9 +40,12 @@ covers, and publishing to Douyin.
   between candidate sources, prefer channels that explicitly allow
   reuse — a stated permission in the channel About page or the video
   description, a Creative Commons licence, or an official open
-  policy. The same content from a permitted channel beats the same
-  content from a silent or unknown one. This is a preference at
-  selection time; it does not override the hard gate above or §6.
+  policy. Official/public sources whose material is open by law or
+  long-standing practice count the same way (NASA — US federal works
+  are public domain; SpaceX official footage; ESA's CC BY material).
+  The same content from a permitted channel beats the same content
+  from a silent or unknown one. This is a preference at selection
+  time; it does not override the hard gate above or §6.
 - **Attribution in every video** (2026-10-22 user rule): every
   produced video credits its source inside the video itself — the
   outro card carries one added small line beneath the fixed copy
