@@ -1669,7 +1669,7 @@ def make_vocab_excel(vocab: list, title: str, out_dir: str) -> str:
 
 def make_outro_card(vocab_count: int, out_png: str, badge: str = "",
                     W: int = 1080, H: int = 1920,
-                    traditional: bool = False):
+                    traditional: bool = False, source_line: str = ""):
     """4-second end card: join the fan group to get the vocab Excel."""
     from PIL import Image, ImageDraw, ImageFont, ImageFilter
     fb = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
@@ -1711,17 +1711,20 @@ def make_outro_card(vocab_count: int, out_png: str, badge: str = "",
            (255, 200, 70), fr)
     if badge:
         tc(H - 220, badge, 52, (255, 255, 255), fr)
+    if source_line:
+        tc(H - 120, source_line, 30, (150, 160, 175), fr)
     img.save(out_png)
     return out_png
 
 
 def make_outro(vocab_count: int, out_mp4: str, badge: str = "",
                duration: float = 4.0, fps: int = 30,
-               traditional: bool = False) -> str:
+               traditional: bool = False, source_line: str = "") -> str:
     """Render the 4 s end card to mp4 (with silent audio for concat)."""
     import subprocess
     png = out_mp4 + ".card.png"
-    make_outro_card(vocab_count, png, badge, traditional=traditional)
+    make_outro_card(vocab_count, png, badge, traditional=traditional,
+                    source_line=source_line)
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
          "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
@@ -2192,7 +2195,8 @@ def compose_landscape(source: str, segments: list[dict], vocab: list[dict],
 
 
 def make_outro_card_landscape(vocab_count: int, out_png: str, badge: str = "",
-                              traditional: bool = False):
+                              traditional: bool = False,
+                              source_line: str = ""):
     """Landscape (1920x1080) version of the 4 s fan-group end card.
     Same texts and brand style as the vertical card (§14)."""
     from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -2235,17 +2239,21 @@ def make_outro_card_landscape(vocab_count: int, out_png: str, badge: str = "",
            (255, 200, 70), fr)
     if badge:
         tc(H - 110, badge, 44, (255, 255, 255), fr)
+    if source_line:
+        tc(H - 58, source_line, 28, (150, 160, 175), fr)
     img.save(out_png)
     return out_png
 
 
 def make_outro_landscape(vocab_count: int, out_mp4: str, badge: str = "",
                          duration: float = 4.0, fps: int = 30,
-                         traditional: bool = False) -> str:
+                         traditional: bool = False,
+                         source_line: str = "") -> str:
     """Render the landscape 4 s end card to mp4 (silent audio)."""
     png = out_mp4 + ".card.png"
     make_outro_card_landscape(vocab_count, png, badge,
-                              traditional=traditional)
+                              traditional=traditional,
+                              source_line=source_line)
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
          "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",

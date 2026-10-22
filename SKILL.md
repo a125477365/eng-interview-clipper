@@ -36,6 +36,21 @@ covers, and publishing to Douyin.
   proceed. This is a hard gate, not a warning to scroll past.
 - If metadata is unavailable (network block), say so explicitly and let
   the user decide — do not silently assume permission.
+- **Prefer permitted sources** (2026-10-22 user rule): when choosing
+  between candidate sources, prefer channels that explicitly allow
+  reuse — a stated permission in the channel About page or the video
+  description, a Creative Commons licence, or an official open
+  policy. The same content from a permitted channel beats the same
+  content from a silent or unknown one. This is a preference at
+  selection time; it does not override the hard gate above or §6.
+- **Attribution in every video** (2026-10-22 user rule): every
+  produced video credits its source inside the video itself — the
+  outro card carries one added small line beneath the fixed copy
+  (the fixed copy itself stays unchanged, §14):
+  `原视频：{频道名}《{原标题}》`, rendered through the `source_line`
+  parameter of `make_outro()` / `make_outro_landscape()`. The publish
+  description carries the same attribution line. Existing burned-in
+  logos/watermarks are likewise never stripped (§3).
 
 ### 1. Download — resolution first
 
