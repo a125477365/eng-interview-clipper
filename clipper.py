@@ -1044,7 +1044,9 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
         # Panel visible from the FIRST FRAME (user, 2026-10-20 — overrides
         # the v13.2 "appears when first word is spoken" behavior): before
         # the first occurrence, show the first window of upcoming words
-        # with progress 0/N and the FIRST word pre-selected (gold) — it
+        # with progress 1/N (2026-10-23 user rule: the pre-selected first
+        # word counts as reached from the first frame — supersedes the
+        # 2026-10-20 initial 0/N) and the FIRST word pre-selected (gold) — it
         # stays selected until it is actually spoken, where the regular
         # occurrence window takes over with the same word still selected.
         if occs[0]["start"] > 0.01:
@@ -1053,7 +1055,7 @@ def build_ass(segments: list[dict], vocab: list[dict], total: float,
             unit0 = "個" if traditional else "个"
             L.append(f"Dialogue: 0,{a0},{b0},VH,,0,0,0,,"
                      f"{{\\pos({PANEL_L},{PANEL_Y + 20})\\an1}}{hdr0} {n} {unit0}  "
-                     f"0/{n}")
+                     f"1/{n}")
             _init_win, _init_seen = [], set()
             for w in occs:
                 if w["word"] not in _init_seen:
@@ -2111,7 +2113,7 @@ def build_ass_landscape(segments: list[dict], vocab: list[dict],
                     win.append(o)
                     if len(win) == 5:
                         break
-            emit_window(a0, b0, win, win[0]["word"], -1.0, 0)
+            emit_window(a0, b0, win, win[0]["word"], -1.0, 1)
         seen_total = set()
         lastpos = {}
         for i, o in enumerate(occs):

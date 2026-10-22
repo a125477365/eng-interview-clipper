@@ -338,10 +338,15 @@ spec, do not weaken them:
 - **Panel timing** (2026-10-20 user rule, supersedes the 2026-10-19
   "appears when spoken" rule): the vocab panel is visible from the FIRST
   FRAME to the end. Before the first word is spoken it shows the first
-  window of upcoming words with progress 0/N and the first word
-  PRE-SELECTED (gold) — it stays selected until it is actually spoken,
-  where its occurrence window takes over with the same word still
-  selected. Each occurrence window starts exactly when its word is spoken.
+  window of upcoming words and the first word PRE-SELECTED (gold) — it
+  stays selected until it is actually spoken, where its occurrence
+  window takes over with the same word still selected. Each occurrence
+  window starts exactly when its word is spoken.
+- **Initial progress reads 1/N** (2026-10-23 user rule, supersedes the
+  2026-10-20 initial 0/N): because the first word is already selected
+  from the first frame, the header progress starts at 1/N, not 0/N —
+  the counter reflects the currently selected word. Applies to both the
+  portrait (build_ass) and landscape (build_ass_landscape) panels.
 - **Full-duration coverage — panel AND subtitles** (2026-10-20 user rule):
   across the WHOLE video there must never be a moment with speech but no
   subtitle, nor a moment with subtitles but no vocab panel. Panel events
