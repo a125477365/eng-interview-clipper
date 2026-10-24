@@ -492,33 +492,52 @@ Geometry (v5, user-confirmed 2026-10-23/24 — replaces the 2026-10-21
 rejected: speakers came out too small and the panel read as an
 overlay):
 
-- Canvas 1920x1080. LEFT person zone x=0..1150, video area y=0..864,
-  subtitles in the black band below (y=864..1080). RIGHT vocab zone
-  x=1150..1920 (770 px). People appear ONLY in the person zone; the
-  vocab zone shows ONLY vocab.
-- Vocab-zone background = FROSTED GLASS, exact production spec
-  (user-confirmed 2026-10-24): source = the ORIGINAL frame's video
-  band — full 1920 px wide, y=0..864 — NOT the person-zone reframe;
-  it plays LIVE on the same timeline as the video (it moves with
-  the scene, it is not a still). Chain: downscale to 36x17 then back
-  up to 1920x864 (bilinear), crop the right 770 px (x=1150..1920),
-  `lutrgb` x0.62 / x0.62 / x0.70, overlaid at x=1150, y=0 — so the
-  frost covers y=0..864 ONLY; below y=864 the panel column sits on
-  the uniform dark base (near-black (6,8,12)), same as the subtitle
-  band. Because the source is the original frame, a blurred outline
+- Canvas 1920x1080. LEFT person area x=0..1150, RIGHT vocab panel
+  x=1150..1920 (770 px). BOTH run the FULL height y=0..1080 — there
+  is no horizontal band division anymore (user 2026-10-25, per the
+  reference frame: right vocab panel, left person, subtitles
+  floating over the bottom of both). People appear ONLY in the
+  person area; the vocab panel shows ONLY vocab. The reference
+  frame's "MJ ENGLISH" corner badge is the reference account's own
+  mark and is NEVER reproduced in our videos (our videos carry
+  only our own source line/outro).
+- Vocab-panel background = FROSTED GLASS, exact production spec
+  (user-confirmed 2026-10-24, extended to full height 2026-10-25):
+  source = the ORIGINAL frame — NOT the person-zone reframe; it
+  plays LIVE on the same timeline as the video (it moves with
+  the scene, it is not a still). Chain: downscale the original
+  frame to 36 px wide (36x20) then back up to 1920x1080 (bilinear),
+  crop the right 770 px (x=1150..1920), `lutrgb` x0.62 / x0.62 /
+  x0.70, overlaid at x=1150, y=0 — so the frost covers the panel's
+  FULL height y=0..1080. Because the source is the original frame, a blurred outline
   of whoever stands on the right side of the original shot WILL
   show through — the user's explicit tolerance (2026-10-24): a vague
   face-shaped outline is ACCEPTABLE, but facial features must NOT be
   discernible, and NO readable text may survive. (User tuned
   2026-10-24: brighter + lighter frost than the first v4 pass —
   24x11 at x0.52 was too dark and too heavy.)
-- Person-zone placement （横屏）: the person zone is TOP-anchored at
-  y=0..864; y=864..1080 across the FULL width is the solid black
-  subtitle band. Separation, landscape values: person zone and vocab
+- Subtitles (user rule 2026-10-25, correcting the same-day
+  frosted-band idea — the user said that wording was wrong):
+  subtitles have NO background color — the lines float
+  TRANSPARENTLY over the person area AND the vocab-panel
+  background across the bottom of the frame, centered on the FULL
+  frame (center x=960), NOT confined to the person area. EN is the
+  BIG line: 72 px white bold, top y=946 (bottom ≈1018). ZH is the
+  SMALL line, at the SAME size as the vocab panel's ZH: 42 px gold,
+  top y=1030 (bottom ≈1072). EN/ZH gap 12 px, never touching.
+  This retires the old bottom-band subtitle spec (EN 64 / ZH 52,
+  tops y=872/968) and the old solid/frosted band entirely — there
+  is no band anymore.
+- Person-area placement （横屏）: the person area runs TOP to BOTTOM,
+  y=0..1080; strips and CU fill the full 1150x1080 zone (strip
+  output sizes 575x1080 each for two-person, 383x1080 each for
+  three-person; CU 1150x1080). The subtitle lines float over the
+  bottom of the person area; the person area itself has no band
+  cut. Separation, landscape values: person area and vocab
   column never overlap (panel text is inset 50 px from the zone
-  boundary, see below); video band ends at y=864 and the first
-  subtitle line starts at y=872 (8 px gap, never touching);
-  subtitle EN and ZH lines never touch (32 px gap, see below).
+  boundary, see below); subtitle EN and ZH lines never touch
+  (12 px gap, see above); the vocab LIST never enters the
+  subtitle zone (boundary rule, see panel rows below).
 - PERSON-ZONE IRON RULE （长短比例铁律， user's own wording
   2026-10-24): a person's ASPECT RATIO must never be changed — no
   stretching, ever, in any crop. Uniform scaling + cropping only.
@@ -526,7 +545,7 @@ overlay):
   （原话： "头长不能变，要不头型都变了，只有截取不能拉缩型状"):
   CROPPING ONLY — never stretch or squash the shape. Verify
   numerically per strip: the x and y scale factors MUST be equal
-  (e.g. a 581x873 crop scaled to 575x864 is 0.9897 on BOTH axes);
+  (e.g. a 581x1091 crop scaled to 575x1080 is 0.9897 on BOTH axes);
   any mismatch is a defect even if it looks close.
 - Person-zone framing is per-shot (shot list from scene detection),
   windows placed from FACE MEASUREMENTS on full-size stills — never
@@ -535,9 +554,12 @@ overlay):
   Shot classes:
   - CU (one speaker): one window per speaker, face-centered, sized
     to the benchmark the user approved (Yahoo Finance host CU: head +
-    hair ≈ 630 of the 864 zone height; a 1020x767 crop of a 1080p
-    source scaled to 1150x864 lands there). Every speaker's CU uses
-    the SAME displayed size — a big-head-only framing was rejected.
+    hair ≈ 630 px displayed — same absolute size as v5; the zone is
+    now 1080 tall so the head reads slightly smaller relative to
+    the zone, with more body/room visible; a 1020x958 crop of a
+    1080p source scaled to 1150x1080 lands there). Every speaker's
+    CU uses the SAME displayed size — a big-head-only framing was
+    rejected.
     Window x from the measured face center, y keeps the full hair
     (heads never cut — standing rule).
   - MED (1–2 people in one comfortable window): single window,
@@ -547,7 +569,7 @@ overlay):
     one strip per person, spliced left-to-right. STRIP RULES (user,
     2026-10-24, user's own wording: "头要一样大，一样高，每个截取图
     宽度一样宽，每个人在自己所属截取图的中间"): (1) every strip has
-    the SAME output size — same width AND same height (e.g. 575x864
+    the SAME output size — same width AND same height (e.g. 575x1080
     each; an earlier cut with 589/560 strips was rejected on sight);
     (2) each person sits at the HORIZONTAL CENTER of their own
     strip — people must not crowd the seam, nor sit far from the
@@ -560,8 +582,10 @@ overlay):
     head length: two heads of equal length at different heights
     still fail. Align tops by shifting the crop window vertically
     (y0): output top = (source head top − y0) × scale; pick y0 per
-    strip so all output tops match (anchor on one representative
-    frame per shot — seated positions are stable within a shot).
+    strip so all output tops match, anchored on THAT SEGMENT's own
+    frame(s) — see per-segment calibration below; seated positions
+    are stable within one shot but NOT across segments (different
+    segments are different camera setups).
     Verify all four by arithmetic from source measurements:
     output center = (source head center − x0) × scale must equal
     the strip center; output top and output head height likewise.
@@ -589,9 +613,66 @@ overlay):
   FRAGMENTED mp4 (ultrafast intermediate) so partial progress
   survives VM restarts and mid-encode frames can be spot-checked →
   render ONE sample frame per shot class and get the user's OK
-  BEFORE the final compose → compose (base + person zone + frost +
-  ASS, veryfast crf20) → outro → Excel → coverage audit → 3
-  verification frames (§10/§15 as usual).
+  BEFORE the final compose (look approval) PLUS one verification
+  frame per (sub-)segment (internal check — a sample per class
+  does NOT certify the other segments) → compose (frost base +
+  full-height person zone + ASS, veryfast crf20) → outro → Excel →
+  coverage audit → 3 verification frames (§10/§15 as usual).
+- Per-segment calibration (2026-10-24 Yahoo v5 lesson — the method
+  gap behind the v4 strip defect): the strip RULES above existed,
+  but the method said "one representative frame per shot class"
+  and that one frame's windows were reused for every segment of
+  the class. Different segments are different camera setups, and
+  the reuse left centering errors of 47–192 px. Rules now:
+  (1) A SEGMENT is the calibration unit, never the class: measure
+  head centers/tops on EACH segment's own mid-frame and compute
+  its own windows (x0/y0 per strip, scales fixed per class for a
+  consistent look). (2) Intra-segment cuts: scene-detect EACH
+  strip segment at low threshold (0.15) ON THE SOURCE — the
+  stripped mini at 0.35 missed a close-up→two-shot cut; every
+  detected cut splits the segment into sub-shots with their own
+  windows, and a sub-shot that changes person count switches
+  treatment (three-shot → close-up uses the CU formula, never
+  force strips onto a close-up — it cut the guest's head top
+  off). (3) Movement inside a segment (host turns from camera to
+  guest over ~10 s): a fixed window cannot center a moving head —
+  animate the crop x linearly between the two measured endpoints
+  (frame-index expression, scale fixed) or split at a real cut;
+  never leave a fixed window over a moving head. (4) Verify every
+  (sub-)segment with at least one rendered frame before composing
+  pieces; a class sample that passes does not pass the class.
+- Frame-exact splicing (2026-10-24 user rule): a splice must not
+  duplicate or truncate any frame anywhere, except deletions the
+  user already approved (e.g. a removed political block, which is
+  already baked into the reference timeline). Method: (1) snap
+  every segment/sub-segment boundary to a frame number
+  (round(t × fps)); a cut point IS a frame index — the new shot's
+  FIRST frame; the previous sub-shot is [F_start, F_cut), the next
+  [F_cut, F_end). (2) Build pieces with EXACT frame counts
+  (frame-count trims, audio trimmed to the matching sample
+  count) — never float-second cuts: float `-t` rounded each v4
+  piece up ~2–3 frames and v4 gained 42 frames over v3. (3)
+  Splice into the REFERENCE timeline (v3, never a drifted
+  intermediate). Acceptance gate: the final file's total video
+  frame count MUST equal the reference file's frame count
+  exactly. (4) Junction check: for every new cut point, compare
+  the two frames straddling the cut against the master at the
+  same frame indices — continuous, no duplicate, no skip.
+- Scene-detection + frame-count lessons (2026-10-24 Yahoo v5):
+  (1) scene-detection values run systematically 1 frame LATE —
+  the true cut = detected value − 1, and detection only nominates
+  candidates: every cut must be confirmed by eyeballing the
+  boundary frames on both sides. (2) A "false detection" verdict
+  needs boundary-frame evidence on BOTH sides of the cut — a
+  41699 detection once dismissed as false was a real cut (a
+  close-up hidden inside a "close-up segment"). (3) Long segments
+  (>300 frames) cannot be certified by 2 sample points: run a
+  0.15-threshold scene scan over the WHOLE segment plus one
+  internal verification frame every ~150–200 frames. (4) Total
+  frame counts MUST come from `ffprobe -count_frames` real counts
+  — never derive them from seconds × frame rate (a 1619.48 s
+  estimate gave 48584 vs the real 48583, a 1-frame error that
+  nearly polluted a splice).
 - Logo-intersection completeness (2026-10-24 Yahoo lesson): after
   building the reframe graph, PROGRAMMATICALLY list every window —
   CU, MED and strips alike — whose rect intersects a logo/bug rect,
@@ -634,12 +715,18 @@ overlay):
   bar — color change only, never a bar. Before the first word is
   spoken, the first window is shown from frame 0 with the first word
   pre-selected gold (§7 panel-timing rule).
-  Row pitch 178 px; within a row (bottom-anchored): EN at y_en,
-  ZH gloss + phonetic at y_en+56, dots at y_en+108 — giving ~14 px
-  clear gaps between EN/ZH, ZH/dots, and dots/next-row EN, so no
-  two rows or row elements ever touch or overlap. Row 1 EN y=210,
-  row 5 EN y=922 (its ZH/dots run below y=864 onto the dark base —
-  by design, the panel spans the full column height).
+  Row pitch 150 px (was 178 — tightened 2026-10-25 so the list
+  clears the subtitle zone); within a row (bottom-anchored): EN at
+  y_en, ZH gloss + phonetic at y_en+56, dots at y_en+108 — giving
+  ~14 px clear gaps between EN/ZH, ZH/dots, and dots/next-row EN,
+  so no two rows or row elements ever touch or overlap. Row 1 EN
+  y=210, row 5 EN y=810 (ZH 866, dots bottom 918).
+  BOUNDARY RULE (user 2026-10-25): the panel BACKGROUND (frost)
+  runs to y=1080, but the vocab LIST never enters the subtitle
+  zone — the last row's dots bottom (918) must clear the subtitle
+  EN top (946) by ≥10 px (here 28 px). Only background sits under
+  the subtitles, never list text. Verify by frame check: no row
+  element may touch or overlap any subtitle line.
 - Each row: EN word (56 px, pale #C7D8C7; current word 66 px gold
   bold; phrases / words over 14 chars render smaller: 44 px,
   current 48 px gold) — ZH gloss + phonetic below it (42 px white;
@@ -650,15 +737,17 @@ overlay):
   at 14, scaled proportionally) — filled gold = already occurred
   (for the current word this includes the ongoing occurrence),
   hollow gray = remaining. The ×N number stays authoritative.
-- Subtitles, exact geometry: centered on the VIDEO region (x=575),
-  in the black band below the video — EN 64 px white bold, top at
-  y=872 (8 px below the video band edge y=864, never touching the
-  video); ZH 52 px gold, top at y=968 (EN bottom ≈936, so a 32 px
-  gap — EN and ZH never touch). Multi-line sentences shift up/down
-  from these anchors (EN −40 px per extra line, ZH +36 px, and
-  ∓16 px more when both exceed one line) so the block stays inside
-  the band. One sentence at a time; vocab words in the subtitle are
-  highlighted yellow-bold; wrap-never-truncate (EN wrap width 30,
+- Subtitles, exact geometry (2026-10-25 user rule): centered on the
+  FULL frame (x=960), NO background — the lines float transparently
+  over the person area and the vocab-panel background. EN 72 px
+  white bold, top at y=946 (bottom ≈1018); ZH 42 px gold — the SAME
+  size as the vocab panel's ZH — top at y=1030 (bottom ≈1072);
+  EN/ZH gap 12 px, never touching. Multi-line sentences shift
+  up/down from these anchors (EN −48 px per extra line, ZH +40 px,
+  and ∓18 px more when both exceed one line) so the block stays
+  inside the frame and above the bottom edge. One sentence at a
+  time; vocab words in the subtitle are highlighted yellow-bold;
+  wrap-never-truncate (EN wrap width scales with the larger size,
   ZH wrap ≤19 units in this width). All Chinese text
   is Simplified Chinese (the reference frame's Traditional glyphs
   are NOT copied; §14b Traditional is TikTok-only).
