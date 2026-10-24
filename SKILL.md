@@ -425,7 +425,7 @@ transparent. 5-row scrolling window follows speech. Implemented in
   crop's top offset must be 0 (not 85px). Verify with frame extraction at
   talking-head timestamps before full render.
 
-### 9L. Landscape scheme — 1920x1080 (2026-10-21 user rule)
+### 9L. Landscape scheme — 1920x1080 (2026-10-21 user rule; person-zone reframe v5, 2026-10-24)
 
 The user picks the orientation per video: **竖屏 = §9 as-is （不用修）;
 横屏 = this section.** Only the compose geometry differs. EVERY other
@@ -444,18 +444,90 @@ vertical functions are NOT modified for landscape. Coverage audit for
 landscape: `audit_ass_coverage(path, total,
 panel_styles=clipper._LAND_PANEL_STYLES, sub_style="LEN")`.
 
-Geometry (from the user's 2026-10-21 reference frame):
+Geometry (v5, user-confirmed 2026-10-23/24 — replaces the 2026-10-21
+"fit the whole frame into the left region" scheme, which the user
+rejected: speakers came out too small and the panel read as an
+overlay):
 
-- Canvas 1920x1080. RIGHT column x=1150..1920 (770 px) is the vocab
-  panel on a dark (10,14,22) background, divider line at x=1150. LEFT
-  region x=0..1150 shows the source frame.
-- Video: fitted WHOLE into the left region (aspect preserved,
-  centered) — NEVER cropped or stretched, so whoever is speaking is
-  on screen COMPLETE (heads never cut, nobody hidden behind the
-  panel). The letterbox area is near-black (6,8,12). Note: the
-  reference frame overlays the panel on the picture; side-by-side
-  columns are used instead so the panel can never cover the speaker
-  （人物完整优先）.
+- Canvas 1920x1080. LEFT person zone x=0..1150, video area y=0..864,
+  subtitles in the black band below (y=864..1080). RIGHT vocab zone
+  x=1150..1920 (770 px). People appear ONLY in the person zone; the
+  vocab zone shows ONLY vocab.
+- Vocab-zone background = FROSTED GLASS: the (reframed) original
+  video, heavily blurred and slightly darkened — production values:
+  downscale to 36x17 then back up to full size (bilinear), crop the
+  right 770 px, `lutrgb` x0.62 / x0.62 / x0.70. It must stay abstract:
+  colors and light of the scene may show through, but NO recognizable
+  person, face or text may be identifiable in it. (User tuned
+  2026-10-24: brighter + lighter frost than the first v4 pass —
+  24x11 at x0.52 was too dark and too heavy.)
+- PERSON-ZONE IRON RULE （长短比例铁律， user's own wording
+  2026-10-24): a person's ASPECT RATIO must never be changed — no
+  stretching, ever, in any crop. Uniform scaling + cropping only.
+  The person's SIZE may change freely.
+- Person-zone framing is per-shot (shot list from scene detection),
+  windows placed from FACE MEASUREMENTS on full-size stills — never
+  estimate spans from thumbnails or contact-sheet montages (a v4
+  strip estimated from a small montage put the seam through a face).
+  Shot classes:
+  - CU (one speaker): one window per speaker, face-centered, sized
+    to the benchmark the user approved (Yahoo Finance host CU: head +
+    hair ≈ 630 of the 864 zone height; a 1020x767 crop of a 1080p
+    source scaled to 1150x864 lands there). Every speaker's CU uses
+    the SAME displayed size — a big-head-only framing was rejected.
+    Window x from the measured face center, y keeps the full hair
+    (heads never cut — standing rule).
+  - MED (1–2 people in one comfortable window): single window,
+    face-centered — crop the source's left/right, keep the original
+    scene （保留人物原场景）.
+  - Wide multi-person shots whose span does not fit the zone aspect:
+    one strip per person, spliced left-to-right. TWO strip rules
+    (user, 2026-10-24): (1) each person sits at the HORIZONTAL CENTER
+    of their own strip — people must not crowd the seam, nor sit far
+    from the outer frame edges; (2) all people display at the SAME
+    size — equalize on the person's real size: measure head height
+    in the source (a person seated farther away gets a proportionally
+    LARGER strip scale; per-strip scales are expected to differ).
+    Head-height measurement: average two reads — hair-outline height
+    and skin-run face height — hair volume alone misleads (it made
+    the middle guest first too small, then too big).
+- Broadcast logo / bug inside the person zone: FIRST choice is the
+  window — frame it out （直接截取出视频外； dark vignettes / soft
+  darkening over a logo are forbidden, user 2026-10-23). Where a
+  logo still intersects a window or strip, bake a boxblur patch into
+  that shot's chain: patch rect = glyph rect expanded ≥30 source px
+  on every side (glyphs must sit in the fully-opaque core), edges
+  feathered by an alpha ramp (~22 px) EXCEPT edges that coincide
+  with the frame boundary (no feather there — a rim over glyphs at
+  the frame edge ghosts through). Readable broadcaster text must
+  never survive in the person zone. (This is the landscape-reframe
+  application of §3/§9a; the vertical default-keep rule is unchanged.)
+- Production flow for the person zone: scene-detect shots → classify
+  (CU / MED / strips) → measure faces on full-size stills → build the
+  per-shot reframe graph → encode the reframed person-zone video as
+  FRAGMENTED mp4 (ultrafast intermediate) so partial progress
+  survives VM restarts and mid-encode frames can be spot-checked →
+  render ONE sample frame per shot class and get the user's OK
+  BEFORE the final compose → compose (base + person zone + frost +
+  ASS, veryfast crf20) → outro → Excel → coverage audit → 3
+  verification frames (§10/§15 as usual).
+- Logo-intersection completeness (2026-10-24 Yahoo lesson): after
+  building the reframe graph, PROGRAMMATICALLY list every window —
+  CU, MED and strips alike — whose rect intersects a logo/bug rect,
+  and patch every one. The first Yahoo cut patched only the strips
+  and the top-right bug; 7 CU/MED windows still showed a readable
+  logo fragment ("…ance") in the corner.
+- Compose-range method (2026-10-24 Yahoo lesson): when composing a
+  range that does not start at 0, use TRIM filters on sequentially
+  decoded inputs (trim + setpts re-zero, subtitles offset via a
+  second setpts) — NEVER input `-ss` seeks into the fragmented
+  reframe for a long compose: a ~1300 s seek stalled the filter
+  graph ~2 frames in and the video froze solid while the audio ran
+  on (the muxer duplicated the last frame to the end). A short seek
+  for a single verification frame is fine.
+- Final QC addition: run `freezedetect` (n=0.003, d=3) over the
+  finished file — any long freeze is a defect, not a static shot;
+  also spot-check frames just after every internal join/seam.
 - Panel header: `本集生词 N 个` at the top-left of the column (x=1200),
   progress `i/N` at the top-right (x=1870, gold), divider line below.
 - Panel rows: a 5-row window of distinct words ordered by most-recent
