@@ -386,7 +386,9 @@ Each vocab item uses TWO lines:
 - Line 1: English word (large, left) + ×count (right-aligned in its own
   column at PANEL_R — NEVER inline, fixes the 2026-10-16 ×n cutoff bug)
 - Line 2: Chinese gloss + phonetic /.../ (smaller, left)
-- Current word: full-width highlight bar behind both lines
+- Current word: NO background highlight bar (2026-10-16 standing rule,
+  confirmed in code: "no highlight bar") — EN, ZH and ×N all turn gold
+  together; color change only, never a bar
 
 Header: `本集生词 N 个` (left) + `i/N` (right). Background stays black
 transparent. 5-row scrolling window follows speech. Implemented in
@@ -425,7 +427,7 @@ transparent. 5-row scrolling window follows speech. Implemented in
   crop's top offset must be 0 (not 85px). Verify with frame extraction at
   talking-head timestamps before full render.
 
-### 9L. Landscape scheme — 1920x1080 (2026-10-21 user rule; person-zone reframe v5, 2026-10-24)
+### 9L. Landscape scheme — 1920x1080 (2026-10-21 user rule; person-zone reframe v5, strip rules finalized 2026-10-24)
 
 The user picks the orientation per video: **竖屏 = §9 as-is （不用修）;
 横屏 = this section.** Only the compose geometry differs. EVERY other
@@ -453,18 +455,41 @@ overlay):
   subtitles in the black band below (y=864..1080). RIGHT vocab zone
   x=1150..1920 (770 px). People appear ONLY in the person zone; the
   vocab zone shows ONLY vocab.
-- Vocab-zone background = FROSTED GLASS: the (reframed) original
-  video, heavily blurred and slightly darkened — production values:
-  downscale to 36x17 then back up to full size (bilinear), crop the
-  right 770 px, `lutrgb` x0.62 / x0.62 / x0.70. It must stay abstract:
-  colors and light of the scene may show through, but NO recognizable
-  person, face or text may be identifiable in it. (User tuned
+- Vocab-zone background = FROSTED GLASS, exact production spec
+  (user-confirmed 2026-10-24): source = the ORIGINAL frame's video
+  band — full 1920 px wide, y=0..864 — NOT the person-zone reframe;
+  it plays LIVE on the same timeline as the video (it moves with
+  the scene, it is not a still). Chain: downscale to 36x17 then back
+  up to 1920x864 (bilinear), crop the right 770 px (x=1150..1920),
+  `lutrgb` x0.62 / x0.62 / x0.70, overlaid at x=1150, y=0 — so the
+  frost covers y=0..864 ONLY; below y=864 the panel column sits on
+  the uniform dark base (near-black (6,8,12)), same as the subtitle
+  band. Because the source is the original frame, a blurred outline
+  of whoever stands on the right side of the original shot WILL
+  show through — the user's explicit tolerance (2026-10-24): a vague
+  face-shaped outline is ACCEPTABLE, but facial features must NOT be
+  discernible, and NO readable text may survive. (User tuned
   2026-10-24: brighter + lighter frost than the first v4 pass —
   24x11 at x0.52 was too dark and too heavy.)
+- Person-zone placement: the person zone is TOP-anchored at y=0..864
+  (it is NOT vertically centered — the vertical "center line at
+  y=960" rule does not apply to landscape); y=864..1080 across the
+  FULL width is the solid black subtitle band. The standing
+  no-contact rules map to landscape as: person zone and vocab
+  column never overlap (panel text is inset 50 px from the zone
+  boundary, see below); video band ends at y=864 and the first
+  subtitle line starts at y=872 (8 px gap, never touching);
+  subtitle EN and ZH lines never touch (32 px gap, see below);
+  the notch/island rule is N/A in landscape.
 - PERSON-ZONE IRON RULE （长短比例铁律， user's own wording
   2026-10-24): a person's ASPECT RATIO must never be changed — no
   stretching, ever, in any crop. Uniform scaling + cropping only.
-  The person's SIZE may change freely.
+  The person's SIZE may change freely. User restated 2026-10-24
+  （原话： "头长不能变，要不头型都变了，只有截取不能拉缩型状"):
+  CROPPING ONLY — never stretch or squash the shape. Verify
+  numerically per strip: the x and y scale factors MUST be equal
+  (e.g. a 581x873 crop scaled to 575x864 is 0.9897 on BOTH axes);
+  any mismatch is a defect even if it looks close.
 - Person-zone framing is per-shot (shot list from scene detection),
   windows placed from FACE MEASUREMENTS on full-size stills — never
   estimate spans from thumbnails or contact-sheet montages (a v4
@@ -481,16 +506,34 @@ overlay):
     face-centered — crop the source's left/right, keep the original
     scene （保留人物原场景）.
   - Wide multi-person shots whose span does not fit the zone aspect:
-    one strip per person, spliced left-to-right. TWO strip rules
-    (user, 2026-10-24): (1) each person sits at the HORIZONTAL CENTER
-    of their own strip — people must not crowd the seam, nor sit far
-    from the outer frame edges; (2) all people display at the SAME
-    size — equalize on the person's real size: measure head height
-    in the source (a person seated farther away gets a proportionally
-    LARGER strip scale; per-strip scales are expected to differ).
+    one strip per person, spliced left-to-right. STRIP RULES (user,
+    2026-10-24, user's own wording: "头要一样大，一样高，每个截取图
+    宽度一样宽，每个人在自己所属截取图的中间"): (1) every strip has
+    the SAME output size — same width AND same height (e.g. 575x864
+    each; an earlier cut with 589/560 strips was rejected on sight);
+    (2) each person sits at the HORIZONTAL CENTER of their own
+    strip — people must not crowd the seam, nor sit far from the
+    outer frame edges; (3) all people display at the SAME size —
+    equalize on the person's real size: measure head height in the
+    source (a person seated farther away gets a proportionally
+    LARGER strip scale; per-strip scales are expected to differ);
+    (4) all people's HEAD TOPS are LEVEL — "高" is defined by the
+    user as the head TOP （原话： "高指的是要用人的头顶算"), NOT by
+    head length: two heads of equal length at different heights
+    still fail. Align tops by shifting the crop window vertically
+    (y0): output top = (source head top − y0) × scale; pick y0 per
+    strip so all output tops match (anchor on one representative
+    frame per shot — seated positions are stable within a shot).
+    Verify all four by arithmetic from source measurements:
+    output center = (source head center − x0) × scale must equal
+    the strip center; output top and output head height likewise.
     Head-height measurement: average two reads — hair-outline height
     and skin-run face height — hair volume alone misleads (it made
-    the middle guest first too small, then too big).
+    the middle guest first too small, then too big). NEVER judge
+    centering or size from visual-grounding bounding boxes: they
+    carry a systematic rightward bias (~20–50 px) in this workflow
+    and misdiagnosed two consecutive fixes; trust the arithmetic
+    and the rendered sample frame, not the box.
 - Broadcast logo / bug inside the person zone: FIRST choice is the
   window — frame it out （直接截取出视频外； dark vignettes / soft
   darkening over a logo are forbidden, user 2026-10-23). Where a
@@ -525,34 +568,71 @@ overlay):
   graph ~2 frames in and the video froze solid while the audio ran
   on (the muxer duplicated the last frame to the end). A short seek
   for a single verification frame is fine.
+- Piece-compose from a fragmented mini (2026-10-24 Yahoo lesson):
+  when a replacement piece is composed from a mini with an input
+  `-ss` seek, add `setpts=PTS-STARTPTS` to the mini input BEFORE
+  the overlay — input-seek timestamps do not re-zero, and without
+  the re-zero the overlay emits black frames until the seek point.
+  (The same trap bites sample frames taken from a still-encoding
+  mini; wait for the mini to finish or re-zero.)
 - Final QC addition: run `freezedetect` (n=0.003, d=3) over the
   finished file — any long freeze is a defect, not a static shot;
   also spot-check frames just after every internal join/seam.
-- Panel header: `本集生词 N 个` at the top-left of the column (x=1200),
-  progress `i/N` at the top-right (x=1870, gold), divider line below.
+- Panel, exact geometry (all y are ASS bottom-anchored positions;
+  user-confirmed by the approved Yahoo samples — landscape
+  deliberately uses FIVE rows, not the vertical four, because the
+  panel column is taller): header `本集生词 N 个` 44 px at
+  (x=1200, y=100), left-aligned with the row text; progress `i/N`
+  44 px gold at (x=1870, y=100), right-aligned. NO divider line is
+  drawn in the landscape chain (an earlier draft claimed one — the
+  approved frames have none); the header-to-first-row gap does the
+  separating: first row EN top ≈154, i.e. 54 px below the header
+  bottom, never overlapping. Column gutters: panel text inset 50 px
+  from the zone boundary (x=1150 → text x=1200) and 50 px from the
+  right frame edge (×N right edge x=1870 → frame 1920).
 - Panel rows: a 5-row window of distinct words ordered by most-recent
   occurrence; the CURRENT word is the BOTTOM row, gold on EN+ZH+×N
-  (the account's standing highlight rule, same as vertical). Before
+  (the account's standing highlight rule, same as vertical) with NO
+  background highlight bar — color change only, never a bar. Before
   the first word is spoken, the first window is shown from frame 0
   with the first word pre-selected gold (§7 panel-timing rule).
+  Row pitch 178 px; within a row (bottom-anchored): EN at y_en,
+  ZH gloss + phonetic at y_en+56, dots at y_en+108 — giving ~14 px
+  clear gaps between EN/ZH, ZH/dots, and dots/next-row EN, so no
+  two rows or row elements ever touch or overlap. Row 1 EN y=210,
+  row 5 EN y=922 (its ZH/dots run below y=864 onto the dark base —
+  by design, the panel spans the full column height).
 - Each row: EN word (56 px, pale #C7D8C7; current word 66 px gold
-  bold; phrases / words over 14 chars render smaller) — ZH gloss +
-  phonetic below it (42 px; current 48 px gold), phonetic in a SINGLE
-  slash pair AFTER the gloss — ×N right-aligned at x=1870 (38 px
-  gray; current 44 px gold).
-- Dots row under each gloss: one dot per occurrence (capped at 14,
-  scaled proportionally) — filled gold = already occurred (for the
-  current word this includes the ongoing occurrence), hollow gray =
-  remaining. The ×N number stays authoritative.
-- Subtitles: centered on the VIDEO region (x=575), bottom area —
-  EN 64 px white bold at y≈872 (vocab words highlighted yellow-bold,
-  same as vertical), ZH 52 px gold at y≈968. One sentence at a time;
-  wrap-never-truncate (§9 rules; ZH wrap ≤19 units in this width).
-  All Chinese text is Simplified Chinese (the reference frame's
-  Traditional glyphs are NOT copied; §14b Traditional is TikTok-only).
+  bold; phrases / words over 14 chars render smaller: 44 px,
+  current 48 px gold) — ZH gloss + phonetic below it (42 px white;
+  current 48 px gold), phonetic in a SINGLE slash pair AFTER the
+  gloss — ×N right-aligned at x=1870 (38 px gray; current 44 px
+  gold). ×N is a fixed right-aligned column (it does not hug the
+  gloss text — the vertical "拉近" rule is a vertical-layout rule
+  and does not apply to this column layout).
+- Dots row under each gloss (30 px): one dot per occurrence (capped
+  at 14, scaled proportionally) — filled gold = already occurred
+  (for the current word this includes the ongoing occurrence),
+  hollow gray = remaining. The ×N number stays authoritative.
+- Subtitles, exact geometry: centered on the VIDEO region (x=575),
+  in the black band below the video — EN 64 px white bold, top at
+  y=872 (8 px below the video band edge y=864, never touching the
+  video); ZH 52 px gold, top at y=968 (EN bottom ≈936, so a 32 px
+  gap — EN and ZH never touch). Multi-line sentences shift up/down
+  from these anchors (EN −40 px per extra line, ZH +36 px, and
+  ∓16 px more when both exceed one line) so the block stays inside
+  the band. One sentence at a time; vocab words highlighted
+  yellow-bold, same as vertical; wrap-never-truncate (§9 rules; EN
+  wrap width 30, ZH wrap ≤19 units in this width). All Chinese text
+  is Simplified Chinese (the reference frame's Traditional glyphs
+  are NOT copied; §14b Traditional is TikTok-only).
 - Outro: `make_outro_landscape()` renders the same 4 s fan-group card
   at 1920x1080 (same texts/brand); append with `concat_mp4s()` exactly
   like vertical (§14a). The 4 s does not count toward the §12 cap.
+  Plus the §0 attribution line in small gray text beneath the fixed
+  card copy (via the `source_line` parameter):
+  `原视频：{频道名}《{原标题}》` — mandatory on every video, the fixed
+  card copy itself stays unchanged.
 
 ### 9a. Logo exclusion — keep by default (2026-10-20 user rule)
 
