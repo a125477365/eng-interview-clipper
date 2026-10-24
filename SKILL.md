@@ -407,19 +407,53 @@ transparent. 5-row scrolling window follows speech. Implemented in
   to follow the speech, anchored slightly left of center at x=500 (long words must never clip); the word being spoken is
   highlighted gold. Panel background is a dark translucent overlay.
 - Interview video: 16:9 fitted to 1080x608, top edge at y=610.
-- Subtitles, one segment at a time: English at y=1300 (white; words that
-  are in the vocab list highlighted yellow-bold), Chinese at y=1440
-  (gold). English and Chinese must never overlap or cover each other.
-- **Subtitle wrapping, never truncation** (2026-10-17 user rule): long
-  subtitles MUST wrap to multiple lines, NEVER be cut off. Follow movie
-  subtitle conventions:
-  - Chinese: break at punctuation (，。！？；：、), max ~17 full-width units
-    per line; if no punctuation, split evenly by character count
-  - English: break at word boundaries, balance line lengths
-  - Prefer one line per sentence; wrap only when necessary; never drop
-    characters to avoid wrapping
-  - Adjust Y position for multi-line: EN moves up, ZH moves down, keeping
-    the "four no-touches" layout intact
+- Subtitles, one segment at a time (VERTICAL ONLY — landscape keeps
+  its own §9L subtitle spec and has no right-rail constraint):
+  English 64 px white bold, anchor y=1330; Chinese 60 px gold, anchor
+  y=1430 (anchors 100 apart, the 2026-10-16 spacing rule); words in
+  the vocab list highlighted yellow-bold. English and Chinese must
+  never overlap or cover each other.
+- **Right-rail safe zone — subtitles must NEVER go under Douyin's
+  right action bar (2026-10-24 user rule, from a published-video
+  screenshot: the comment button covers subtitle text)**. The rail's
+  icons start at canvas x≈941 (measured from the in-app screenshot:
+  comment-button left edge on a 1125-px-wide phone screen, video fit
+  to width). Vertical subtitle safe zone, canvas 1080 wide: x=180..900
+  (720 px wide, centered on 540). No subtitle pixel may pass x=900.
+  The 41 px margin absorbs phone-model / app-version differences in
+  rail position. The left edge 180 mirrors it to keep subtitles
+  centered; nothing on the left side sits at subtitle height.
+- **Subtitle width and line caps (vertical)**. The width cap is in
+  PIXELS, not characters: every rendered line ≤720 px at its font size
+  (EN 64 px bold ≈31 px/char typical → ≈23 chars/line; ZH 60 px bold
+  = 60 px/char → 12 chars/line). Wrap starting point: EN max 11
+  code-units (≈22 chars), ZH max 12 chars; then pixel-check every
+  line with the real font and re-split any line over 720 px at an
+  earlier word/punctuation boundary. NEVER truncate, NEVER break a
+  word (a single overlong word stays whole on its own line — the only
+  exception, flagged in QC if it crosses x=900).
+- **EN max 2 lines, ZH max 2 lines per card — hard caps (2026-10-22
+  user rule: 中文尽量一行、英文最多两行, and EN/ZH must correspond)**.
+  ZH aims for 1 line per card (≤12 chars) and never exceeds 2. When a
+  sentence exceeds either cap at safe width, SPLIT it into sequential
+  cards at clause boundaries (punctuation, conjunctions, relative
+  clauses): each card independently satisfies EN ≤2 lines and ZH ≤2
+  lines, ZH split at the matching clause boundary so EN and ZH stay
+  matched per card, and time split by word timestamps (fall back to
+  character proportion when word times are missing). A card is one
+  EN+ZH pair shown together; cards never overlap in time. This
+  replaces "prefer one line per sentence": long sentences become
+  2–3 short cards rather than 3–4-line blocks — the price of clearing
+  the rail at readable size (font stays 64/60 px, not shrunk).
+- Multi-line shifts (existing behavior, kept): EN block moves up
+  40 px per extra EN line, ZH moves down 38 px per extra ZH line;
+  when both exceed one line, add 20 px more separation each way, so
+  EN/ZH never touch and subtitles never touch the video above.
+- QC (vertical): the §8 sample frames and the §10/§15 verification
+  frames must include the longest subtitle card; check no subtitle
+  pixel crosses x=900 and no card exceeds 2 EN lines. After the first
+  video built under this rule, verify once against a real in-app
+  phone screenshot before treating the 900 edge as settled.
 - Interface stays clean and minimal. Only real footage from the source
   interview — never AI-generated visuals or stock filler.
 - **Crop must preserve headroom** (2026-10-17 user rule): when cropping
@@ -430,15 +464,22 @@ transparent. 5-row scrolling window follows speech. Implemented in
 ### 9L. Landscape scheme — 1920x1080 (2026-10-21 user rule; person-zone reframe v5, strip rules finalized 2026-10-24)
 
 The user picks the orientation per video: **竖屏 = §9 as-is （不用修）;
-横屏 = this section.** Only the compose geometry differs. EVERY other
-rule applies identically to both orientations: redistribution gate
-(§0), opening/ending trims (§2), burned-in logos (§3/§9a), transcription
-+ proofread + translation + the mandatory final AI review (§5),
-content screening (§6), ALL vocab rules (§7 — baseline, exemptions,
-first-frame panel, pre-selection, progress must reach N, full-duration
-coverage), episode splitting (§12), the vocab Excel (§13), the 4 s
-fan-group outro (§14), covers (§11 — same two ratios for landscape
-posts too), and publishing (§15).
+横屏 = this section.** ORIENTATION SEPARATION (user, 2026-10-24):
+the vocab panel, subtitles and person-zone geometry are DIFFERENT
+between orientations and must NEVER be mixed — §9 is vertical-only,
+§9L is landscape-only; do not carry a panel/subtitle value from one
+orientation into a build of the other. ONLY the process rules below
+are shared across orientations: redistribution
+gate (§0), opening/ending trims (§2), burned-in logos (§3/§9a),
+transcription + proofread + translation + the mandatory final AI
+review (§5), content screening (§6), vocab EXTRACTION rules (§7 —
+baseline, exemptions, progress must reach N, full-duration coverage;
+panel DISPLAY is §9/§9L, not shared), episode splitting (§12), the
+vocab Excel (§13), the 4 s fan-group outro (§14), covers (§11 — same
+two ratios for landscape posts too), and publishing (§15). Panel
+timing (first-frame panel, first-word pre-selection) happens to hold
+in both orientations, but each orientation's geometry below is
+specified on its own and must be followed as written.
 
 Functions: `clipper.build_ass_landscape()`,
 `clipper.compose_landscape()`, `clipper.make_outro_landscape()`. The
@@ -471,16 +512,13 @@ overlay):
   discernible, and NO readable text may survive. (User tuned
   2026-10-24: brighter + lighter frost than the first v4 pass —
   24x11 at x0.52 was too dark and too heavy.)
-- Person-zone placement: the person zone is TOP-anchored at y=0..864
-  (it is NOT vertically centered — the vertical "center line at
-  y=960" rule does not apply to landscape); y=864..1080 across the
-  FULL width is the solid black subtitle band. The standing
-  no-contact rules map to landscape as: person zone and vocab
+- Person-zone placement （横屏）: the person zone is TOP-anchored at
+  y=0..864; y=864..1080 across the FULL width is the solid black
+  subtitle band. Separation, landscape values: person zone and vocab
   column never overlap (panel text is inset 50 px from the zone
   boundary, see below); video band ends at y=864 and the first
   subtitle line starts at y=872 (8 px gap, never touching);
-  subtitle EN and ZH lines never touch (32 px gap, see below);
-  the notch/island rule is N/A in landscape.
+  subtitle EN and ZH lines never touch (32 px gap, see below).
 - PERSON-ZONE IRON RULE （长短比例铁律， user's own wording
   2026-10-24): a person's ASPECT RATIO must never be changed — no
   stretching, ever, in any crop. Uniform scaling + cropping only.
@@ -579,9 +617,8 @@ overlay):
   finished file — any long freeze is a defect, not a static shot;
   also spot-check frames just after every internal join/seam.
 - Panel, exact geometry (all y are ASS bottom-anchored positions;
-  user-confirmed by the approved Yahoo samples — landscape
-  deliberately uses FIVE rows, not the vertical four, because the
-  panel column is taller): header `本集生词 N 个` 44 px at
+  user-confirmed by the approved Yahoo samples — landscape uses FIVE
+  rows because the panel column is taller): header `本集生词 N 个` 44 px at
   (x=1200, y=100), left-aligned with the row text; progress `i/N`
   44 px gold at (x=1870, y=100), right-aligned. NO divider line is
   drawn in the landscape chain (an earlier draft claimed one — the
@@ -590,12 +627,13 @@ overlay):
   bottom, never overlapping. Column gutters: panel text inset 50 px
   from the zone boundary (x=1150 → text x=1200) and 50 px from the
   right frame edge (×N right edge x=1870 → frame 1920).
-- Panel rows: a 5-row window of distinct words ordered by most-recent
-  occurrence; the CURRENT word is the BOTTOM row, gold on EN+ZH+×N
-  (the account's standing highlight rule, same as vertical) with NO
-  background highlight bar — color change only, never a bar. Before
-  the first word is spoken, the first window is shown from frame 0
-  with the first word pre-selected gold (§7 panel-timing rule).
+- Panel rows （横屏）: a 5-row window of distinct words ordered by
+  most-recent occurrence; the CURRENT word is the BOTTOM row.
+  Landscape selection rule, stated on its own: the current word's
+  EN, ZH and ×N all turn gold together, with NO background highlight
+  bar — color change only, never a bar. Before the first word is
+  spoken, the first window is shown from frame 0 with the first word
+  pre-selected gold (§7 panel-timing rule).
   Row pitch 178 px; within a row (bottom-anchored): EN at y_en,
   ZH gloss + phonetic at y_en+56, dots at y_en+108 — giving ~14 px
   clear gaps between EN/ZH, ZH/dots, and dots/next-row EN, so no
@@ -607,9 +645,7 @@ overlay):
   current 48 px gold) — ZH gloss + phonetic below it (42 px white;
   current 48 px gold), phonetic in a SINGLE slash pair AFTER the
   gloss — ×N right-aligned at x=1870 (38 px gray; current 44 px
-  gold). ×N is a fixed right-aligned column (it does not hug the
-  gloss text — the vertical "拉近" rule is a vertical-layout rule
-  and does not apply to this column layout).
+  gold). ×N is a fixed right-aligned column at x=1870.
 - Dots row under each gloss (30 px): one dot per occurrence (capped
   at 14, scaled proportionally) — filled gold = already occurred
   (for the current word this includes the ongoing occurrence),
@@ -621,9 +657,9 @@ overlay):
   gap — EN and ZH never touch). Multi-line sentences shift up/down
   from these anchors (EN −40 px per extra line, ZH +36 px, and
   ∓16 px more when both exceed one line) so the block stays inside
-  the band. One sentence at a time; vocab words highlighted
-  yellow-bold, same as vertical; wrap-never-truncate (§9 rules; EN
-  wrap width 30, ZH wrap ≤19 units in this width). All Chinese text
+  the band. One sentence at a time; vocab words in the subtitle are
+  highlighted yellow-bold; wrap-never-truncate (EN wrap width 30,
+  ZH wrap ≤19 units in this width). All Chinese text
   is Simplified Chinese (the reference frame's Traditional glyphs
   are NOT copied; §14b Traditional is TikTok-only).
 - Outro: `make_outro_landscape()` renders the same 4 s fan-group card
