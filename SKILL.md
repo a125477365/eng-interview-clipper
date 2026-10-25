@@ -12,6 +12,110 @@ covers, and publishing to Douyin.
 - The user gives you a YouTube (or any yt-dlp-supported) interview URL and
   wants a bilingual learning clip published to Douyin / TikTok.
 
+## Orientation map — which rules apply where (2026-10-25)
+
+Read this before building anything. The user picks ONE orientation per
+video (§9L intro). A value from one orientation must NEVER be carried
+into a build of the other. Three buckets only:
+
+### Shared — identical for vertical and horizontal
+
+- §0 redistribution gate + source attribution; §1 download (1080p
+  first, never below 720p); §2 opening/ending trims + frame-0 check
+  on the RENDERED file; §3/§9a burned-in logos KEEP by default
+  (removal only when rare/brief); §3a source card cancelled.
+- §4 transcription + non-speech filtering; §5/§5a/§5b translation,
+  proofreading, overlap fixing, final AI review, translation-shift
+  audit; §6/§6a content screening (Taiwan zero tolerance, three-layer
+  check, cross-platform precedent) and copyright.
+- §7 vocab EXTRACTION rules: high-school baseline (zk ∪ gk), hard-word
+  exemptions, no count cap, strict audit, wordfreq loud fail, progress
+  must reach N, surface-form matching, single-slash phonetic AFTER the
+  gloss, phrases. Panel TIMING is also shared: panel visible from the
+  first frame to the end, first word pre-selected gold, progress
+  starts 1/N, full-duration coverage with no panel/subtitle gap.
+  (Timing is shared; panel GEOMETRY is not — see below.)
+- §8 sample frames before the full render; §10 QC (frame 0, sync
+  spot-checks, audio format, frame-accurate cuts, true cut-point
+  walk-back, mechanical gates ≠ translation gate, post-render
+  political re-scan); §11 covers (both ratios); §12 episode
+  splitting; §13 vocab Excel; §14/§14a outro + assembly; §14b
+  Traditional version; §15 publish (full-quality master, tags
+  verified, publish only on explicit go-ahead).
+- §9c shared items: verification screenshots must carry subtitles;
+  illustration may sit left of the vocab panel; no quality
+  compression for upload; never delete/re-upload after publishing;
+  re-extract vocab after any trim; user-supplied cover art is
+  pixel-untouchable.
+- Meta-rules §9d–§9g and the Workflow estimate rule (re-base every
+  round) are shared.
+
+### Vertical only — §9, §7b, §9b, and the vertical items of §9c
+
+- §9 geometry, all of it: canvas 1080x1920; vocab panel top y=170
+  (see the y=170 vs y=180 note below); interview video 1080x608
+  with top edge y=610; subtitles EN 64 px white bold anchor y=1330,
+  ZH 60 px gold anchor y=1430 (100 px apart); picture vertical
+  centerline y=960.
+- Vertical subtitle constraints, all of them: right-rail safe zone
+  x=180..900 (no subtitle pixel past x=900); pixel width cap
+  720 px; EN max 2 lines, ZH max 2 lines per card (ZH aims for
+  1 line); over-long sentences split into sequential cards at
+  clause boundaries with EN/ZH matched per card.
+- §7b two-line vocab row format: EN line + right-aligned ×N column,
+  ZH gloss + phonetic on line 2, current word turns EN+ZH+×N gold
+  together with NO background bar, ~4-row window.
+- §9c vertical items: vocab-panel position y=180; the "four
+  no-contacts" spacing (panel clear of the notch, panel clear of
+  video, video clear of subtitles, EN clear of ZH); header
+  "本集生词 N 个" left-aligned with the list and kept apart.
+- §9b v12 layout is vertical AND single-video-only: it applies to
+  that one video, never as a general vertical rule.
+
+### Horizontal only — §9L, all of it
+
+- §9L geometry, all of it: canvas 1920x1080; person area x=0..1150
+  and vocab panel x=1150..1920, BOTH full height y=0..1080; frosted
+  panel background (36 px downscale, lutrgb 0.62/0.62/0.70) to
+  y=1080; subtitles with NO background, centered on the FULL frame
+  (x=960), EN 72 px white bold top y=928, ZH 60 px gold top
+  y=1012, 12 px gap; vocab list NEVER enters the subtitle zone
+  (last-row dots bottom 908 vs subtitle EN top 928, ≥10 px clear).
+- Horizontal subtitle cards are ALWAYS 1 EN line + 1 ZH line —
+  2-line blocks are forbidden (they push EN up into the panel
+  dots). Any sentence that would wrap is split by clause, never
+  wrapped to 2 lines. There is NO right-rail safe zone in
+  landscape: the vertical x=180..900 rule does not apply here.
+- Horizontal vocab panel: 5 rows, pitch 150 px, EN 48 px green
+  #6EC88C / ZH 42 px white, current word gold, dots row, ×N
+  right-aligned x=1870. Size order frozen: subtitle EN 72 >
+  subtitle ZH 60 > vocab EN 48 > vocab ZH 42.
+- Person-zone iron rules (landscape only): aspect ratio never
+  changed (cropping + uniform scaling only); strips same output
+  size, each person centered in their own strip, equal displayed
+  sizes, head TOPS level (not head lengths); per-segment (never
+  per-class) calibration; frame-exact splicing against the
+  reference timeline; scene-detection values run 1 frame late;
+  logo/text intersection patching for every window; no source
+  text in any strip; strip-bottom frost fill; speaker-only
+  fallback for unlevel bottoms; TRIM-based compose ranges and
+  setpts re-zero for pieces; freezedetect on the finished file.
+- The landscape logo/text patching above is the landscape-reframe
+  application of the shared §3/§9a keep rule — it does not change
+  the vertical default-keep rule.
+
+### Easy confusions — check these before every build
+
+- Subtitle EN size: vertical 64 px vs landscape 72 px (ZH is 60 px
+  in both — do not "fix" one from the other).
+- Vocab rows: vertical ~4 rows, two-line format vs landscape
+  5 rows, EN/ZH/dots format.
+- Card lines: vertical EN ≤2 / ZH ≤2 vs landscape strictly 1+1.
+- Panel top: §9 says y=170, §9c says y=180 (v13 final). This
+  discrepancy predates this map and is left UNCHANGED here —
+  resolve it with the user before the next vertical build, then
+  delete the losing value per §9e.
+
 ## Setup (one time)
 
 - Install: `pip install -r requirements.txt` (yt-dlp, faster-whisper,
@@ -399,7 +503,7 @@ spec, do not weaken them:
 
 ### 8. Sample frames before the full render
 
-### 7b. Vocab panel — two-line format (2026-10-16)
+### 7b. Vocab panel — two-line format (2026-10-16, VERTICAL ONLY — see Orientation map)
 
 Each vocab item uses TWO lines:
 - Line 1: English word (large, left) + ×count (right-aligned in its own
@@ -417,7 +521,7 @@ transparent. 5-row scrolling window follows speech. Implemented in
   (opening, middle, near end, one with the vocab panel visible) and get
   the user's approval on the layout. This saves the most expensive step.
 
-### 9. Compose — 1080x1920, exact layout
+### 9. Compose — 1080x1920, exact layout (VERTICAL ONLY — see Orientation map)
 
 `clipper.compose()` builds the final video. The layout is fixed:
 
@@ -1070,14 +1174,14 @@ stub of a few minutes at the end.
 - 无 2 秒来源卡；片尾保留 4 秒进群卡
 - 输出 <1GB
 
-### 9c. 长期规则补遗（2026-10-16/17 用户立下，之前漏记）
+### 9c. 长期规则补遗（2026-10-16/17 用户立下，之前漏记；方向见 Orientation map：标【竖】的仅竖屏，其余共用）
 
 - **核实截图必须带字幕**：发布前的开始/中间/结束 3 张截图必须含字幕区+生词栏完整界面，无字幕用户无法审批布局
 - **插图可放生词界面左侧**：独立于裁剪方案的长期要求
 - **不压制画质**：成片在 1GB 上限内用原画质直接发布，不为上传压缩（2026-10-17 用户否决压缩提议）
 - **发后不删改重传**：标题、描述、封面、标签发布前一次弄对，发出去就别动——同一视频删掉原样重传会被平台去重机制判"重复/搬运"压推荐，已跑起来的版本删掉等于浪费推荐 momentum（2026-10-18 v13 教训）
 - **生词栏标题**（"本集生词 N 个"）：与生词列表左对齐并拉开距离，不得重叠
-- **面板位置**：y=180，接近灵动岛但不被覆盖（v13 定版）
+- **面板位置**【竖】：y=180，接近灵动岛但不被覆盖（v13 定版）
 - **剪辑范围变化后生词重梳**：重剪后生词表按新范围重新提取
 - **封面用户图零修改**：用户提供的封面截图一像素不能改，只能在文字区等背景元素叠加，前景零遮挡
 
