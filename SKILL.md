@@ -171,6 +171,25 @@ supersedes the 2026-10-17 per-video stance)
   whether to cut or publish as-is.
   Only proceed to vocab extraction and composing after quality fixes
   are done AND the user has decided on every political flag.
+- **译稿错位审计 (2026-10-25 Yahoo v6c lesson — the defect that
+  passed every mechanical gate)**: a translation file can be shifted
+  by one segment across a whole block: every Chinese line translates
+  the NEXT segment's English (v6c: content 1489–1616 s, ~46 segments;
+  e.g. EN "can't put themselves at risk." paired with the Chinese
+  for the following segment), then silently re-syncs at a later
+  segment. Line counts, frame counts and panel geometry all still
+  pass — so audit SEMANTIC correspondence, not just card counts,
+  before building the ASS: scan that each ZH translates its OWN EN
+  (names, numbers and distinctive words must match the same
+  segment), and eye-check the head, middle and tail of every long
+  block. A run of ≥3 mismatched segments is a shifted block:
+  STOP. Do NOT fix it by shifting all ZH lines back by one — the
+  block head's correct translation does not exist in the data, and
+  mid-block half-sentences interleave, so a mechanical shift leaves
+  wrong lines in place. Fix = re-translate the whole block
+  segment-by-segment from each segment's own English (back up the
+  original file first), rebuild only the intersecting pieces, then
+  run the rework junction check on both ends of the block.
 
 ### 5b. Proofread the English transcription — mandatory (2026-10-17)
 
@@ -461,7 +480,7 @@ transparent. 5-row scrolling window follows speech. Implemented in
   crop's top offset must be 0 (not 85px). Verify with frame extraction at
   talking-head timestamps before full render.
 
-### 9L. Landscape scheme — 1920x1080 (2026-10-21 user rule; person-zone reframe v5, strip rules finalized 2026-10-24)
+### 9L. Landscape scheme — 1920x1080 (2026-10-21 user rule; full-height layout v6 finalized 2026-10-25, strip + bottom + color/size rules)
 
 The user picks the orientation per video: **竖屏 = §9 as-is （不用修）;
 横屏 = this section.** ORIENTATION SEPARATION (user, 2026-10-24):
@@ -487,10 +506,11 @@ vertical functions are NOT modified for landscape. Coverage audit for
 landscape: `audit_ass_coverage(path, total,
 panel_styles=clipper._LAND_PANEL_STYLES, sub_style="LEN")`.
 
-Geometry (v5, user-confirmed 2026-10-23/24 — replaces the 2026-10-21
+Geometry (v6, user-confirmed 2026-10-25 — replaces the 2026-10-21
 "fit the whole frame into the left region" scheme, which the user
 rejected: speakers came out too small and the panel read as an
-overlay):
+overlay; and replaces the v5 1150x864 + bottom-band layout, retired
+2026-10-25):
 
 - Canvas 1920x1080. LEFT person area x=0..1150, RIGHT vocab panel
   x=1150..1920 (770 px). BOTH run the FULL height y=0..1080 — there
@@ -522,9 +542,9 @@ overlay):
   TRANSPARENTLY over the person area AND the vocab-panel
   background across the bottom of the frame, centered on the FULL
   frame (center x=960), NOT confined to the person area. EN is the
-  BIG line: 72 px white bold, top y=946 (bottom ≈1018). ZH is the
-  SMALL line, at the SAME size as the vocab panel's ZH: 42 px gold,
-  top y=1030 (bottom ≈1072). EN/ZH gap 12 px, never touching.
+  BIG line: 72 px white bold, top y=928 (bottom ≈1000). ZH is the
+  second line: 60 px gold, top y=1012 (bottom ≈1072). EN/ZH gap
+  12 px, never touching.
   This retires the old bottom-band subtitle spec (EN 64 / ZH 52,
   tops y=872/968) and the old solid/frosted band entirely — there
   is no band anymore.
@@ -538,6 +558,25 @@ overlay):
   boundary, see below); subtitle EN and ZH lines never touch
   (12 px gap, see above); the vocab LIST never enters the
   subtitle zone (boundary rule, see panel rows below).
+- Person-area BOTTOM rules (user 2026-10-25, from the v6 demo
+  frames — the strip bottoms were messy): (1) NO source-video
+  TEXT, ever — no lower-third name banners, tickers, captions or
+  on-screen graphics text may appear in any strip or CU. Measure
+  per segment where the source's text band starts (banners/tickers
+  typically sit in the source's bottom rows) and end every crop
+  ABOVE that band. (2) NO black gaps at strip bottoms — a strip
+  pushed up for head-top alignment must not end in empty black.
+  Where a strip's crop cannot reach the zone bottom, fill the
+  strip's remaining bottom rows with the SAME frost as the vocab
+  panel (same chain, same lutrgb brightness) — frost fill is the
+  default for level strips with empty bottoms, decided case by
+  case per segment. (3) Speaker-only fallback: if a multi-person
+  shot's strips cannot be made level at the bottom (different
+  strip aspects/heights leave uneven bottoms), do NOT ship uneven
+  strips — show ONLY the current speaker's headshot (CU) for that
+  segment instead. Rule priority: exclude source text first, then
+  frost-fill level bottoms, then fall back to speaker-only when
+  bottoms still cannot be leveled.
 - PERSON-ZONE IRON RULE （长短比例铁律， user's own wording
   2026-10-24): a person's ASPECT RATIO must never be changed — no
   stretching, ever, in any crop. Uniform scaling + cropping only.
@@ -561,7 +600,11 @@ overlay):
     CU uses the SAME displayed size — a big-head-only framing was
     rejected.
     Window x from the measured face center, y keeps the full hair
-    (heads never cut — standing rule).
+    (heads never cut — standing rule) — and the crop's bottom must
+    end above the segment's measured source-text band (see bottom
+    rules below): if the standard crop height cannot fit above the
+    band, narrow the crop (zoom in) or frost-fill the remainder —
+    never show the text.
   - MED (1–2 people in one comfortable window): single window,
     face-centered — crop the source's left/right, keep the original
     scene （保留人物原场景）.
@@ -585,7 +628,12 @@ overlay):
     strip so all output tops match, anchored on THAT SEGMENT's own
     frame(s) — see per-segment calibration below; seated positions
     are stable within one shot but NOT across segments (different
-    segments are different camera setups).
+    segments are different camera setups). (5) Strip BOTTOMS must
+    end level at the zone bottom: a strip that cannot reach the
+    bottom gets frost fill, and a segment whose strips cannot be
+    leveled at all falls back to speaker-only CU — see bottom
+    rules below. A strip that shows source text or a black gap at
+    its bottom fails verification even if its centering is right.
     Verify all four by arithmetic from source measurements:
     output center = (source head center − x0) × scale must equal
     the strip center; output top and output head height likewise.
@@ -605,8 +653,11 @@ overlay):
   feathered by an alpha ramp (~22 px) EXCEPT edges that coincide
   with the frame boundary (no feather there — a rim over glyphs at
   the frame edge ghosts through). Readable broadcaster text must
-  never survive in the person zone. (This is the landscape-reframe
-  application of §3/§9a; the vertical default-keep rule is unchanged.)
+  never survive in the person zone — and since 2026-10-25 this
+  extends to ALL source text (lower-thirds, tickers, captions),
+  not just logos: see the bottom rules. (This is the
+  landscape-reframe application of §3/§9a; the vertical
+  default-keep rule is unchanged.)
 - Production flow for the person zone: scene-detect shots → classify
   (CU / MED / strips) → measure faces on full-size stills → build the
   per-shot reframe graph → encode the reframed person-zone video as
@@ -626,8 +677,10 @@ overlay):
   the reuse left centering errors of 47–192 px. Rules now:
   (1) A SEGMENT is the calibration unit, never the class: measure
   head centers/tops on EACH segment's own mid-frame and compute
-  its own windows (x0/y0 per strip, scales fixed per class for a
-  consistent look). (2) Intra-segment cuts: scene-detect EACH
+  its own windows (x0/y0 per strip, scales set per class for a
+  consistent look, with a per-segment UNIFORM fit factor when the
+  taller 1080-zone crop would overflow the source — all strips of
+  the segment share the factor, so equal head sizes still hold). (2) Intra-segment cuts: scene-detect EACH
   strip segment at low threshold (0.15) ON THE SOURCE — the
   stripped mini at 0.35 missed a close-up→two-shot cut; every
   detected cut splits the segment into sub-shots with their own
@@ -720,16 +773,16 @@ overlay):
   y_en, ZH gloss + phonetic at y_en+56, dots at y_en+108 — giving
   ~14 px clear gaps between EN/ZH, ZH/dots, and dots/next-row EN,
   so no two rows or row elements ever touch or overlap. Row 1 EN
-  y=210, row 5 EN y=810 (ZH 866, dots bottom 918).
+  y=200, row 5 EN y=800 (ZH 856, dots bottom 908).
   BOUNDARY RULE (user 2026-10-25): the panel BACKGROUND (frost)
   runs to y=1080, but the vocab LIST never enters the subtitle
-  zone — the last row's dots bottom (918) must clear the subtitle
-  EN top (946) by ≥10 px (here 28 px). Only background sits under
+  zone — the last row's dots bottom (908) must clear the subtitle
+  EN top (928) by ≥10 px (here 20 px). Only background sits under
   the subtitles, never list text. Verify by frame check: no row
   element may touch or overlap any subtitle line.
-- Each row: EN word (56 px, pale #C7D8C7; current word 66 px gold
-  bold; phrases / words over 14 chars render smaller: 44 px,
-  current 48 px gold) — ZH gloss + phonetic below it (42 px white;
+- Each row: EN word (48 px, pale #C7D8C7; current word 57 px gold
+  bold; phrases / words over 14 chars render smaller: 38 px,
+  current 41 px gold) — ZH gloss + phonetic below it (42 px white;
   current 48 px gold), phonetic in a SINGLE slash pair AFTER the
   gloss — ×N right-aligned at x=1870 (38 px gray; current 44 px
   gold). ×N is a fixed right-aligned column at x=1870.
@@ -737,20 +790,89 @@ overlay):
   at 14, scaled proportionally) — filled gold = already occurred
   (for the current word this includes the ongoing occurrence),
   hollow gray = remaining. The ×N number stays authoritative.
-- Subtitles, exact geometry (2026-10-25 user rule): centered on the
-  FULL frame (x=960), NO background — the lines float transparently
-  over the person area and the vocab-panel background. EN 72 px
-  white bold, top at y=946 (bottom ≈1018); ZH 42 px gold — the SAME
-  size as the vocab panel's ZH — top at y=1030 (bottom ≈1072);
-  EN/ZH gap 12 px, never touching. Multi-line sentences shift
-  up/down from these anchors (EN −48 px per extra line, ZH +40 px,
-  and ∓18 px more when both exceed one line) so the block stays
-  inside the frame and above the bottom edge. One sentence at a
-  time; vocab words in the subtitle are highlighted yellow-bold;
-  wrap-never-truncate (EN wrap width scales with the larger size,
-  ZH wrap ≤19 units in this width). All Chinese text
-  is Simplified Chinese (the reference frame's Traditional glyphs
-  are NOT copied; §14b Traditional is TikTok-only).
+- Subtitles, exact geometry (2026-10-25 user rule, size order
+  corrected the same day — see color/size order below): centered
+  on the FULL frame (x=960), NO background — the lines float
+  transparently over the person area and the vocab-panel
+  background. EN 72 px white bold, top at y=928 (bottom ≈1000);
+  ZH 60 px gold, top at y=1012 (bottom ≈1072); EN/ZH gap 12 px,
+  never touching. One clause per card; EN 1 line + ZH 1 line per
+  card, always (see the card rule below — 2-line blocks are
+  forbidden: they push the EN line up into the panel dots).
+  Vocab words in the subtitle are highlighted yellow-bold;
+  wrap-never-truncate: a clause that would wrap is split into
+  more cards instead (EN wraps within the frame width, centered
+  style — no line may touch the left/right frame edge, verified
+  by frame). All Chinese text is Simplified Chinese (the
+  reference frame's Traditional glyphs are NOT copied; §14b
+  Traditional is TikTok-only).
+- Color + size order (user 2026-10-25, per the MJ reference frame
+  the user sent — the user confirmed 2026-10-25: follow THAT frame
+  for sizes and colors, no further re-derivation; these values are
+  FROZEN): four treatments as in the reference — vocab EN GREEN
+  (#6EC88C, ASS &H008CC86E — the reference's mint, deepened only
+  enough to read as green on our brightened frost, where the
+  earlier pale mint #C7D8C7 washed out to white), vocab ZH white,
+  subtitle EN white bold, subtitle ZH GOLD (#FFC61A, ASS
+  &H001AC6FF — the reference's gold, deepened only enough to read
+  as gold on frost, where the earlier pale gold #F5D67B washed out
+  to near-white). The current-word highlight uses the same gold.
+  Note, as in the reference: vocab ZH and subtitle EN are both
+  white by design — told apart by size (42 vs 72) and weight
+  (regular vs bold). Size order, largest to smallest: subtitle EN
+  72 > subtitle ZH 60 > vocab EN 48 > vocab ZH 42. (The subtitle
+  ZH is deliberately LARGER than the vocab EN here — the earlier
+  v6 demo had it inverted, 42 vs 56, and the hierarchy read
+  backwards against the reference.)
+- Subtitle cards, one clause per card (user 2026-10-25, from the
+  v6b g73 defect): a landscape subtitle card is ALWAYS EN 1 line
+  + ZH 1 line, never more. A 2-line ZH block shifts the whole
+  block upward (EN center pulled to y=885) and the EN line then
+  collides with the panel's last-row dots (dots bottom 908) — the
+  g73 frame showed the EN line and the panel dots touching. So:
+  any sentence that would wrap to 2 lines in either language is
+  SPLIT by clause boundaries (then phrase/comma boundaries if a
+  single clause still overflows) into more cards, EN/ZH paired per
+  card, times split by word timestamps — the same clause-split
+  method as the vertical safe-zone rule (§9). Multi-line shift
+  arithmetic is therefore retired for landscape: no card ever
+  needs it, because no card ever has 2 lines. The panel boundary
+  (dots 908 vs EN top 928) holds precisely because every card is
+  1+1 lines.
+  Anchor alignment (2026-10-25 Yahoo v6c lesson): a Chinese cut
+  placed by proportional position can misplace a distinctive ASCII
+  token (person/brand/number name, upper-case or numeric) into the
+  neighbouring card — anchor the Chinese cut to that token
+  instead (extend the previous card's last Chinese word past the
+  punctuation, or cut the next card's first word forward),
+  provided the anchor sits within half a span of the proportional
+  target (guards against false matches); Chinese punctuation
+  boundaries set by the translator still take priority over
+  anchors.
+  Chinese split must never break a word (2026-10-25 Yahoo v6c
+  lesson): a card split that lands inside a Chinese word (e.g.
+  构建|自己, 应该|建立 split across two cards) is a defect even
+  when both cards stay within 1+1 lines. Split only at word
+  boundaries; if a balanced split would cut a word, move the whole
+  word to the next card. QC: re-joining the split cards' Chinese
+  must reconstruct the original sentence character-for-character —
+  no character lost, duplicated, or stranded. This applies to the
+  vertical clause splits (§9) as well as landscape cards.
+  Numeric tokens stay whole (2026-10-25 Yahoo v6c lesson): a number
+  with its unit or percent sign (e.g. 80%) must never be split
+  across cards — if a split would separate the number from "%" or
+  put the token itself across the boundary, move the whole token
+  to the next card. This extends the ASCII-token anchor rule above
+  to numbers and percentages, which the anchor rule alone did not
+  catch.
+  Rework junction check (2026-10-25 user rule): after any rework
+  that touches a contiguous block (re-translation, re-cut,
+  re-build), verify BOTH ends of the adjusted block before
+  delivery: the subtitle-card timeline must neither overlap nor
+  drop/duplicate a card across either junction, frame-check both
+  sides of each junction, and confirm audio/video continuity at
+  the rebuilt pieces' splice points; report both junctions
+  explicitly.
 - Outro: `make_outro_landscape()` renders the same 4 s fan-group card
   at 1920x1080 (same texts/brand); append with `concat_mp4s()` exactly
   like vertical (§14a). The 4 s does not count toward the §12 cap.
@@ -796,6 +918,23 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   the transcript AND spot-check frames to find where the segment
   actually begins, then verify the cut by watching the first
   10 seconds after the junction.
+- **Mechanical gates do NOT certify translation (2026-10-25 Yahoo
+  v6c lesson)**: v6c passed every mechanical gate — exact frame
+  count, clean decode, freeze only on the outro card, panel
+  boundary, 675 cards all 1+1 lines — and still reached delivery
+  with a ~46-segment shifted translation block. Delivery QC must
+  therefore include the §5 translation-shift audit (semantic
+  EN-ZH correspondence scan + eye-check of block head/middle/
+  tail) as a SEPARATE gate; a file that passes only the
+  mechanical gates is not cleared for delivery.
+- **Post-render political re-scan (2026-10-25 Yahoo v6d method)**:
+  after the final render, scan the full burned subtitle text plus
+  the vocab-panel text for political keywords and read every hit
+  in context; separately verify that every marker phrase of any
+  block cut at §6 is ABSENT from the finished video. This is a
+  post-render gate, distinct from the pre-compose §6 screening —
+  a cut that was decided but not actually removed must be caught
+  here, not by the user.
 
 ### 11. Covers — two ratios
 
@@ -906,6 +1045,14 @@ stub of a few minutes at the end.
   user's explicit go-ahead.
 - Orientation: the user says 横屏 or 竖屏 per video (default 竖屏）;
   横屏 uses §9L functions, everything else is identical.
+- **Progress estimates are re-based every round (2026-10-25 Yahoo
+  v6c lesson)**: never carry an estimate over from a previous
+  round — the v6b round's "1–1.5 hours" was quoted for v6c after
+  the scope had changed (color deepening + clause re-splitting
+  forced a full re-render), and had to be corrected to ~2.5 hours.
+  Recompute from the CURRENT round's measured piece speed and
+  remaining piece count, and always present the number as an
+  estimate, never a commitment.
 
 ## Files
 
