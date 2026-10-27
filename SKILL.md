@@ -43,7 +43,8 @@ into a build of the other. Three buckets only:
   Traditional version; §15 publish (full-quality master, tags
   verified, publish only on explicit go-ahead); §16 clips (cut from
   the finished master, batch review, every-other-day upload,
-  full-video cover, assistant-owned titles/descriptions).
+  full-video cover, assistant-owned titles/descriptions); §17
+  division of labor (assistant vs user actions + reminders).
 - §9c shared items: verification screenshots must carry subtitles;
   illustration may sit left of the vocab panel; no quality
   compression for upload; never delete/re-upload after publishing;
@@ -1156,6 +1157,24 @@ stub of a few minutes at the end.
 - 标题与描述：由助手自行把握，但必须遵守账号文案口径（只写客观事实，不自夸；描述末尾带来源行「原视频：{频道名}《{原标题}》」；标签沿用该访谈的标签组）。
 - 合集归属：切片进该访谈的切片合集（每访谈一个）；完整版进全账号共用的「访谈完整版」合集（收全部已发布完整视频）；完整版合集封面不带人名。
 - 上传分工：完整版文件大，由用户自己传；切片由助手传。
+
+### 17. 分工 — 助手做 vs 提醒用户做（2026-10-27 用户立下，通用）
+
+助手做的事（不用用户动手）：
+- 全流程代跑：三层审查、双平台同源核查、转写、翻译、生词、合成、核实截图、视频封面与合集封面设计。
+- 切片：从成片直切、批量交齐审核、标题/描述/标签把握、合集归属。
+- 网页端操作：建合集、换合集封面、往合集加视频、隔天一支上传已通过审核的切片（窗口 18:20）。
+- 数据复盘：每支发完 72 小时看 2 秒跳出率、完播率、单支涨粉数、合集新增关注并汇报。
+- skill 维护与 GitHub 推送（用户给 token 后）。
+
+必须提醒用户做的事（每项都要列入交付清单，不能只在聊天里提一句）：
+- 审片定发：成片与切片批量审核，用户说"发"才发；没点头的不传。
+- 完整版自己上传（文件大）。
+- App 内置顶轮换：置顶位固定 3 个（最新完整版、数据最好切片、机动 1 个）；每出新访谈，提醒用户把置顶换成最新完整版（置顶网页端失败，只能 App 内做）。
+- App 内看审核通知：视频被判不适宜公开等情况，以 App 审核通知为准。
+- App 内改简介、头像（如需）。
+- 选片拍板：三层审查命中、台湾话题例外等，必须用户定夺后才开工。
+- 推送时提供 GitHub token（聊天里给，用后撤销）。
 
 ## Workflow with the user
 
