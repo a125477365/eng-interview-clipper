@@ -41,7 +41,9 @@ into a build of the other. Three buckets only:
   political re-scan); §11 covers (both ratios); §12 episode
   splitting; §13 vocab Excel; §14/§14a outro + assembly; §14b
   Traditional version; §15 publish (full-quality master, tags
-  verified, publish only on explicit go-ahead).
+  verified, publish only on explicit go-ahead); §16 clips (cut from
+  the finished master, batch review, every-other-day upload,
+  full-video cover, assistant-owned titles/descriptions).
 - §9c shared items: verification screenshots must carry subtitles;
   illustration may sit left of the vocab panel; no quality
   compression for upload; never delete/re-upload after publishing;
@@ -1141,6 +1143,19 @@ stub of a few minutes at the end.
 - Report back the work ID. Deleting/replacing an already-published
   version is a separate user-confirmed step.
 - TikTok: same video, separate login — treat as phase 2.
+
+### 16. 切片 — 从成片切短视频矩阵（2026-10-27 用户立下，通用）
+
+- 只从已交付的成片母带直切：ffmpeg 按段边界精确截取、重编码，画面、字幕、生词栏原样保留；不重渲染、不改布局、不碰母带与段数据；绝不含片尾卡；绝不起于半句、止于半句。
+- 选段标准（按序）：反直觉结论、具体数字或例子、生词密度高、完整问答；跳过自我介绍、寒暄、过渡语。
+- 分层：获客层 30–90 秒（一个结论加一个例子）；承接层 1–3 分钟（一个完整问答加生词）；完整版只做合集锚点，不考核播放量。
+- 一次性交付审核：同一访谈的全部切片一次交齐给用户审片（附每支的母带时间、标题、描述、标签），不一支一支零散交付。
+- 审核门禁：用户审完定夺（可整批通过或单支调整）后才可上传；任何一支用户没点头的不传；发后不删改重传（§9c）。
+- 上传节奏：通过后按隔天一支的顺序上传（2026-10-27 用户定，先跑两周看数据再决定是否加密）；窗口沿用 18:20。
+- 封面：切片一律使用其完整视频的封面，不再每支单独配封面帧。
+- 标题与描述：由助手自行把握，但必须遵守账号文案口径（只写客观事实，不自夸；描述末尾带来源行「原视频：{频道名}《{原标题}》」；标签沿用该访谈的标签组）。
+- 合集归属：切片进该访谈的切片合集（每访谈一个）；完整版进全账号共用的「访谈完整版」合集（收全部已发布完整视频）；完整版合集封面不带人名。
+- 上传分工：完整版文件大，由用户自己传；切片由助手传。
 
 ## Workflow with the user
 
