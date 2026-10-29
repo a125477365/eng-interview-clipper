@@ -11,6 +11,17 @@ covers, and publishing to Douyin.
 
 - The user gives you a YouTube (or any yt-dlp-supported) interview URL and
   wants a bilingual learning clip published to Douyin / TikTok.
+- **One-sentence dispatch (2026-10-29, four modes, user names one):**
+  - Interview long video / clips: user sends an interview URL (existing
+    flow, §1–§17) or says 做切片.
+  - 沉浸式听力： user says “做一期沉浸式听力” (+ optional theme / school
+    level) → §18.
+  - 沉浸式对话： user says “做一期沉浸式对话” (+ optional theme) → §19.
+  - 睡前深夜英语： user says “做一期睡前英语” (+ optional theme) → §21.
+  - If the sentence names no mode, ask which of the four (one question),
+    do not guess. All four modes share the publish discipline: sample /
+    review first, publish only on the user's explicit 发, never
+    delete / re-upload after publishing.
 
 ## Orientation map — which rules apply where (2026-10-25)
 
@@ -42,9 +53,12 @@ into a build of the other. Three buckets only:
   splitting; §13 vocab Excel; §14/§14a outro + assembly; §14b
   Traditional version; §15 publish (full-quality master, tags
   verified, publish only on explicit go-ahead); §16 clips (cut from
-  the finished master, batch review, every-other-day upload,
+  the finished master, batch review, every-day upload,
   full-video cover, assistant-owned titles/descriptions); §17
-  division of labor (assistant vs user actions + reminders).
+  division of labor (assistant vs user actions + reminders); §18
+  immersive listening practice; §19 immersive daily conversation; §20
+  new-line shared rules (screening, intro sting, collections, weekly
+  cadence, style freeze); §21 bedtime late-night English.
 - §9c shared items: verification screenshots must carry subtitles;
   illustration may sit left of the vocab panel; no quality
   compression for upload; never delete/re-upload after publishing;
@@ -1245,3 +1259,215 @@ stub of a few minutes at the end.
   - 通用要求 → 按 §9e 规则更新到 skill（已有→不动，没有→补上，冲突→用最终版删旧条，保证无重复无冲突）
   - 仅适用于该视频 → 不更新到 skill，只在该视频执行
 - 本条元规则本身是通用要求，已记入 skill
+
+## §18 沉浸式英语听力练习（2026-10-29 用户立项，取代已取消的 AI 英语短剧线）
+
+Collection name on Douyin: 沉浸式英语听力练习. Audience: primary / middle /
+high school students (NOT the interview line's adult CET-4 / IELTS audience).
+Format reference ONLY: VibeEnglish《沉浸式英語聽力練習》(YouTube USt5BeZp9Qs).
+Study its layout, pacing and sentence pattern; NEVER copy its sentences,
+topics or artwork. All scripts are original, proprietary content.
+
+### §18a Format (measured from the reference, 2026-10-29)
+
+- Landscape 1920x1080. No vocab panel, no word card, no interview-style
+  vocab sidebar anywhere in this line.
+- One sentence = 4 renditions in fixed order: (1) blind listen, female
+  voice; (2) blind listen, male voice; (3) with subtitles, female voice;
+  (4) with subtitles, male voice.
+- Blind screen: dark calm background + headphones icon + the word
+  “Listen”. No sentence text, no subtitles, no translation on this screen.
+- Subtitle screen: blue gradient background; top-left the sentence number
+  (1, 2, 3, …); top-right the account mark (ours, never the reference's);
+  center the English sentence in white bold with the sentence's key word
+  highlighted yellow; below it the IPA transcription in italic gray;
+  below that the Chinese translation in white, Simplified characters only.
+- Voices: one female + one male American English TTS, teacher style,
+  clear and friendly. Articulation ~150–160 wpm during speech (measured
+  from the reference: 158 wpm articulation, ~70 wpm effective density
+  once pauses are counted). Pauses: 1–2s between renditions, 2–3s between
+  sentences. The voice pair is frozen after the first episode and reused
+  for every episode in this collection. Voices are similar in style to
+  the reference's speakers; NEVER clone the reference speakers' actual
+  voices, and never imitate a real person.
+- Content: everyday sentences for primary / middle / high school
+  students: school, family, hobbies, food, travel, daily routines,
+  health, friendship, study. Simple grammar, common words, one
+  self-contained sentence each, positive tone. No politics, no news,
+  no sensitive topics (see §20 screening, which runs BEFORE synthesis).
+- Episode length: ~20 minutes (18–22 min). ~40 sentences per episode;
+  adjust the count to hit the duration. Sentences numbered from 1.
+- Style unity: same intro sting (§20), same backgrounds, same subtitle
+  style, same voice pair, same layout in every episode.
+
+### §18b Pipeline
+
+User says one sentence (“做一期沉浸式听力” + optional theme / school
+level) → pick an unused theme (§20 topic log) → draft the sentences →
+run §20 screening and drop / replace any flagged line (note the
+replacement) → TTS female + male → render blind + subtitle screens per
+sentence in order → self-check: 3–5 spot checks that audio matches the
+subtitle, numbering is sequential, and blind screens carry no text →
+deliver the episode for user review → publish ONLY on the user's
+explicit 发. Weekly cadence: 1 episode per week for this collection
+(§20). On the first episode, create the Douyin collection
+沉浸式英语听力练习 and add every episode to it.
+
+## §19 沉浸式日常英语对话（2026-10-29 用户立项）
+
+Collection name on Douyin: 沉浸式日常英语对话. Same student audience as
+§18, NOT the interview line's adult audience. Format reference ONLY:
+English Podcast 1314 (YouTube IfJayeiBJV0, hosts Mia + Leo). Study its
+layout, pacing and dialogue shape; NEVER copy its dialogue, topics or
+artwork. All dialogue is original, proprietary content.
+
+### §19a Format (measured from the reference, 2026-10-29)
+
+- Landscape 1920x1080. No vocab panel, no vocab review segment, no
+  interview-style vocab sidebar anywhere in this line.
+- Dark background. Left: female host illustration; right: male host
+  illustration. The two illustrated characters are fixed across every
+  episode (same artwork = style unity). Hosts are fictional; the
+  illustrations are NOT photos of real people. Top-center the account
+  mark (ours, never the reference's).
+- Center: English subtitle in white bold with the currently spoken word
+  highlighted cyan (karaoke word highlight, following the speech);
+  below it the Chinese translation in yellow, Simplified characters
+  only. Bottom-center: a waveform bar animating with the speech.
+- Voices: main pair female + male American English TTS (same style
+  criteria as §18; the pair is frozen after the first episode). Guest
+  voices are allowed: up to 2–3 additional distinct TTS voices per
+  episode for skit characters, drawn from a small fixed set so the
+  collection still sounds consistent. Same no-cloning rule as §18.
+- Pace: natural conversation, ~150–160 wpm articulation (measured from
+  the reference: 157 wpm). No deliberate slowing; natural turn-taking
+  with brief pauses. No repeated renditions (unlike §18).
+- Content: one daily-life theme per episode (habits, school, weekend
+  plans, shopping, cooking, sports, travel, friendship…). Dialogue
+  suitable for primary / middle / high school students, about A2–B1
+  level, practical phrases, natural tone (not textbook-stiff), positive.
+  No politics, no news, no sensitive topics (§20 screening BEFORE
+  synthesis).
+- Episode length: ~20 minutes (18–22 min), roughly 3000 words of
+  dialogue. Structure: intro sting → theme dialogue in several
+  scenes / segments → one brief closing line.
+- Style unity: same intro sting (§20), same host illustrations, same
+  subtitle style, same main voice pair in every episode.
+
+### §19b Pipeline
+
+Same as §18b, with the trigger “做一期沉浸式对话” (+ optional theme).
+Weekly cadence: 1 episode per week for this collection (§20). On the
+first episode, create the Douyin collection 沉浸式日常英语对话 and add
+every episode to it.
+
+## §20 新线通用规则（§18 + §19 + §21，2026-10-29 用户立下）
+
+### §20a 内容与政治筛查（合成前必过，缺一不可）
+
+- 三条新线的内容必须严格遵守此前的政治检查要求：绝不能有任何
+  损害中国的内容和词句。筛查对象是脚本本身（新线没有采访源片、
+  没有出镜人物可查三层，查脚本即是全量检查）。
+- 禁止项：政治内容、台湾相关内容与词句、反华内容、地理敏感内容、
+  对中国的负面内容、任何损害中国的内容和词句。主题只限日常生活、
+  学校、兴趣、健康、旅行、饮食、友谊、学习等安全正面领域。
+- 未成年人适配：全部内容适合小学生、初中生、高中生，语言干净、
+  积极正面，无任何不适合未成年人的内容。
+- 命中处理：任一句子命中禁止项，整句删除或替换，不得靠剪辑、
+  改词蒙混；替换处在交付时注明。筛查不过，绝不合成。
+- 声音与人物：只用风格相近的 TTS 音色，绝不克隆参考视频真人
+  的声音；主持人均为虚构人物，绝不模仿、冒充任何真人。
+
+### §20b 片头音乐（三条新线共用）
+
+- 一个统一的轻柔入场音乐（约 5–8 秒，柔和钢琴风，符合账号
+  风格），只生成一次，之后三条新线的每一期都复用同一个片头，
+  不得每期重生成（风格统一即账号标识）。
+- 片头放在每期视频开头，正片开始前播完，不压正片台词。
+
+### §20c 风格冻结与话题不重复
+
+- 每条新线首期定版即冻结：片头音乐文件、界面布局、字幕字体
+  与颜色、主声音色与语速、主持人形象。后续各期原样复用，不
+  得擅自换风格；用户明确要求改风格时，改后重新冻结并注明。
+- 话题日志：每条新线各维护一份已用主题 / 句子清单（存在该线
+  的工作目录），写脚本前先查日志；主题、句子不得跨期重复。
+  每期内容必须不一样。
+
+### §20d 周更与发布纪律
+
+- 三条新线每周各 1 条（合计每周 3 条）。固定时间表（2026-10-30
+  用户定，均为 18:00，与访谈线 18:20 窗口区分）：周五 18:00
+  沉浸式英语听力练习（§18，20 分钟左右）、周六 18:00 沉浸式日常
+  英语对话（§19，20 分钟左右）、周日 18:00 睡前深夜英语（§21，
+  40 分钟左右）。
+- 生成与审核流程（2026-10-30 用户定，取代一句话下单）：每期由
+  助手提前自动生成，不等用户一句话下单；生成任务在档期前一天
+  上午约 9 点定时跑（见 cron），按 §18/§19/§21 全流程做一期
+  （查话题日志不重复、过 §20a 筛查、合成、渲染、自核），做好
+  后发用户审核（附成片＋主题＋时长＋句数＋筛查结果）；用户审
+  核通过（说发 / 通过）后，助手自动发布（上传抖音＋加进对应
+  合集），用户不用再手动传。批准在档期 18:00 之前 → 按档期
+  18:00 发；批准在 18:00 之后 → 批准后立即发。没有用户批准，
+  绝不发布；档期到了没批准的不自动发、不擅自顶替。用户仍可
+  随时一句话点名加做一期（§18/§19/§21 分发不变）。
+- 发布纪律与访谈线一致：先审片（用户看成片或抽查），用户说
+  发才发；发后不删改重传；标题、描述、标签、封面一次弄对。
+- 封面：每期一张固定模板封面（合集名 + 本期主题），横竖两张
+  （横 4:3、竖 3:4），模板首期定版后冻结；封面不带“完整版”字样
+  （新线各期均为独立单期，不是访谈完整版）。
+
+## §21 睡前深夜英语（2026-10-30 用户立项）
+
+Collection name on Douyin: 睡前深夜英语. Same student audience as §18 /
+§19, NOT the interview line's adult audience. Format reference ONLY:
+English Suki Stories《Learn English While You Sleep | Two Lunchboxes
+(A2)》(YouTube 91Fi_qw5MI02). Study its layout, pacing and story shape;
+NEVER copy its story, sentences or artwork. All stories are original,
+proprietary content.
+
+### §21a Format (measured from the reference, 2026-10-30)
+
+- Landscape 1920x1080. No vocab panel, no vocab review segment, no
+  interview-style vocab sidebar anywhere in this line.
+- Background: calm night stills (starry sky, moon, quiet night city,
+  moonlit clouds), dark and low-contrast, static or very slow crossfade
+  only. No fast cuts, no motion, nothing that disturbs sleep. (This
+  line's background is night stills by design; it is NOT the interview
+  line's real-world footage rule.)
+- Subtitles, centered, one sentence at a time: English in white, plain
+  (no word highlight, no color coding, as in the reference). Below the
+  English, one line of Chinese translation in a soft light tone,
+  smaller than the English, Simplified characters only. NOTE: the
+  reference itself shows English-only subtitles on screen; the Chinese
+  line is added per the user's explicit requirement for 中英文字幕.
+  If the user later says English-only, drop the Chinese line.
+- Top-right: the account mark (ours, never the reference's).
+- Voice: ONE male narrator, calm, soft, unhurried. Style reference is
+  the reference video's narrator (timbre / speed); NEVER clone his
+  actual voice, and never imitate a real person. Articulation
+  ~145–150 wpm during speech (measured 147 wpm); pauses between
+  sentences bring the effective density to ~100–105 wpm (measured
+  104 wpm). Slower and calmer than the conversation line, faster than
+  the listening line's repetition density.
+- Content: ONE continuous gentle story per episode (a day in a life,
+  a trip, home, friendship, nature, school memories…), told mostly in
+  simple present / past tense, A2 level, short sentences, everyday
+  words. Sleep-safe: no suspense, no scary content, no conflict, no
+  excitement, no sad or tense turns; the story stays warm and
+  unhurried from start to finish, suitable for primary / middle / high
+  school students. No politics, no news, no sensitive topics (§20
+  screening BEFORE synthesis).
+- Episode length: ~40 minutes (36–44 min), roughly 4000 words of
+  story. Structure: intro sting (§20b) → one gentle opening line →
+  the continuous story → one soft closing line (sleep-well send-off).
+  No segments, no review, no repetition drills (unlike §18).
+- Style unity: same intro sting (§20b), same night-still style, same
+  subtitle style, same narrator voice in every episode.
+
+### §21b Pipeline
+
+Same as §18b, with the trigger “做一期睡前英语” (+ optional theme).
+Weekly cadence: Sunday 18:00 (§20d). On the first episode, create the
+Douyin collection 睡前深夜英语 and add every episode to it. Topic log
+and style freeze follow §20c.
