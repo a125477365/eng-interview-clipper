@@ -17,7 +17,7 @@ covers, and publishing to Douyin.
   - 沉浸式听力： user says “做一期沉浸式听力” (+ optional theme / school
     level) → §18.
   - 沉浸式对话： user says “做一期沉浸式对话” (+ optional theme) → §19.
-  - 睡前深夜英语： user says “做一期睡前英语” (+ optional theme) → §21.
+  - 睡前英语静听： user says “做一期睡前英语” (+ optional theme) → §21.
   - If the sentence names no mode, ask which of the four (one question),
     do not guess. All four modes share the publish discipline: sample /
     review first, publish only on the user's explicit 发, never
@@ -1674,7 +1674,7 @@ every episode to it.
 - 三条新线每周各 1 条（合计每周 3 条）。固定时间表（2026-10-30
   用户定，均为 18:00，与访谈线 18:20 窗口区分）：周五 18:00
   沉浸式英语听力练习（§18，20 分钟左右）、周六 18:00 沉浸式日常
-  英语对话（§19，20 分钟左右）、周日 18:00 睡前深夜英语（§21，
+  英语对话（§19，20 分钟左右）、周日 18:00 睡前英语静听（§21，
   40 分钟左右）。
 - 生成与审核流程（2026-10-30 用户定，2026-10-30 晚用户改定为周五
   批次，取代档期前一天生成）：三条线一律周五上午集中生成
@@ -1692,19 +1692,36 @@ every episode to it.
 - 标题（2026-10-30 晚用户定）：每视频发布标题直接用片头卡
   （音乐段界面）上显示的期数与标题（合集名-主题-第 N 期），
   不另起、不加字。
-- 封面（2026-10-30 晚用户定）：视频封面直接用片头卡帧（音乐段
-  界面），横 4:3 与竖 3:4 各一张（居中裁切；3:4 裁到文字时改等
-  比缩放留边，不切文字）；合集封面由助手按对该栏目的理解自行
-  设计，不再沿用视频横版图。封面不带“完整版”字样（新线各期
+- 封面（2026-10-30 晚用户改定，取代片头卡帧做法）：视频封面
+  文字直接用开头卡上的全部文字（集合名中英、主题中英、期数，听力还有说明行），背景按视频内容 AI 生成（如夜
+  景话题用夜景背景、买早餐用 3D 卡通买早餐场景），横 4:3 与竖
+  3:4 各一张，封面文字居中对称、好看；合集封面不许用视频界面当背景，生成与集合主题一
+  致的封面，可以没有文字。封面不带“完整版”字样（新线各期
   均为独立单期，不是访谈完整版）。
 - 每视频一份英文 Word 下载文档（2026-10-30 用户立下）：文件名
   ＝视频标题，正文只放英文 — 听力按句编号、对话按说话人标注
   轮次、睡前/访谈按句编号；上传后用分享链接＋授权码（提取码）
   下载。
+- 发布时四项必办（2026-10-30 用户立下，仅三条新线，不含采访
+  视频）：上传时在发布表单里选好定时发布时间、合集、自主声明
+  “内容由AI生成”；封面因发布页上传按钮对浏览器无响应，走
+  编辑页提交。合集是上传时选的，不是发布后才选的；且只在第
+  一次提交时可选，提交后、发布前选不上，漏选只能发布后经合
+  集管理补加。四项缺一不可，发布前逐项核对。
+- 发布元数据细则（2026-10-30 晚用户令：集合、视频封面，集合、视频标题，AI 声明，集合选择，发布时间逐项定死）：
+  - 集合标题：固定三名——沉浸式英语听力练习、沉浸式日常英语对话、睡前英语静听（2026-10-30 晚由睡前深夜英语改名，旧名不再用）。改名走合集管理、只改标题一栏，不动简介、封面、公开范围、合集内视频；改名后合集进审核中属正常，新标题已显示即成功。
+  - 集合封面：横版 4:3（1200×900），无文字，与集合主题一致的图片，绝不许用视频界面当背景（一个集合会有很多视频）；经合集管理更换；换封面后合集进审核中属正常。
+  - 视频封面：文字直接用开头卡上的全部文字（集合名中英、主题中英、期数，听力还有说明行），居中对称、好看；背景按本期内容 AI 生成（夜景话题用夜景背景、买早餐用 3D 卡通买早餐场景）；中文一律 PIL（Noto Sans CJK Bold）叠加，不靠图片模型渲染中文；横 4:3（1200×900）与竖 3:4（900×1200）各一张，3:4 的文字在裁切后画、保证不被裁切、居中留边。发布页“上传封面”按钮对浏览器无响应，一律走编辑页“设置封面”提交；提交时横竖封面检测须显示“封面检测通过、暂未发现封面低质问题”；换封面后视频进审核中属正常，定时时间不变；审核通过后回到定时发布中。封面不带“完整版”字样。
+  - 视频标题：格式＝合集名-主题-第 N 期，直接用片头卡（音乐段界面）上显示的期数与标题，不另起、不加字。改标题走编辑页；定时视频有“继续编辑”入口时可改，提交后进审核中、定时不变；审核中的视频无编辑入口，等审核回到定时发布中或发布后再改。
+  - AI 声明：三条新线上传时必须在发布表单里勾选“内容由AI生成”；漏勾的补救：发布后经编辑页补勾（定时视频距发布时间不足 2 小时时编辑保存被平台拒绝，见发布时间条）。每次编辑提交后复核声明仍已勾。
+  - 集合选择：只在第一次提交（上传表单）时可选；提交后、发布前（定时中/审核中）编辑页选不上；漏选的补救二选一：①视频尚未发布——删旧定时、原样重传，第一次提交即选上合集（重传须原标题/描述/标签/定时不变）；②视频已发布——经合集管理补加。已发布的视频绝不删了原样重传（平台去重机制判重复/搬运压推荐）。
+  - 发布时间：周五批次——三条线周五上午集中生成（睡前 07:19、听力 08:19、对话 09:19），周五统一交用户审核，审核通过后周五一次上传全部三条，上传界面定时发布时间填原档期（听力周五 18:00、对话周六 18:00、睡前周日 18:00）；无批准绝不发；批准晚于档期则立即发。平台规则：定时视频编辑保存时，距发布时间不足 2 小时或超过 14 天会被拒（“定时时长不短于2小时，不长于14天”）；编辑提交后视频进审核中、无继续编辑入口，审核通过后回到定时发布中，定时时间不变。
+  - 每次编辑提交后复核清单：标题、简介、标签、合集、声明、定时时间——除本次授权改的项外其余必须与原来一致；列表缩略图已更新；封面检测通过。任一项不符先汇报、不擅自再提交。
+  - 视频改名联动：视频标题改了，下载文档文件名须同步改为新标题并重新上传到百度网盘文件夹“英语视频文档”（同一文件夹、同一个分享），旧标题文档处理掉，保证一视频一份文档。
 
-## §21 睡前深夜英语（2026-10-30 用户立项）
+## §21 睡前英语静听（2026-10-30 用户立项，2026-10-30 晚由睡前深夜英语改名）
 
-Collection name on Douyin: 睡前深夜英语. Same student audience as §18 /
+Collection name on Douyin: 睡前英语静听. Same student audience as §18 /
 §19, NOT the interview line's adult audience. Format reference ONLY:
 English Suki Stories《Learn English While You Sleep | Two Lunchboxes
 (A2)》(YouTube 91Fi_qw5MI02). Study its layout, pacing and story shape;
@@ -1810,7 +1827,7 @@ proprietary content.
   as an unresolved flag or publish blocker. This supersedes the
   earlier same-day note that publishing was deferred pending a
   license decision. Bedtime clone EP1 publish: 2026-11-01 18:00,
-  Douyin scheduled publish + first creation of the 「睡前深夜英语」
+  Douyin scheduled publish + first creation of the 「睡前英语静听」
   collection (§20d Sunday slot).
 - Intro card (2026-10-30 user review; content differs per line, never
   copy another line's card): night-still background unchanged,
@@ -1856,7 +1873,7 @@ proprietary content.
 
 Same as §18b, with the trigger “做一期睡前英语” (+ optional theme).
 Weekly cadence: Sunday 18:00 (§20d). On the first episode, create the
-Douyin collection 睡前深夜英语 and add every episode to it. Topic log
+Douyin collection 睡前英语静听 and add every episode to it. Topic log
 and style freeze follow §20c.
 
 ## §22 Parametric index, TBD gaps, conflict resolutions (2026-10-30 consolidation)
