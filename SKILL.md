@@ -1990,3 +1990,27 @@ a number.
   details). Those are intentionally NOT in this skill: this file
   covers video generation for the 4 types only. Do not import
   non-generation MEMORY items into build decisions.
+
+## §23 下载文档与网盘（2026-10-30 用户立下，通用）
+
+- Every generated video gets a Word doc named exactly after the video
+  title, uploaded to Baidu Netdisk. Generate and upload right after
+  generation, so the doc is ready by publish time. No extra approval
+  is needed for the upload itself.
+
+- Doc content is English only, format approved 2026-10-30. Interview
+  full versions and clips: subtitle sentences, numbered. Listening:
+  sentences, numbered. Conversation: rounds labelled by speaker.
+  Bedtime: sentences, numbered.
+
+- Docs live in `~/workspace/new-lines/downloads/`, built by
+  `generate_download_docs.py`. Upload with the Baidu connector helper
+  `~/workspace/custom-connectors/custom.baidu-netdisk/bin/upload_docs.py`,
+  which uploads into the folder `/英语视频文档` and skips files already
+  present there.
+
+- The folder is shared once, as one private share with one link and one
+  extraction code. The share create API returns 404 for this personal
+  app, so create the share once via the Baidu web UI or App. Later docs
+  go into the same folder under that same share; do not create a new
+  share per video.
