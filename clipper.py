@@ -1941,15 +1941,18 @@ build_ass / compose / outro with its own geometry:
   distinct words ordered by most-recent occurrence, current word LAST
   (bottom row) and gold (EN+ZH+xn). Under each gloss, a dots row shows
   occurrence progress (filled gold = already spoken, hollow = left).
-- Subtitles: centered on the VIDEO region (x=575), EN white above ZH
-  gold, bottom area — same one-sentence / wrap-never-truncate rules.
+- Subtitles: centered on the FULL frame (x=960), fixed positions EN
+  (960,964) / ZH (960,1042) [tops 928/1012], one clause per card,
+  single line each — callers pre-split segments to fit (EN dwidth
+  ≤33.75, ZH ≤19.0); multi-line shift arithmetic is retired.
 """
 LW, LH = 1920, 1080
 LPANEL_X = 1150            # panel column start; video area is 0..1150
 LPANEL_L = 1200            # panel text left edge
 LPANEL_R = 1870            # panel right edge (xn column)
-LROW_H = 178               # landscape panel row height (5 rows)
-LSUB_CX = 575              # subtitle center x = middle of video area
+LROW_H = 150               # landscape panel row height (5 rows)
+LSUB_CX = 960              # subtitle center x = middle of full frame
+EN_POS, ZH_POS = 964, 1042  # subtitle centers: EN top 928, ZH top 1012
 
 _LAND_PANEL_STYLES = ("LHh", "LE", "LEC", "LEP", "LEPCur", "LZHn",
                       "LZHCur", "LCt", "LCtCur", "LDots")
@@ -2007,27 +2010,27 @@ def build_ass_landscape(segments: list[dict], vocab: list[dict],
              "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, "
              "ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
              "Alignment, MarginL, MarginR, MarginV, Encoding")
-    L.append(f"Style: LEN,{FONT},64,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: LEN,{FONT},72,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,3,0,5,40,40,20,1")
-    L.append(f"Style: LZH,{FONT},52,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: LZH,{FONT},60,&H001AC6FF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,3,0,5,40,40,20,1")
     L.append(f"Style: LHh,{FONT},44,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,7,20,20,10,1")
-    L.append(f"Style: LE,{FONT},56,&H00D2D8C7,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: LE,{FONT},48,&H008CC86E,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
-    L.append(f"Style: LEC,{FONT},66,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: LEC,{FONT},57,&H001AC6FF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
-    L.append(f"Style: LEP,{FONT},44,&H00D2D8C7,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: LEP,{FONT},38,&H008CC86E,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
-    L.append(f"Style: LEPCur,{FONT},48,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: LEPCur,{FONT},41,&H001AC6FF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
     L.append(f"Style: LZHn,{FONT},42,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "0,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
-    L.append(f"Style: LZHCur,{FONT},48,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: LZHCur,{FONT},48,&H001AC6FF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,1,20,20,10,1")
     L.append(f"Style: LCt,{FONT},38,&H00A0A0A0,&H000019FF,&H00000000,&H80000000,"
              "0,0,0,0,100,100,0,0,1,2,0,3,20,20,10,1")
-    L.append(f"Style: LCtCur,{FONT},44,&H007BD6F5,&H000019FF,&H00000000,&H80000000,"
+    L.append(f"Style: LCtCur,{FONT},44,&H001AC6FF,&H000019FF,&H00000000,&H80000000,"
              "-1,0,0,0,100,100,0,0,1,2,0,3,20,20,10,1")
     L.append(f"Style: LDots,{FONT},30,&H00FFFFFF,&H000019FF,&H00000000,&H80000000,"
              "0,0,0,0,100,100,0,0,1,0,0,1,20,20,10,1")
@@ -2041,21 +2044,16 @@ def build_ass_landscape(segments: list[dict], vocab: list[dict],
         a, b = _ass_time(s["start"]), _ass_time(s["end"])
         en_plain = re.sub(r"\s+", " ", s["text"]).strip()
         zh_plain = re.sub(r"\s+", " ", s.get("zh", "")).strip()
-        en_lines = _wrap_en(en_plain, 30.0)
-        zh_lines = _wrap_zh(zh_plain, 19.0) if zh_plain else []
-        en_tagged = _highlight_vocab(r"\N".join(en_lines), vocab_words)
-        zh_tagged = r"\N".join(zh_lines)
-        n_en, n_zh = len(en_lines), len(zh_lines)
-        en_y = 872 - (n_en - 1) * 40
-        zh_y = 968 + (n_zh - 1) * 36
-        if n_en > 1 and n_zh > 1:
-            en_y -= 16
-            zh_y += 16
+        # v6 rule: one clause per card, single line each — segments must
+        # be pre-split by the caller to fit (EN dwidth <= 33.75,
+        # ZH <= 19.0); no wrapping, no multi-line shift here.
+        en_tagged = _highlight_vocab(en_plain, vocab_words)
+        zh_tagged = zh_plain
         L.append(f"Dialogue: 0,{a},{b},LEN,,0,0,0,,"
-                 f"{{\\pos({LSUB_CX},{en_y})}}{en_tagged}")
+                 f"{{\\pos({LSUB_CX},{EN_POS})}}{en_tagged}")
         if zh_tagged:
             L.append(f"Dialogue: 0,{a},{b},LZH,,0,0,0,,"
-                     f"{{\\pos({LSUB_CX},{zh_y})}}{zh_tagged}")
+                     f"{{\\pos({LSUB_CX},{ZH_POS})}}{zh_tagged}")
 
     # ---- vocab panel (right column) ----
     occs = _occurrences(segments, vocab_index)
@@ -2076,7 +2074,7 @@ def build_ass_landscape(segments: list[dict], vocab: list[dict],
                  f"{{\\pos({LPANEL_R},100)\\an3}}{seen_n}/{n}")
         for j, w in enumerate(win):
             is_cur = (w["word"] == cur_word)
-            y_en = 210 + j * LROW_H
+            y_en = 200 + j * LROW_H
             y_zh = y_en + 56
             y_dots = y_en + 108
             word = w["word"]

@@ -128,10 +128,9 @@ into a build of the other. Three buckets only:
 - Vocab rows: vertical ~4 rows, two-line format vs landscape
   5 rows, EN/ZH/dots format.
 - Card lines: vertical EN ≤2 / ZH ≤2 vs landscape strictly 1+1.
-- Panel top: §9 says y=170, §9c says y=180 (v13 final). This
-  discrepancy predates this map and is left UNCHANGED here —
-  resolve it with the user before the next vertical build, then
-  delete the losing value per §9e.
+- Panel top (resolved 2026-10-30): vertical panel top = y=180
+  (§9c v13 final + code PANEL_Y=180). The §9 text value y=170 was
+  stale and is corrected in §9; do not use y=170.
 
 ## Setup (one time)
 
@@ -531,8 +530,8 @@ Each vocab item uses TWO lines:
   together; color change only, never a bar
 
 Header: `本集生词 N 个` (left) + `i/N` (right). Background stays black
-transparent. 5-row scrolling window follows speech. Implemented in
-`clipper.build_ass()`.
+transparent. 4-row scrolling window follows speech (2 before + current
++ 1 after). Implemented in `clipper.build_ass()`.
 
 - Before the 20–40 minute full render, compose 3–5 sample frames
   (opening, middle, near end, one with the vocab panel visible) and get
@@ -542,10 +541,27 @@ transparent. 5-row scrolling window follows speech. Implemented in
 
 `clipper.compose()` builds the final video. The layout is fixed:
 
-- Vocab panel: top at y=170 — below the iPhone Dynamic Island / notch
-  safe area. Header `本集生词 N 个 i/N`, then a 5-row window that scrolls
-  to follow the speech, anchored slightly left of center at x=500 (long words must never clip); the word being spoken is
-  highlighted gold. Panel background is a dark translucent overlay.
+- Vocab panel: top at y=180 — below the iPhone Dynamic Island / notch
+  safe area (code PANEL_Y=180; the old §9 text value y=170 was stale,
+  resolved 2026-10-30). Header `本集生词 N 个 i/N` at y=200
+  (PANEL_Y+20), then a 4-row window that scrolls to follow the speech
+  (code max_rows=4, window = 2 before + current + 1 after; the old
+  "5-row" text was stale, resolved 2026-10-30). Panel text left
+  x=290 (PANEL_L), ×N right x=790 (PANEL_R), row pitch 100 (ROW_H);
+  first-row EN y=240 (PANEL_Y+60), ZH gloss at y_en+42. The word
+  being spoken is highlighted gold. Panel background is a dark
+  translucent overlay.
+- Subtitle styles (ASS, font Noto Sans CJK SC): EN 64 px white bold,
+  outline 3, alignment 5 (bottom-center), margins 60/60, MarginV 40;
+  ZH 60 px gold #F5D67B (ASS &H007BD6F5) bold, outline 3, alignment 5,
+  margins 60/60, MarginV 40. Vocab words inside subtitles are
+  highlighted yellow #FFFF00 bold ({\1c&H0000FFFF&\b1}). Vertical
+  subtitle ZH gold #F5D67B is the v13 shipped value and is NOT the
+  landscape gold #FFC61A — orientation-specific, never mix.
+- Vocab panel styles (ASS, font Noto Sans CJK SC): EN 44 px white
+  regular, current 52 px gold bold; ZH gloss 44 px white regular,
+  current 52 px gold bold; ×N 40 px gray #A0A0A0, current 44 px gold
+  bold. Phonetic in a single slash pair AFTER the gloss.
 - Interview video: 16:9 fitted to 1080x608, top edge at y=610.
 - Subtitles, one segment at a time (VERTICAL ONLY — landscape keeps
   its own §9L subtitle spec and has no right-rail constraint):
@@ -594,6 +610,15 @@ transparent. 5-row scrolling window follows speech. Implemented in
   pixel crosses x=900 and no card exceeds 2 EN lines. After the first
   video built under this rule, verify once against a real in-app
   phone screenshot before treating the 900 edge as settled.
+- Sequential-card splitting (TBD, 2026-10-30): the §9 rule that a
+  sentence exceeding the caps splits into sequential time-split cards
+  (clause boundaries, EN/ZH matched per card, times split by word
+  timestamps) is specified but NOT implemented in clipper.py — the
+  code implements multi-line shifts (EN up 40 px per extra line, ZH
+  down 38 px, +20 px each way when both exceed one line) but not the
+  sequential-card split. Implement the sequential-card split before
+  the next vertical build; until then a long sentence renders as a
+  2-line card, never more than 2 lines per language.
 - Interface stays clean and minimal. Only real footage from the source
   interview — never AI-generated visuals or stock filler.
 - **Crop must preserve headroom** (2026-10-17 user rule): when cropping
@@ -945,6 +970,18 @@ overlay; and replaces the v5 1150x864 + bottom-band layout, retired
   ZH is deliberately LARGER than the vocab EN here — the earlier
   v6 demo had it inverted, 42 vs 56, and the hierarchy read
   backwards against the reference.)
+- Subtitle center is the FULL frame (x=960). Code-sync note
+  (RESOLVED 2026-10-30): clipper.py's build_ass_landscape constants
+  were synced to the frozen values in this section (LEN 72, LZH 60
+  #FFC61A, LE 48 #6EC88C, LEC 57, LSUB_CX=960, panel pitch 150,
+  row 1 EN y=200, subtitle centers EN (960,964) / ZH (960,1042))
+  and verified by a test run emitting exactly these values.
+  Dots filled #F5D67B was verified already matching the delivered
+  v6d file (shared _dots_str) and left unchanged. The frozen values
+  in this section are canonical.
+- Subtitle vocab highlight (both orientations): vocab words inside
+  subtitles are yellow #FFFF00 bold ({\1c&H0000FFFF&\b1}), same
+  mechanism as vertical (§9).
 - Subtitle cards, one clause per card (user 2026-10-25, from the
   v6b g73 defect): a landscape subtitle card is ALWAYS EN 1 line
   + ZH 1 line, never more. A 2-line ZH block shifts the whole
@@ -1062,9 +1099,23 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
 - `clipper.make_covers()`: from a clean interview frame (person not
   stretched; burned-in logos stay visible, never blurred), produce BOTH
   `cover_34.png` (1080x1440) and `cover_43.png` (1200x900).
-- Each carries: kicker line, the headline quote, `N个生词 · 中英逐句精讲`,
+- Cover copy hierarchy (2026-10-21 user final, three rounds): top
+  kicker in small text (guest + topic only); headline line 1
+  「英语听力精听课」 (English-listening first); headline line 2
+  「真实对话精练」 (never 「必练」); one subtitle line carrying
+  「高中 · 四六级 · 雅思」 + vocab count + episode count; keep all
+  copy minimal. Gold on covers is #FFD700.
+- Each cover carries: kicker line, the headline, `N个生词 · 中英逐句精讲`,
   and the account badge. Title text must be large, centered, high
   contrast.
+- Cover heads must be real photos of real people — never AI-generated
+  or spliced heads (2026-10-17 user rule).
+- Cover rework rule (2026-10-17 user rule): when the user asks to change
+  one item on a cover (e.g. the vocab count), work from the
+  user-confirmed original version and change ONLY the authorized item —
+  no re-composition, no background repainting, no title or background
+  color change. If a rework goes wrong, revert to the user's original
+  attachment and stop producing new versions.
 
 ### 12. Episode splitting (content over 59 minutes)
 
@@ -1122,8 +1173,48 @@ stub of a few minutes at the end.
 - Card design (1080x1920, brand style): gold speech-bubble icon,
   `加入粉丝群` / `领取本集生词清单` / `{N} 个生词 · 中英对照 Excel`,
   account badge at the bottom. Silent audio.
+- Vertical outro measured geometry (clipper.make_outro_card, font
+  Noto Sans CJK Bold unless noted): vertical gradient
+  (8,14,38)→(26,44,96); gold glow ellipse [340,380,740,700] blur 40
+  alpha 30; gold bubble rounded rect [390,480,690,660] radius 45 fill
+  (255,200,70), tail triangle [(470,650),(440,720),(530,650)];
+  群 64px centered in bubble, dark text (12,18,44) at y=530;
+  加入粉丝群 110px gold (255,200,70) at y=800; 领取本集生词清单
+  72px white at y=960; {N} 个生词 · 中英对照 Excel 48px gold,
+  Regular font, at y=1070; account badge 52px white Regular at
+  y=1700; source line 30px gray (150,160,175) Regular at y=1800.
+  Outro segment encode: still loop 30 fps, libx264 veryfast crf 20
+  yuv420p, AAC 48 kHz stereo, silent audio, 4.0 s, +faststart.
+- No QR code on any fan-group card (2026-10-30 user rule: the user
+  has not provided a group QR code; do not invent or place one).
 - The 4 s is appended AFTER the episode's content (content length per §12);
   it does not count toward the 59-minute per-episode cap.
+- Landscape interview outro (clipper.make_outro_landscape, used by
+  landscape interview videos): vertical gradient (8,14,38)→(26,44,96);
+  gold glow ellipse [760,110,1160,430] blur 40 alpha 30; gold bubble
+  rounded rect [810,180,1110,360] radius 45 fill (255,200,70), tail
+  triangle [(890,350),(860,420),(980,350)]; 群 64px dark (12,18,44)
+  at y=232; 加入粉丝群 104px gold (255,200,70) at y=480;
+  领取本集生词清单 68px white at y=630; {N} 个生词 · 中英对照
+  Excel 46px gold Regular at y=724; account badge 44px white
+  Regular at y=970; source line 28px gray (150,160,175) Regular at
+  y=1022. Same texts/brand as the vertical card, same 4 s silent
+  segment encode.
+- Landscape variant (1920x1080, used by the §18/§19/§21 outros;
+  parameters from the verified listening EP1 build, 2026-10-30):
+  vertical gradient (8,14,38)→(26,44,96); gold glow ellipse
+  [760,90,1160,410] blur 40; gold bubble rounded rect
+  [810,170,1110,350] radius 45 fill (255,200,70), tail triangle
+  [(900,340),(880,410),(970,340)], 群 64px centered in bubble, dark
+  text (12,18,44); 加入粉丝群 110px gold (255,200,70) at y=470;
+  benefit line 72px white at y=620; item line 48px gold at y=730;
+  account badge 48px white at y=960. All text Noto Sans CJK Bold,
+  centered at x=960. Silent audio, 4 s.
+  NOTE: the new-line landscape outro values above differ from the
+  interview landscape outro values in the previous paragraph — they
+  are two distinct frozen specs (new-line vs interview), not a
+  conflict. Use the new-line values for §18/§19/§21 and the
+  interview values for landscape interview videos.
 
 ### 14a. Final assembly — main + outro (source card cancelled 2026-10-16)
 
@@ -1152,9 +1243,19 @@ stub of a few minutes at the end.
   platforms re-encode anyway, so give their encoder the best source.
   Compressed copies are for review links only.
 - Douyin creator platform: upload the mp4, title format
-  `《人物：金句｜英文精听》`, add ALL FOUR topic tags
-  `#人物 #公司 #AI #英语精听` (verify each one landed — the platform
-  sometimes drops tags), visibility 公开, publish immediately.
+  `《人物：金句｜英文精听》`, visibility 公开, publish immediately.
+- Account: Douyin tanjian89, display name RealTalk英语精选 — the
+  account mark text on all new-line videos (§18/§19/§21).
+- Topic tags: platform cap is 5 tags. Add the interview's tag group
+  (up to 5); verify each tag actually landed — the platform
+  sometimes drops tags, and adding a tag requires clicking the tag
+  once then selecting it from the dropdown (font color change
+  confirms it, §16). If a tag group has more than 5 tags, the
+  selection is TBD — the user decides which 5 ship; do not silently
+  drop tags.
+- Uploads go out directly: files marked for upload are uploaded
+  without asking the user for permission each time (2026-10-27
+  user rule).
 - Report back the work ID. Deleting/replacing an already-published
   version is a separate user-confirmed step.
 - TikTok: same video, separate login — treat as phase 2.
@@ -1184,6 +1285,7 @@ stub of a few minutes at the end.
 - 网页端操作：建合集、换合集封面、往合集加视频、一天一支上传已通过审核的切片（窗口 18:20）。
 - 数据复盘：每支发完 72 小时看 2 秒跳出率、完播率、单支涨粉数、合集新增关注并汇报。
 - skill 维护与 GitHub 推送（用户给 token 后）。
+- 上传文件直接传：标记为上传的文件不用每次问用户要允许（2026-10-27 用户立下）。
 
 必须提醒用户做的事（每项都要列入交付清单，不能只在聊天里提一句）：
 - 审片定发：成片与切片批量审核，用户说"发"才发；没点头的不传。
@@ -1275,30 +1377,100 @@ topics or artwork. All scripts are original, proprietary content.
 - One sentence = 4 renditions in fixed order: (1) blind listen, female
   voice; (2) blind listen, male voice; (3) with subtitles, female voice;
   (4) with subtitles, male voice.
-- Blind screen: dark calm background + headphones icon + the word
-  “Listen”. No sentence text, no subtitles, no translation on this screen.
-- Subtitle screen: blue gradient background; top-left the sentence number
-  (1, 2, 3, …); top-right the account mark (ours, never the reference's);
-  center the English sentence in white bold with the sentence's key word
-  highlighted yellow; below it the IPA transcription in italic gray;
-  below that the Chinese translation in white, Simplified characters only.
-- Voices: one female + one male American English TTS, teacher style,
-  clear and friendly. Articulation ~150–160 wpm during speech (measured
-  from the reference: 158 wpm articulation, ~70 wpm effective density
-  once pauses are counted). Pauses: 1–2s between renditions, 2–3s between
-  sentences. The voice pair is frozen after the first episode and reused
-  for every episode in this collection. Voices are similar in style to
-  the reference's speakers; NEVER clone the reference speakers' actual
-  voices, and never imitate a real person.
+- Blind screen (measured EP1 build): vertical gradient
+  (11,30,58)→(5,11,22); headphones icon in cyan (111,195,232):
+  headband arc [760,250,1160,650] start 180 end 360 width 22, ear
+  cups rounded rects [730,450,812,630] and [1108,450,1190,630]
+  radius 32; the word “Listen” in DejaVu Sans Bold 120px white,
+  centered at x=960, top y=700. No sentence text, no subtitles, no
+  translation on this screen.
+- Subtitle screen (measured EP1 build, FROZEN — EP1 approved for
+  publishing 2026-10-30): vertical gradient (47,111,168)→(27,74,117);
+  sentence number in DejaVu Sans Bold 56px white at (60,42);
+  account mark “RealTalk英语精选” in Noto Sans CJK Bold 40px index=2
+  white, right edge x=1860, top y=48; English sentence in DejaVu
+  Sans Bold starting 68px, shrinking by 4px steps to a 48px floor
+  until the sentence fits at most 2 lines, wrap width 1700px, line
+  height = font size + 26, the EN block vertically centered at
+  y0 = 470 − total_height/2; the sentence's key word or short phrase
+  in gold #FFD700, all other words white; below the EN block the IPA
+  transcription in DejaVu Sans Regular 40px (34px if wider than
+  1700px) gray (200,208,216) at en_bottom + 55; below that the
+  Chinese translation in Noto Sans CJK Bold 56px index=2 white at
+  en_bottom + 145, Simplified characters only. (This corrects the
+  older §18a text “EN 64px / IPA italic 36px” — the production code
+  values above are what shipped in EP1.)
+- Key word (TBD rule, 2026-10-30): one key word or short phrase per
+  sentence, recorded in the sentences file's `key` field. EP1 pattern
+  (sentences.json, the reference): the sentence's focal action word
+  or phrase (e.g. “at once”, “brush”, “cooks”, “draw”, “sing”). No
+  written selection rule exists yet — record one when EP2 is built;
+  until then follow the EP1 pattern.
+- Voices: one female + one male American English TTS, teacher style.
+  Female = Aria (avocado_v2:MAI_01), male = Helio (avocado_v2:MAI_03).
+  Both at tts speed 65 (calibrated: female ~148 wpm, male ~160 wpm
+  articulation). TTS command pattern (verified from the conversation
+  line's tts_all.py, same tool and flags): `/opt/hatch/bin/tts speak
+  --voice <voice_id> --language en --speed 65 --output <file>
+  --text-stdin` with the sentence text on stdin. The voice pair is
+  frozen after the first episode and reused for every episode in this
+  collection. Voices are similar in style to the reference's speakers;
+  NEVER clone the reference speakers' actual voices, and never imitate
+  a real person.
+- Rendition order and pauses (measured EP1 build): per sentence, in
+  fixed order: blind female, blind male, subtitle female, subtitle
+  male. Segment encode: still image looped at 30 fps + sentence audio,
+  audio aresample 48000, apad to the segment duration, setsar=1,
+  libx264 veryfast crf 20 yuv420p, AAC 48 kHz stereo; final assembly
+  by concat demuxer -c copy (segments share identical parameters).
+  Pause values: base p = 1.5 s after renditions 1, 2 and 3, p4 = 2.5 s
+  after rendition 4 (i.e. between sentences). Total duration =
+  sting 6.0 + 2 × audio_sum + 3N × p + N × p4 (N = sentence count;
+  each audio file plays twice: once blind, once subtitled). If the
+  total falls outside 1080–1320 s, retarget 1200 s by adjusting pauses
+  only: p = (1200 − sting − audio_total − N) / (4N), p4 = p + 1.0
+  (EP1 formula: p = (1200 − sting − audio_total − 40) / 160 for
+  N = 40).
 - Content: everyday sentences for primary / middle / high school
   students: school, family, hobbies, food, travel, daily routines,
   health, friendship, study. Simple grammar, common words, one
   self-contained sentence each, positive tone. No politics, no news,
   no sensitive topics (see §20 screening, which runs BEFORE synthesis).
-- Episode length: ~20 minutes (18–22 min). ~40 sentences per episode;
-  adjust the count to hit the duration. Sentences numbered from 1.
+- Episode length: 18–22 min. ~40 sentences per episode; adjust the
+  count to hit the duration. Sentences numbered from 1. EP1 measured
+  totals (reference build): 40 sentences, 383 words, final
+  1204.76 s, 19,524,912 bytes, 1920x1080, 30 fps, H.264 + AAC.
 - Style unity: same intro sting (§20), same backgrounds, same subtitle
   style, same voice pair, same layout in every episode.
+- File naming (EP1 pattern): `listening/epNN/listening_epNN_final.mp4`
+  for the approved final; rework versions take a new suffix and never
+  overwrite the approved final until the user approves the rework
+  (same rule as bedtime `_clone` files, §21).
+- Covers (measured EP1 build): gradient (18,41,77)→(8,18,38), all
+  text Noto Sans CJK Bold index=2 centered: 1200x900 cover —
+  collection 56px white at y=300, theme 84px gold #FFD700 at y=420,
+  episode 44px white at y=580; 900x1200 cover — collection 52px white
+  at y=420, theme 76px gold at y=540, episode 44px white at y=700.
+  File names: `covers/cover_ep1_43.png` (1200x900) and
+  `covers/cover_ep1_34.png` (900x1200).
+- Intro card (2026-10-30 user review): dark blue gradient, ~6s with the
+  shared sting. Bilingual, ALL text in one font (Noto Sans CJK Bold) so
+  Chinese and English match: collection name ZH + EN (Immersive English
+  Listening Practice); theme ZH in gold + EN translation in gold;
+  episode ZH + EN (第 N 期 · Episode N); and the format explanation line
+  ZH “每句话先盲听两次，再跟字幕听两次” + EN “Listen blind twice
+  first, then listen twice with subtitles.” Layout (1920x1080,
+  verified EP1 build): gradient (18,41,77)→(8,18,38); collection ZH
+  64px white at y=250; collection EN 38px white at y=330; theme ZH
+  110px gold #FFD700 at y=430; theme EN 60px gold at y=570; episode
+  48px white at y=680; explanation ZH 46px white at y=790;
+  explanation EN 34px white at y=860. All centered at x=960, font
+  Noto Sans CJK Bold index=2.
+- Outro (2026-10-30 user review): 4s fan-group card appended AFTER the
+  last sentence, same design as the interview line's §14 outro adapted
+  to landscape 1920x1080, silent audio: gold speech-bubble icon with 群,
+  加入粉丝群 / 下载本期对话内容 / {N} 句 · 中英对照 / account badge.
+  The 4s does not count toward the 18–22 min content length.
 
 ### §18b Pipeline
 
@@ -1326,19 +1498,46 @@ artwork. All dialogue is original, proprietary content.
 - Landscape 1920x1080. No vocab panel, no vocab review segment, no
   interview-style vocab sidebar anywhere in this line.
 - Dark background. Left: female host illustration; right: male host
-  illustration. The two illustrated characters are fixed across every
-  episode (same artwork = style unity). Hosts are fictional; the
-  illustrations are NOT photos of real people. Top-center the account
-  mark (ours, never the reference's).
-- Center: English subtitle in white bold with the currently spoken word
-  highlighted cyan (karaoke word highlight, following the speech);
-  below it the Chinese translation in yellow, Simplified characters
-  only. Bottom-center: a waveform bar animating with the speech.
-- Voices: main pair female + male American English TTS (same style
-  criteria as §18; the pair is frozen after the first episode). Guest
-  voices are allowed: up to 2–3 additional distinct TTS voices per
-  episode for skit characters, drawn from a small fixed set so the
-  collection still sounds consistent. Same no-cloning rule as §18.
+  illustration: cartoon style, both wearing headphones and facing
+  microphones (as in the reference). The two illustrated characters are
+  fixed across every episode (same artwork = style unity). Hosts are
+  fictional; the illustrations are NOT photos of real people.
+  Top-center the account mark (ours, never the reference's).
+- Base image (measured EP1 build, FROZEN — EP1 approved for
+  publishing 2026-10-30): canvas 1920x1080, background = the female
+  host artwork's corner pixel (EP1: (22,27,48) sampled from host_f
+  pixel (0,0)); host artwork files `assets/host_f.png` and
+  `assets/host_m.png` (1600x1600 each), each resized to 400x400 and
+  pasted at (50,240) female left and (1470,240) male right; account
+  mark “RealTalk英语精选” in Noto Sans CJK Bold 44px white, centered
+  at x=960, top y=35.
+- Subtitles (measured EP1 build, FROZEN): ASS styles — EN: DejaVu
+  Sans 48px bold white, outline 2, alignment 8 (top-center), margins
+  470/470, MarginV 600; ZH: Noto Sans CJK SC 44px bold yellow #FFFF00,
+  outline 2, alignment 8, margins 470/470, MarginV 810. Karaoke word
+  highlight: words turn cyan ({\1c&H00FFFF00&}, ASS BGR = RGB
+  00FFFF) as they are spoken and stay cyan; upcoming words stay
+  white. Word timing comes from word-level alignment of the rendered
+  dialogue audio (EP1: aligned.json + words_turn_NNN.json, produced
+  by faster-whisper word timestamps on the dialogue mix). Chinese
+  translation in yellow, Simplified characters only.
+- Waveform (measured EP1 build, FROZEN): ffmpeg showwaves
+  s=900x120 mode=p2p rate=30 colors=white, overlaid at (510,940)
+  on the base image, bottom-center.
+- Voices: main pair female + male American English TTS, same pair as
+  §18: female Aria (avocado_v2:MAI_01), male Helio (avocado_v2:MAI_03),
+  both at tts speed 65, same tones as §18; the pair is frozen after
+  the first episode. Guest voices: up to 2–3 additional distinct TTS
+  voices per episode for skit characters, drawn from a small fixed
+  set so the collection still sounds consistent; EP1 guest voice =
+  Vanessa (avocado_v2:Vanessa) for the Lily character. Guest voices
+  must stay clear and easy to understand, no exaggerated character
+  voices. Same no-cloning rule as §18. TTS command pattern: same as
+  §18 (`/opt/hatch/bin/tts speak --voice <voice_id> --language en
+  --speed 65 --output <file> --text-stdin`); per-turn audio files
+  named turn_NNN.mp3, restart-safe (skip a turn whose file already
+  exists and is larger than 0 bytes), 2 attempts per turn before
+  marking it failed.
 - Pace: natural conversation, ~150–160 wpm articulation (measured from
   the reference: 157 wpm). No deliberate slowing; natural turn-taking
   with brief pauses. No repeated renditions (unlike §18).
@@ -1348,11 +1547,52 @@ artwork. All dialogue is original, proprietary content.
   level, practical phrases, natural tone (not textbook-stiff), positive.
   No politics, no news, no sensitive topics (§20 screening BEFORE
   synthesis).
-- Episode length: ~20 minutes (18–22 min), roughly 3000 words of
-  dialogue. Structure: intro sting → theme dialogue in several
-  scenes / segments → one brief closing line.
+- Episode length: 18–22 min, roughly 3000 words of dialogue.
+  Structure: intro sting → theme dialogue in several scenes /
+  segments → one brief closing line. EP1 measured totals (reference
+  build): 78 turns, 2666 words, 234 sentences, 5 scenes (Friday
+  evening plans, Saturday market, Sunday picnic, Sunday dinner,
+  closing); Emma 34 turns, Jack 35 turns, guest Lily 9 turns; final
+  1243.79 s, 58,970,665 bytes, 1920x1080, 30 fps, H.264 + AAC.
 - Style unity: same intro sting (§20), same host illustrations, same
   subtitle style, same main voice pair in every episode.
+- Render (measured EP1 build): 2-pass ffmpeg. Pass 1: base image
+  looped at 30 fps + dialogue audio + showwaves overlay + ASS
+  burn-in in ONE encode (libx264 yuv420p 30 fps, AAC 48 kHz stereo).
+  Pass 2: intro segment (intro card looped at 30 fps + shared sting,
+  6.0 s, same encode settings) concatenated with the dialogue video
+  (concat filter, re-encode) and the 4 s outro appended, final with
+  +faststart. Verification: full decode with no errors; whisper
+  spot-check 3–5 sentences against the script; word-level alignment
+  QC (EP1 measured: 98.3% — pass/fail threshold TBD, §22).
+- Covers (measured EP1 build): background = host artwork corner
+  color (EP1: (22,27,48)), all text Noto Sans CJK Bold centered:
+  1200x900 cover — collection 56px white at H*0.30, theme 96px gold
+  (255,215,0) at H*0.45, episode 48px white at H*0.62; 900x1200 cover
+  — collection 52px white at H*0.30, theme 88px gold at H*0.45,
+  episode 44px white at H*0.62. File names: `covers/cover_43.png`
+  (1200x900) and `covers/cover_34.png` (900x1200).
+- File naming (EP1 pattern): `conversation/epNN/final.mp4` for the
+  approved final; rework versions take a new suffix (EP1: final_v1.mp4
+  backup) and never overwrite the approved final until the user
+  approves the rework.
+- Intro card (2026-10-30 user review; content differs per line, never
+  copy another line's card): bilingual, ALL text in one font (Noto Sans
+  CJK Bold) so Chinese and English match: collection ZH + EN
+  (Immersive Everyday English Conversations); theme ZH in gold + EN
+  translation in gold; episode ZH + EN (第 N 期 · Episode N). No
+  format-explanation line (this line has no multi-pass format).
+  Layout (1920x1080, verified EP1 build): solid background (22,27,48)
+  sampled from the host artwork corner; collection ZH 72px white at
+  y=300; collection EN 40px white at y=390; theme ZH 110px gold
+  #FFD700 at y=490; theme EN 60px gold at y=620; episode 56px white
+  at y=730. All centered at x=960, font Noto Sans CJK Bold index=2.
+  Intro segment 6.0s with the shared sting.
+- Outro (2026-10-30 user review): 4s fan-group card appended AFTER the
+  closing line, same design as §14 adapted to landscape 1920x1080,
+  silent audio: gold speech-bubble icon with 群, 加入粉丝群 /
+  下载本期对话内容 / {N} 轮对话 · 中英对照 / account badge. The 4s
+  does not count toward the 18–22 min content length.
 
 ### §19b Pipeline
 
@@ -1377,6 +1617,9 @@ every episode to it.
   改词蒙混；替换处在交付时注明。筛查不过，绝不合成。
 - 声音与人物：只用风格相近的 TTS 音色，绝不克隆参考视频真人
   的声音；主持人均为虚构人物，绝不模仿、冒充任何真人。
+  唯一例外：睡前线（§21a）经用户 2026-10-30 决定直接克隆参考
+  旁白声音 — 该例外仅限睡前线，听力（§18）与对话（§19）仍
+  用 TTS、绝不克隆。
 
 ### §20b 片头音乐（三条新线共用）
 
@@ -1384,15 +1627,47 @@ every episode to it.
   风格），只生成一次，之后三条新线的每一期都复用同一个片头，
   不得每期重生成（风格统一即账号标识）。
 - 片头放在每期视频开头，正片开始前播完，不压正片台词。
+- Shared sting file (measured, frozen 2026-10-30 unified version):
+  `~/workspace/new-lines/assets/intro_sting.wav` — 6.0 s, PCM 16-bit
+  little-endian WAV, 48000 Hz, stereo, 1,152,078 bytes, md5
+  1dea3132cd41c4e41a2e474986992ebe. This file is the single source
+  of truth for the intro sting; verify the md5 before reuse. The
+  bedtime line attenuates its own intro segment by 9 dB (§21a) but
+  NEVER modifies this shared file.
 
 ### §20c 风格冻结与话题不重复
 
 - 每条新线首期定版即冻结：片头音乐文件、界面布局、字幕字体
   与颜色、主声音色与语速、主持人形象。后续各期原样复用，不
   得擅自换风格；用户明确要求改风格时，改后重新冻结并注明。
+- Frozen shared assets (paths): intro sting
+  `~/workspace/new-lines/assets/intro_sting.wav`; host artwork
+  `~/workspace/new-lines/assets/host_f.png` and `host_m.png`
+  (1600x1600 each); night stills
+  `~/workspace/new-lines/assets/night_1.png`, `night_2.png`,
+  `night_3.png` (1920x1080 each).
+- 三线开头与结尾卡内容各不相同，不得互抄（2026-10-30 用户
+  立下）：听力、对话、睡前三条线的开头卡与结尾卡文案各自独
+  立（见 §18a/§19a/§21a 与 §14），不得把一条线的卡面文案复
+  用到另一条线。
 - 话题日志：每条新线各维护一份已用主题 / 句子清单（存在该线
   的工作目录），写脚本前先查日志；主题、句子不得跨期重复。
   每期内容必须不一样。
+- topics.json schema and anti-duplication guard (2026-10-30 cron
+  rule, applies to every scheduled generation): each line keeps
+  `<line>/topics.json` — a list of `{episode, theme, date, status}`
+  (listening) or `{collection, episodes: [{episode, theme, date,
+  status}]}` (conversation; bedtime uses the flat list form).
+  Status values: `pending_review` (generated, awaiting user review)
+  or `published` (user approved and published). Generation guard:
+  before generating a new episode, read topics.json; if the latest
+  episode's status is `pending_review`, SKIP generation and report
+  “已有待审核的一期，本次跳过以免重复” — do not generate a new
+  episode, do not publish. Only when the latest status is
+  `published` (or no episode exists) generate a new episode, with
+  episode number = existing count + 1, and record it as
+  `pending_review`. After the user approves and the episode is
+  published, change its status to `published`.
 
 ### §20d 周更与发布纪律
 
@@ -1401,21 +1676,31 @@ every episode to it.
   沉浸式英语听力练习（§18，20 分钟左右）、周六 18:00 沉浸式日常
   英语对话（§19，20 分钟左右）、周日 18:00 睡前深夜英语（§21，
   40 分钟左右）。
-- 生成与审核流程（2026-10-30 用户定，取代一句话下单）：每期由
-  助手提前自动生成，不等用户一句话下单；生成任务在档期前一天
-  上午约 9 点定时跑（见 cron），按 §18/§19/§21 全流程做一期
-  （查话题日志不重复、过 §20a 筛查、合成、渲染、自核），做好
-  后发用户审核（附成片＋主题＋时长＋句数＋筛查结果）；用户审
-  核通过（说发 / 通过）后，助手自动发布（上传抖音＋加进对应
-  合集），用户不用再手动传。批准在档期 18:00 之前 → 按档期
-  18:00 发；批准在 18:00 之后 → 批准后立即发。没有用户批准，
-  绝不发布；档期到了没批准的不自动发、不擅自顶替。用户仍可
-  随时一句话点名加做一期（§18/§19/§21 分发不变）。
+- 生成与审核流程（2026-10-30 用户定，2026-10-30 晚用户改定为周五
+  批次，取代档期前一天生成）：三条线一律周五上午集中生成
+  （睡前 07:19、听力 08:19、对话 09:19，睡前克隆耗时最长先跑），
+  按 §18/§19/§21 全流程做一期（查话题日志不重复、过 §20a
+  筛查、合成、渲染、自核），做好后周五统一发用户审核（附成片
+  ＋主题＋时长＋句数＋筛查结果）；用户审核通过（说发 / 通过）
+  后，主助手于周五一次上传全部三条，上传界面定时发布时间填
+  原档期（听力周五 18:00、对话周六 18:00、睡前周日 18:00），用户
+  不用再手动传。批准在档期 18:00 之后 → 批准后立即发。没有用户
+  批准，绝不发布；档期到了没批准的不自动发、不擅自顶替。用户
+  仍可随时一句话点名加做一期（§18/§19/§21 分发不变）。
 - 发布纪律与访谈线一致：先审片（用户看成片或抽查），用户说
   发才发；发后不删改重传；标题、描述、标签、封面一次弄对。
-- 封面：每期一张固定模板封面（合集名 + 本期主题），横竖两张
-  （横 4:3、竖 3:4），模板首期定版后冻结；封面不带“完整版”字样
-  （新线各期均为独立单期，不是访谈完整版）。
+- 标题（2026-10-30 晚用户定）：每视频发布标题直接用片头卡
+  （音乐段界面）上显示的期数与标题（合集名-主题-第 N 期），
+  不另起、不加字。
+- 封面（2026-10-30 晚用户定）：视频封面直接用片头卡帧（音乐段
+  界面），横 4:3 与竖 3:4 各一张（居中裁切；3:4 裁到文字时改等
+  比缩放留边，不切文字）；合集封面由助手按对该栏目的理解自行
+  设计，不再沿用视频横版图。封面不带“完整版”字样（新线各期
+  均为独立单期，不是访谈完整版）。
+- 每视频一份英文 Word 下载文档（2026-10-30 用户立下）：文件名
+  ＝视频标题，正文只放英文 — 听力按句编号、对话按说话人标注
+  轮次、睡前/访谈按句编号；上传后用分享链接＋授权码（提取码）
+  下载。
 
 ## §21 睡前深夜英语（2026-10-30 用户立项）
 
@@ -1435,35 +1720,137 @@ proprietary content.
   only. No fast cuts, no motion, nothing that disturbs sleep. (This
   line's background is night stills by design; it is NOT the interview
   line's real-world footage rule.)
-- Subtitles, centered, one sentence at a time: English in white, plain
-  (no word highlight, no color coding, as in the reference). Below the
-  English, one line of Chinese translation in a soft light tone,
-  smaller than the English, Simplified characters only. NOTE: the
-  reference itself shows English-only subtitles on screen; the Chinese
-  line is added per the user's explicit requirement for 中英文字幕.
-  If the user later says English-only, drop the Chinese line.
-- Top-right: the account mark (ours, never the reference's).
-- Voice: ONE male narrator, calm, soft, unhurried. Style reference is
-  the reference video's narrator (timbre / speed); NEVER clone his
-  actual voice, and never imitate a real person. Articulation
-  ~145–150 wpm during speech (measured 147 wpm); pauses between
-  sentences bring the effective density to ~100–105 wpm (measured
-  104 wpm). Slower and calmer than the conversation line, faster than
-  the listening line's repetition density.
-- Content: ONE continuous gentle story per episode (a day in a life,
-  a trip, home, friendship, nature, school memories…), told mostly in
-  simple present / past tense, A2 level, short sentences, everyday
-  words. Sleep-safe: no suspense, no scary content, no conflict, no
-  excitement, no sad or tense turns; the story stays warm and
-  unhurried from start to finish, suitable for primary / middle / high
-  school students. No politics, no news, no sensitive topics (§20
-  screening BEFORE synthesis).
-- Episode length: ~40 minutes (36–44 min), roughly 4000 words of
-  story. Structure: intro sting (§20b) → one gentle opening line →
-  the continuous story → one soft closing line (sleep-well send-off).
-  No segments, no review, no repetition drills (unlike §18).
-- Style unity: same intro sting (§20b), same night-still style, same
-  subtitle style, same narrator voice in every episode.
+- Subtitles, centered, one sentence at a time (measured EP1 build,
+  FROZEN — EP1 approved for publishing 2026-10-30): English in
+  DejaVu Sans Regular white, plain (no word highlight, no color
+  coding, as in the reference), starting 56px, shrinking by 4px
+  steps to a 44px floor until the sentence fits at most 2 lines,
+  line height = size × 1.35; below the English, Chinese translation
+  in Noto Sans CJK Regular color (217,217,217) #D9D9D9, starting
+  44px, shrinking by 4px steps to a 34px floor until at most 2
+  lines, line height = size × 1.45, Simplified characters only.
+  Top-right account mark “RealTalk英语精选” in Noto Sans CJK
+  Regular 28px white at (W − 40 − mark_width, 36). Subtitle text is
+  pre-rendered per sentence onto the night still (images/sub_NNN.png)
+  and the segment video loops that still. NOTE: the reference itself
+  shows English-only subtitles on screen; the Chinese line is added
+  per the user's explicit requirement for 中英文字幕. If the user
+  later says English-only, drop the Chinese line.
+- Background: calm night stills (starry sky, moon, quiet night city,
+  moonlit clouds), dark and low-contrast, static or very slow crossfade
+  only. No fast cuts, no motion, nothing that disturbs sleep. (This
+  line's background is night stills by design; it is NOT the interview
+  line's real-world footage rule.) Still files: `assets/night_1.png`
+  (moon + hills), `assets/night_2.png` (moon + lake reflection),
+  `assets/night_3.png` (moon + tent + fireflies), all 1920x1080.
+  EP1 still mapping (reference): sentences 1–145 night_1, 146–306
+  night_2, 307–382 night_3, with a 2 s silent fade crossfade
+  (xfade transition=fade duration=2 offset=0) inserted after sentence
+  145 (night_1→night_2) and after sentence 306 (night_2→night_3).
+  Still-boundary rule TBD (§22): EP1 boundaries are the reference;
+  no written section-break rule exists yet.
+- Timing model (measured EP1 builds, both v1 TTS and clone): target
+  content duration = words / 102.5 × 60 seconds (outro excluded);
+  pause per sentence = (target − speech − sting 6.0 − xfades 4.0)
+  / sentence count, clamped to [0.5, 4.0] s; if clamped, report the
+  actual density. EP1 v1 (Helio): speech 2091.7 s, pause 0.64 s per
+  sentence, content 2348.57 s. EP1 clone: speech 1524.86 s, pause
+  2.12 s per sentence, content 2346.15 s, final 2351.37 s. Effective
+  density 102.5 wpm in both builds.
+- Segment encode (measured EP1 builds): night still looped at 30 fps
+  + sentence audio, audio apad pad_dur = pause, setsar=1, libx264
+  veryfast yuv420p, AAC 48 kHz stereo; final assembly by concat
+  demuxer -c copy in order: intro segment + body segments (+ xfade
+  clip after sentence 145, + xfade clip after sentence 306) + 4 s
+  outro. Rework versions use a NEW filename (EP1: bedtime_ep01_clone.mp4)
+  and never overwrite the approved final or v2 until the user approves
+  the rework.
+- Voice: ONE male narrator. REJECTED for this line, 2026-10-30 user
+  review: Helio (avocado_v2:MAI_03) at tts speed 60 — user judged it
+  too harsh for late night. Do not use Helio speed 60 for this line.
+- Voice parameters (bedtime line): narrator = ONE male voice;
+  target articulation ≈147 wpm during speech, effective density
+  ≈100–105 wpm with pauses (both measured from the reference video
+  bedtime.webm). 2026-10-30 USER DECISION (overrides the
+  earlier no-clone rule FOR THIS LINE ONLY): clone the reference
+  narrator's voice directly for the bedtime narration. APPROVED
+  2026-10-30 (user listened to 3 cloned samples): XTTS-v2 via Coqui
+  TTS 0.22.0, venv ~/workspace/.venv-xtts, language en, speaker_wav
+  = 3 narration-only clips from bedtime.webm (t=300–330, 1000–1030,
+  3000–3030, 30 s each, mono 22050 Hz), no speed/pitch adjustment,
+  output 24 kHz mono wav. Sample measurements: opening 141.2 wpm,
+  F0 means 99.6/86.7/86.3 Hz (reference ≈147 wpm, F0 ≈95 Hz).
+  Full-episode re-voice uses these settings. Scope: bedtime line
+  only — listening (§18) and conversation (§19) keep TTS voices, no
+  cloning; §20's no-clone rule otherwise stands.
+- Clone pipeline (measured EP1 build): TTS call =
+  TTS('tts_models/multilingual/multi-dataset/xtts_v2',
+  progress_bar=False, gpu=False); tts_to_file(text, speaker_wav =
+  [clipA_t300.wav, clipB_t1000.wav, clipC_t3000.wav], language='en',
+  file_path = out); torch threads 2; model files pre-downloaded
+  (~1.8 GB — re-download only if the local model is missing).
+  Per-sentence outputs audio_clone/cNNN.wav (24 kHz mono wav);
+  synthesis is chunked (15-sentence chunks under a supervisor script)
+  so a VM restart resumes from the last completed sentence instead
+  of restarting. Validation: every cNNN.wav must exist and decode;
+  rebuild rejects any clip shorter than 0.3 s; segment build skips a
+  segment whose existing file is within 0.5 s of its expected
+  duration. Measured synthesis throughput on the 2-core VM: ~0.03
+  sentences/s (~33 s per sentence, real-time factor ~8) — re-base
+  time estimates from this rate every round (§Workflow estimate rule).
+  Before any model work, unset ALL proxy env vars (http_proxy,
+  https_proxy, HTTP_PROXY, HTTPS_PROXY, ALL_PROXY, all_proxy,
+  NO_PROXY, no_proxy) and set HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+  when the model is already downloaded. Coqui TTS 0.22.0 requires
+  transformers pinned to 4.46.3 and torch 2.5.1+cpu (newer versions
+  break the checkpoint load).
+- Clone-voice license — RESOLVED 2026-10-30 (user decision, same day
+  correction): use the cloned voice directly; the copyright /
+  licensing question is NOT a publish gate and must not be presented
+  as an unresolved flag or publish blocker. This supersedes the
+  earlier same-day note that publishing was deferred pending a
+  license decision. Bedtime clone EP1 publish: 2026-11-01 18:00,
+  Douyin scheduled publish + first creation of the 「睡前深夜英语」
+  collection (§20d Sunday slot).
+- Intro card (2026-10-30 user review; content differs per line, never
+  copy another line's card): night-still background unchanged,
+  bilingual, ALL text in one font (Noto Sans CJK Bold) so Chinese and
+  English match: collection ZH + EN (Bedtime English); theme ZH in
+  gold + EN translation in gold; episode ZH + EN (第 N 期 · Episode N).
+  No format-explanation line. Layout (1920x1080, verified EP1
+  build): background assets/night_1.png ×0.65 darkened; collection ZH
+  72px white (255,255,255) at y=300; collection EN 40px white at
+  y=395; theme ZH 110px gold (255,215,120) at y=480; theme EN 60px
+  gold at y=610; episode 48px white at y=710. All centered at x=960,
+  font Noto Sans CJK Bold index=2.
+- Outro (2026-10-30 user review): 4s fan-group card appended AFTER the
+  closing line, same design as §14 adapted to landscape 1920x1080,
+  silent audio: gold speech-bubble icon with 群, 加入粉丝群 /
+  下载本期视频声音内容 / 完整故事音频 / account badge. The 4s does
+  not count toward the 36–44 min content length.
+- Voice parameters (bedtime line): narrator = ONE male voice;
+  target articulation ≈147 wpm during speech, effective density
+  ≈100–105 wpm with pauses (both measured from the reference video
+  bedtime.webm). REJECTED for this line, 2026-10-30 user review:
+  Helio (avocado_v2:MAI_03) at tts speed 60 — user judged it too
+  harsh for late night. 2026-10-30 USER DECISION (overrides the
+  earlier no-clone rule FOR THIS LINE ONLY): clone the reference
+  narrator's voice directly for the bedtime narration. APPROVED
+  2026-10-30 (user listened to 3 cloned samples): XTTS-v2 via Coqui
+  TTS 0.22.0, venv ~/workspace/.venv-xtts, language en, speaker_wav
+  = 3 narration-only clips from bedtime.webm (t=300–330, 1000–1030,
+  3000–3030, 30 s each, mono 22050 Hz), no speed/pitch adjustment,
+  output 24 kHz mono wav. Sample measurements: opening 141.2 wpm,
+  F0 means 99.6/86.7/86.3 Hz (reference ≈147 wpm, F0 ≈95 Hz).
+  Full-episode re-voice uses these settings. Scope: bedtime line
+  only — listening (§18) and conversation (§19) keep TTS voices, no
+  cloning; §20's no-clone rule otherwise stands.
+- Intro sting volume (2026-10-30 user decision): the bedtime line
+  attenuates the shared sting by 9 dB via a volume=-9dB filter on
+  its own intro segment only (verified: new intro segment mean
+  −29.3 dB, max −18.2 dB, matching the narration mean −29.3 dB);
+  the shared intro_sting.wav file is unchanged (md5 verified,
+  listening and conversation keep full volume).
 
 ### §21b Pipeline
 
@@ -1471,3 +1858,135 @@ Same as §18b, with the trigger “做一期睡前英语” (+ optional theme).
 Weekly cadence: Sunday 18:00 (§20d). On the first episode, create the
 Douyin collection 睡前深夜英语 and add every episode to it. Topic log
 and style freeze follow §20c.
+
+## §22 Parametric index, TBD gaps, conflict resolutions (2026-10-30 consolidation)
+
+This section is the consolidation log for the 2026-10-30 user order to
+write the generation rules “very finely” so ANY agent can reproduce the
+same quality for the 4 video types. All values marked FROZEN in §§18a /
+19a / 21a are frozen per §20c (EP1 approved for publishing 2026-10-30).
+Writing rule for this whole file (2026-10-30 user standing rule):
+every entry must be a concrete, measured parameter value — canvas size,
+coordinates, font name / size / color hex, voice ID, speed number, wpm,
+dB, durations, file naming, output codec / fps / size limit. No
+comparatives or vague adjectives. Anything not measured from a real
+artifact is marked TBD with a note of where to measure it; never invent
+a number.
+
+### §22a Shared output / encode spec (all 4 types)
+
+- Canvas: interview vertical 1080x1920, interview landscape 1920x1080,
+  new lines 1920x1080.
+- Video codec libx264, pixel format yuv420p, frame rate 30 fps, audio
+  AAC 48 kHz stereo, final files with +faststart.
+- Interview compose: libx264 preset medium (default, overridable by
+  CLIP2VERTICAL_PRESET) crf 20; intermediates libx264 veryfast crf 18.
+  New-line segments: libx264 veryfast crf 20.
+- Final published video size ≤ 1 GB; never recompress a finished master
+  for upload (§9c).
+- Fonts: ASS subtitle/panel font Noto Sans CJK SC; new-line card text
+  Noto Sans CJK Bold index=2 (file
+  /usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc); listening /
+  conversation EN subtitle font DejaVu Sans (Bold for EN, Regular for
+  IPA); bedtime EN DejaVu Sans Regular, ZH Noto Sans CJK Regular.
+  Font file paths: DejaVu Bold
+  /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf, DejaVu Regular
+  /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf, Noto CJK Regular
+  /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc.
+- Verification frames for every delivery (all types): start / middle /
+  end frames showing the full interface (subtitles + panel where the
+  type has one); the user approves from these before any publish.
+  Publishing is approval-gated in all 4 types: no user 发 = no publish,
+  no exceptions (§15, §20d).
+
+### §22b TBD gaps (measured value missing — do not invent, measure at the stated source)
+
+1. Vertical sequential-card splitting: §9 specifies splitting a long
+   sentence into sequential time-split cards, but clipper.py implements
+   only multi-line shifts. Implement the sequential-card split before
+   the next vertical build; measure the result against the §9 caps
+   (EN ≤ 2 lines, ZH ≤ 2 lines, safe zone x=180..900).
+2. Landscape clipper.py style sync — RESOLVED 2026-10-30: code
+   synced to the frozen §9L values (LEN 72, LZH 60 #FFC61A, LE 48
+   #6EC88C, LEC 57, LSUB_CX=960, panel pitch 150, row 1 EN y=200,
+   subtitle centers (960,964)/(960,1042)) and verified by a test
+   run of build_ass_landscape. Dots filled #F5D67B was verified
+   already matching the delivered v6d file (shared _dots_str) and
+   left unchanged. Remaining: clipper.py's compose_landscape video
+   assembly is still v4-era (whole frame + panel); the v6
+   strips/CU assembly lives in the per-episode v6 builders, not in
+   clipper.py — migrate it before any agent builds a landscape
+   video from clipper.py alone.
+3. Listening key-word selection rule: EP1 sentences.json `key` field is
+   the reference pattern (focal action word / phrase). Write the
+   selection rule when EP2 is built; until then follow the EP1 pattern.
+4. Bedtime still-boundary rule: EP1 mapping 1–145 / 146–306 / 307–382
+   is the reference. Write the general section-break rule when EP2 is
+   built.
+5. Conversation word-alignment QC threshold: EP1 measured 98.3%.
+   Set a numeric pass/fail threshold when the next episode is built;
+   until then report the measured percentage.
+6. Interview tag groups larger than 5: platform cap is 5 (§15). When a
+   tag group exceeds 5, the user decides which 5 ship — do not silently
+   drop tags.
+7. Vertical subtitle ZH gold #F5D67B vs landscape #FFC61A is
+   orientation-specific, not a conflict — never carry one into the
+   other orientation's build.
+
+### §22c Conflict resolutions made in this consolidation (newest user decision wins)
+
+- Vertical panel top: §9 text y=170 vs §9c v13 final y=180 + code
+  PANEL_Y=180 → y=180 wins; §9 corrected, Orientation map note updated.
+- Vertical panel rows: §9/§7b text “5-row” vs code max_rows=4 +
+  “2 before + current + 1 after” window + Orientation map ~4-row →
+  4 rows wins; §9/§7b corrected.
+- Listening subtitle sizes: old §18a text “EN 64px / IPA italic 36px”
+  vs production code (EN start 68 shrink 4 to floor 48, max 2 lines;
+  IPA DejaVu Regular 40, 34 fallback, gray (200,208,216)) → production
+  code wins (EP1 approved for publishing); §18a corrected.
+- Listening pauses: old §18a text “1–2 s between renditions, 2–3 s
+  between sentences” vs production formula (p = 1.5 s, p4 = 2.5 s,
+  retarget rule to 1200 s) → production formula wins; §18a corrected.
+- Bedtime clone license: earlier same-day note “publishing deferred
+  pending a license decision” vs 2026-10-30 user correction (use the
+  cloned voice directly; copyright / licensing is NOT a publish gate;
+  clone EP1 publishes 2026-11-01 18:00) → the correction wins; §21a
+  records the resolved decision, and the license question is not
+  presented as an open flag or blocker anywhere in this file.
+- Bedtime voice: Helio speed 60 (original §21a) vs 2026-10-30 user
+  rejection (“too harsh”) + approved XTTS-v2 clone → clone wins for
+  this line only; Helio speed 60 is recorded as REJECTED, not as an
+  option.
+- §20a no-clone rule vs §21a bedtime clone approval → bedtime-only
+  override wins; §18/§19 keep TTS, no cloning.
+- Interview landscape outro vs new-line landscape outro: two distinct
+  frozen specs (clipper.py 104/68/46 values for interview landscape;
+  EP1 rework 110/72/48 values for §18/§19/§21) — recorded separately
+  in §14, not a conflict.
+- Interview landscape code vs delivered v6d: clipper.py's
+  build_ass_landscape carried pre-v6 constants (LEN 64, LZH 52,
+  LE 56 pale, LEC 66, LSUB_CX=575, pitch 178, row start 210,
+  shifting multi-line subtitles) vs the delivered v6d file's
+  frozen §9L values → the delivered values win; code synced
+  2026-10-30 and verified by a test run emitting exactly the
+  frozen values. Dots filled #F5D67B was already correct
+  (shared _dots_str, used by v6d itself) and unchanged.
+
+### §22d Previously reported missing items — verified present (2026-10-30)
+
+- The person-zone bottom three rules, the rework junction check, and
+  the card-split anchor rules were reported missing from the skill at
+  an earlier checkpoint. All three are present in the current local
+  SKILL.md: bottom rules in §9L (no source text / frost fill /
+  speaker-only fallback, with priority order), rework junction check
+  in §9L (verify BOTH ends of any reworked block, report both
+  junctions), anchor alignment + Chinese word-boundary + numeric-token
+  rules in §9L. No action needed.
+
+### §22e Scope note
+
+- MEMORY.md holds non-generation facts (job search, car sale, drone
+  licensing, FPV account direction, Meta account events, server
+  details). Those are intentionally NOT in this skill: this file
+  covers video generation for the 4 types only. Do not import
+  non-generation MEMORY items into build decisions.
