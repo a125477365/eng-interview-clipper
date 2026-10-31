@@ -376,6 +376,9 @@ supersedes the 2026-10-17 per-video stance)
   If an identical or near-identical version already exists and survives
   on both platforms, the content has passed their reviews — safer to
   publish. Report what was found (or not found) to the user.
+- 全面审查见 §25（2026-11-01 用户令，4 线通用最高 gate）：每一帧
+  界面＋每一句声音都查，禁政治人物；§6 原“外国政治人物标时间戳
+  交用户定夺、不自动剪”口径由 §25 取代（定夺机制保留，默认是禁）。
 
 ### 6a. Copyright — read before you publish
 
@@ -1658,6 +1661,7 @@ Traditional (§24a) and passes the ASR gate (§24b).
   过政治筛查：不得有对中国不利的任何画面、符号、文字与人物。
   提示词与成图都要查；命中即重生成或弃用，绝不交付。采访线
   画面是源片实拍，不属生成视觉，走既有三层审查，不另走本条。
+  四线全面审查见 §25（采访实拍画面同样按 §25 查每一帧）。
 
 ### §20b 片头音乐（三条新线共用）
 
@@ -2050,6 +2054,10 @@ a number.
 - Bedtime synthesis granularity: §21a per-sentence clone vs
   2026-11-01 paragraph decision → paragraph wins; §21a
   corrected, §24c is the rule.
+- §25 vs §6/§20a → §25 wins (2026-11-01): every-frame +
+  every-sentence review, no political figures at all; §6's
+  flag-for-decision wording and §20a's script-only scope are
+  superseded.
 
 ### §22d Previously reported missing items — verified present (2026-10-30)
 
@@ -2276,3 +2284,21 @@ a number.
   carry the 英语听力精听课 framing + vocab count). The card removal
   changes only where cover text is sourced from (metadata, not the
   card image) — it never justifies a generic or purpose-free cover.
+
+## §25 四线全面审查（2026-11-01 用户令，4 种视频通用，最高 gate）
+
+- 适用范围：采访、对话、听力、睡前 4 种视频全部适用，新制作与
+  已有视频的重新验证都按本条。
+- 审查对象：每一帧界面＋每一句声音。画面：人物区实拍、封面、
+  背景图、视频内图片、生词界面、字幕、片尾卡、账号标识；声音：
+  每一句英文原声与中文字幕。生成视觉的提示词与成图同样要查。
+- 禁止项：画面、声音、字幕、字词中不得有任何不利于中国政治的
+  内容——政治话语、人物、国旗、词语、派系等等。并且：不得有任何
+  政治人物（不论出镜、图片还是台词／字幕中提及）。
+- 命中处理：任一命中即停，带时间戳／帧号报用户定夺；用户未逐项
+  放行前不得合成、不得发布。此前用户特批保留的项目，按本条重新
+  验证时同样重新标出、等用户再定，不得以“以前批过”为由直接放行。
+- 本条取代 §6 中“外国政治人物标时间戳交用户定夺、不自动剪”的旧
+  口径（定夺机制保留，但默认是禁、不是商量着留）与 §20a 仅查脚本
+  的旧范围（现查脚本＋全部视觉）。§6 的台湾零容忍、反华自动剪、
+  三层审查与双平台存活核查继续有效，与本条并行。
