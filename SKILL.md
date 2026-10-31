@@ -1617,7 +1617,9 @@ artwork. All dialogue is original, proprietary content.
   y=300; collection EN 40px white at y=390; theme ZH 110px gold
   #FFD700 at y=490; theme EN 60px gold at y=620; episode 56px white
   at y=730. All centered at x=960, font Noto Sans CJK Bold index=2.
-  Intro segment 6.0s with the shared sting.
+  Intro segment 6.0s with the shared sting. (Cancelled 2026-11-01
+  user decision: conversation has no opening segment at all —
+  see §24f.)
 - Outro (2026-10-30 user review): 4s fan-group card appended AFTER the
   closing line, same design as §14 adapted to landscape 1920x1080,
   silent audio: gold speech-bubble icon with 群, 加入粉丝群 /
@@ -1722,7 +1724,8 @@ Traditional (§24a) and passes the ASR gate (§24b).
   发才发；发后不删改重传；标题、描述、标签、封面一次弄对。
 - 标题（2026-10-30 晚用户定）：每视频发布标题直接用片头卡
   （音乐段界面）上显示的期数与标题（合集名-主题-第 N 期），
-  不另起、不加字。
+  不另起、不加字。对话/睡前无开头卡后（§24f），标题取自当期
+  元数据（topics.json / 脚本元数据），格式与文字内容不变。
 - 封面（2026-10-30 晚用户改定，取代片头卡帧做法）：视频封面
   文字直接用开头卡上的全部文字（集合名中英、主题中英、期数，听力还有说明行），背景按视频内容 AI 生成（如夜
   景话题用夜景背景、买早餐用 3D 卡通买早餐场景），横 4:3 与竖
@@ -1886,7 +1889,9 @@ proprietary content.
   72px white (255,255,255) at y=300; collection EN 40px white at
   y=395; theme ZH 110px gold (255,215,120) at y=480; theme EN 60px
   gold at y=610; episode 48px white at y=710. All centered at x=960,
-  font Noto Sans CJK Bold index=2.
+  font Noto Sans CJK Bold index=2. (Cancelled 2026-11-01 user
+  decision: bedtime has no opening card at all — see §24f. This
+  layout is kept here only as the record of EP1 and earlier.)
 - Outro (2026-10-30 user review): 4s fan-group card appended AFTER the
   closing line, same design as §14 adapted to landscape 1920x1080,
   silent audio: gold speech-bubble icon with 群, 加入粉丝群 /
@@ -2071,6 +2076,10 @@ a number.
   full versions and clips: subtitle sentences, numbered. Listening:
   sentences, numbered. Conversation: rounds labelled by speaker.
   Bedtime: sentences, numbered.
+- Simplified-only docs (2026-11-01 user order): generate the doc
+  ONLY for the Simplified version (named after the Simplified
+  title). Traditional versions get NO doc — neither a subtitle doc
+  nor a vocab doc. This applies to all 4 lines.
 
 - Docs live in `~/workspace/new-lines/downloads/`, built by
   `generate_download_docs.py`. Upload with the Baidu connector helper
@@ -2206,3 +2215,44 @@ a number.
   底 y_en+106 不动；实测条内空英文→中文约 12px、中文→圆点约
   11px，条间空约 46px，末行圆点底 864、离字幕区 82px。v3 全量
   重渲即按此值。
+
+### §24f 开头界面：听力保留，对话/睡前取消（2026-11-01 用户决定）
+
+- Listening KEEPS its opening instruction card, including the
+  explanation line 「每句话先盲听两次，再跟字幕听两次」 + English,
+  because the 4-pass format (blind ×2 + subtitled ×2) must be
+  explained to viewers. Listening is the ONLY line that keeps an
+  opening interface.
+- Conversation and bedtime: NO opening interface from this decision
+  onward. The ENTIRE opening card is deleted (user 2026-11-01:
+  whole card, not just an explanation line — neither line's card
+  ever carried one). The film starts directly with content, to cut
+  the first-5-seconds exit rate. The intro segment is removed as
+  one unit (card loop + shared sting): no card, no 6s sting lead-in.
+- Scope: all new productions AND reworks, including the
+  already-published conversation EP1 (user 2026-11-01 explicit order
+  to rework it — this is the explicit-order exception to the
+  never-delete-and-republish rule; a rework still stops for the
+  user's publish go-ahead before any delete/upload on the platform).
+- Titles and covers are unaffected in CONTENT: titles stay
+  集合名-主题-第 N 期 and cover text stays the opening-card text
+  (collection ZH+EN, theme ZH+EN, episode; listening also the
+  explanation line), now sourced from the episode metadata
+  (topics.json / script metadata) instead of the card image.
+  Covers of already-published episodes are NOT remade for this
+  change.
+- Traditional versions follow the same rule (no opening card on
+  either version); §24a marks (EK英語) and platforms unchanged.
+- General rule (2026-11-01 user statement): listening is the SOLE
+  exception — it is the only line with an opening card. Interview
+  already has none (§3a, 2-second source card cancelled 2026-10-16:
+  main video + outro only) and stays that way; conversation and
+  bedtime have none from this decision onward. No future line gets
+  an opening card unless the user explicitly orders one.
+- Cover guard (unchanged by the card removal): every cover MUST
+  keep (1) text consistent with the episode's actual content
+  (theme/topic, never generic) and (2) an explicit English-learning
+  purpose (line/collection name carries 英语; interview covers
+  carry the 英语听力精听课 framing + vocab count). The card removal
+  changes only where cover text is sourced from (metadata, not the
+  card image) — it never justifies a generic or purpose-free cover.
