@@ -1653,6 +1653,11 @@ Traditional (§24a) and passes the ASR gate (§24b).
   唯一例外：睡前线（§21a）经用户 2026-10-30 决定直接克隆参考
   旁白声音 — 该例外仅限睡前线，听力（§18）与对话（§19）仍
   用 TTS、绝不克隆。
+- 视觉筛查（2026-11-01 用户令，与内容筛查同级）：三条新线的
+  所有生成视觉——封面、背景图、视频内图片、每帧界面——同样
+  过政治筛查：不得有对中国不利的任何画面、符号、文字与人物。
+  提示词与成图都要查；命中即重生成或弃用，绝不交付。采访线
+  画面是源片实拍，不属生成视觉，走既有三层审查，不另走本条。
 
 ### §20b 片头音乐（三条新线共用）
 
@@ -1745,7 +1750,7 @@ Traditional (§24a) and passes the ASR gate (§24b).
 - 发布元数据细则（2026-10-30 晚用户令：集合、视频封面，集合、视频标题，AI 声明，集合选择，发布时间逐项定死）：
   - 集合标题：固定三名——沉浸式英语听力练习、沉浸式日常英语对话、睡前英语静听（2026-10-30 晚由睡前深夜英语改名，旧名不再用）。改名走合集管理、只改标题一栏，不动简介、封面、公开范围、合集内视频；改名后合集进审核中属正常，新标题已显示即成功。
   - 集合封面：横版 4:3（1200×900），无文字，与集合主题一致的图片，绝不许用视频界面当背景（一个集合会有很多视频）；经合集管理更换；换封面后合集进审核中属正常。
-  - 视频封面：文字直接用开头卡上的全部文字（集合名中英、主题中英、期数，听力还有说明行），居中对称、好看；背景按本期内容 AI 生成（夜景话题用夜景背景、买早餐用 3D 卡通买早餐场景）；中文一律 PIL（Noto Sans CJK Bold）叠加，不靠图片模型渲染中文；横 4:3（1200×900）与竖 3:4（900×1200）各一张，3:4 的文字在裁切后画、保证不被裁切、居中留边。发布页“上传封面”按钮对浏览器无响应，一律走编辑页“设置封面”提交；提交时横竖封面检测须显示“封面检测通过、暂未发现封面低质问题”；换封面后视频进审核中属正常，定时时间不变；审核通过后回到定时发布中。封面不带“完整版”字样。本条仅针对三条新线视频（沉浸式英语听力练习、沉浸式日常英语对话、睡前英语静听），采访视频封面另见访谈线规则、不适用本条。
+  - 视频封面：文字直接用开头卡上的全部文字（集合名中英、主题中英、期数，听力还有说明行），居中对称、好看；背景按本期内容 AI 生成（夜景话题用夜景背景、买早餐用 3D 卡通买早餐场景；背景图同样过政治筛查，见 §20a）；中文一律 PIL（Noto Sans CJK Bold）叠加，不靠图片模型渲染中文；横 4:3（1200×900）与竖 3:4（900×1200）各一张，3:4 的文字在裁切后画、保证不被裁切、居中留边。发布页“上传封面”按钮对浏览器无响应，一律走编辑页“设置封面”提交；提交时横竖封面检测须显示“封面检测通过、暂未发现封面低质问题”；换封面后视频进审核中属正常，定时时间不变；审核通过后回到定时发布中。封面不带“完整版”字样。本条仅针对三条新线视频（沉浸式英语听力练习、沉浸式日常英语对话、睡前英语静听），采访视频封面另见访谈线规则、不适用本条。
   - 视频标题：格式＝合集名-主题-第 N 期，直接用片头卡（音乐段界面）上显示的期数与标题，不另起、不加字。改标题走编辑页；定时视频有“继续编辑”入口时可改，提交后进审核中、定时不变；审核中的视频无编辑入口，等审核回到定时发布中或发布后再改。
   - AI 声明：三条新线上传时必须在发布表单里勾选“内容由AI生成”；漏勾的补救：发布后经编辑页补勾（定时视频距发布时间不足 2 小时时编辑保存被平台拒绝，见发布时间条）。每次编辑提交后复核声明仍已勾。
   - 集合选择：只在第一次提交（上传表单）时可选；提交后、发布前（定时中/审核中）编辑页选不上；漏选的补救二选一：①视频尚未发布——删旧定时、原样重传，第一次提交即选上合集（重传须原标题/描述/标签/定时不变）；②视频已发布——经合集管理补加。已发布的视频绝不删了原样重传（平台去重机制判重复/搬运压推荐）。
@@ -2182,9 +2187,19 @@ a number.
   synthesis itself; gaps BETWEEN paragraphs are set longer than
   sentence gaps (sleep pacing). Gap values are recorded per
   production — no fixed number is set here; do not invent one.
-- Everything else in §21a stands: night stills + mapping, intro
-  sting −9 dB, outro card, target total duration (words / 102.5
-  × 60), segment encode, new-filename rework rule.
+- Everything else in §21a stands: intro sting −9 dB, outro
+  card, target total duration (words / 102.5 × 60), segment
+  encode, new-filename rework rule. Backgrounds are NOT the
+  §21a 3-still mapping: paragraph builds use ONE content-
+  matched background image per paragraph (2026-11-01 user
+  decision for this paragraph build), each image a calm night
+  scene (dark, low-contrast, static, sleep-safe — the §21a
+  sleep constraint stands), generated per paragraph content
+  and screened per §20a visual screening (prompt + output
+  checked; regenerate or drop on hit). Same background set
+  serves both Simplified and Traditional versions (images
+  carry no text). Record the paragraph→background mapping
+  in the delivery.
 - The §24b ASR gate applies to paragraph audio.
 - Listening and conversation do NOT switch: listening
   per-sentence generation is pedagogy (4-pass repetition per
