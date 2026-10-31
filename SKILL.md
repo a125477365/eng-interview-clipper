@@ -2137,7 +2137,12 @@ a number.
   text in the version's script; new-line covers follow §20d
   (opening-card text, centered, AI background) with text in the
   version's script. A Traditional cover is never made by reusing
-  the Simplified cover image.
+  the Simplified cover image. Simplified and Traditional covers
+  share the same background treatment (content-matched AI
+  background); only the text script differs — a Simplified cover
+  must never sit on a plain or gradient background while its
+  Traditional counterpart has a scene background (2026-11-01 user
+  correction).
 - Friday batch (§20d) under this rule: 3 lines × 2 versions =
   6 films + matching covers per week; Traditional versions follow
   §24a marks and platforms.
