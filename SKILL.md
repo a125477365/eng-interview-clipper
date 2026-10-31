@@ -909,11 +909,19 @@ overlay; and replaces the v5 1150x864 + bottom-band layout, retired
   right frame edge (×N right edge x=1870 → frame 1920).
 - Panel rows （横屏）: a 5-row window of distinct words ordered by
   most-recent occurrence; the CURRENT word is the BOTTOM row.
-  Landscape selection rule, stated on its own: the current word's
-  EN, ZH and ×N all turn gold together, with NO background highlight
-  bar — color change only, never a bar. Before the first word is
+  Landscape selection rule, stated on its own (2026-10-31 user rule,
+  supersedes the former color-only rule): the current word's EN, ZH
+  and ×N all turn gold together AND the selected row carries a
+  background bar visibly distinct from the panel frost — gold alone
+  is not enough. The bar is confined to the selected row's slot
+  (touches neither the adjacent rows nor the subtitle zone; exact
+  color/geometry per the approved sample). Before the first word is
   spoken, the first window is shown from frame 0 with the first word
-  pre-selected gold (§7 panel-timing rule).
+  pre-selected gold (§7 panel-timing rule); the window must never
+  collapse to a single word at the moment the first word is spoken
+  (2026-10-31 defect: the panel showed only the spoken word at that
+  instant) — the first window persists with word 1 selected
+  continuously until it is spoken, then advances without collapsing.
   Row pitch 150 px (was 178 — tightened 2026-10-25 so the list
   clears the subtitle zone); within a row (bottom-anchored): EN at
   y_en, ZH gloss + phonetic at y_en+56, dots at y_en+108 — giving
@@ -926,6 +934,17 @@ overlay; and replaces the v5 1150x864 + bottom-band layout, retired
   EN top (928) by ≥10 px (here 20 px). Only background sits under
   the subtitles, never list text. Verify by frame check: no row
   element may touch or overlap any subtitle line.
+  60pt panel dots spacing (SpaceX, user-approved v6 2026-11-01,
+  supersedes +56/+108 for the 60pt panel only): EN 60pt at y_en,
+  ZH 42pt at y_en+39, dots 30pt at y_en+69, pitch 150, selected-bar
+  bottom y_en+106 unchanged. Measured ink gaps (black-background
+  renders, 3 frames): EN bottom → ZH top ~12 px mean (4–19),
+  ZH bottom → dots top ~11 px mean (9–15), dots bottom → next EN
+  top ~46 px mean (40–50); last-row dots ink bottom ~864 vs
+  subtitle EN ink top 946 (~82 px clear). The v2 offsets
+  (+56/+108) measured dots bottom → next EN top ~1 px — that is
+  why v6 moved ZH and dots up 17 px together. The 48pt generic
+  panel offsets above are unchanged pending measurement.
 - Each row: EN word (48 px, pale #C7D8C7; current word 57 px gold
   bold; phrases / words over 14 chars render smaller: 38 px,
   current 41 px gold) — ZH gloss + phonetic below it (42 px white;
@@ -1023,6 +1042,14 @@ overlay; and replaces the v5 1150x864 + bottom-band layout, retired
   to the next card. This extends the ASCII-token anchor rule above
   to numbers and percentages, which the anchor rule alone did not
   catch.
+  Bilingual word-alignment (user 2026-10-31): every card's ZH must be
+  the translation of exactly the EN on that card — cut points at
+  bilingual-aligned semantic boundaries, not independent EN-clause /
+  ZH-proportion cuts. No ZH word may appear on a card before its EN
+  counterpart appears on that card, and vice versa; where the old
+  independent splitting disagrees with alignment, alignment wins.
+  QC: each card's EN and ZH, read together, must cover the same
+  spoken content.
   Rework junction check (2026-10-25 user rule): after any rework
   that touches a contiguous block (re-translation, re-cut,
   re-build), verify BOTH ends of the adjusted block before
@@ -1234,6 +1261,7 @@ stub of a few minutes at the end.
   for Traditional cards and panel headers. (Source intro cancelled 2026-10-16.)
 - The Traditional version goes to TikTok; Simplified goes to Douyin.
 - Titles/descriptions/tags should also be in Traditional for TikTok.
+- 2026-11-01 扩展：简繁双版现适用于 4 种视频，见 §24a；本条仍为采访线繁体版的实现方法（convert BEFORE composing）。
 
 ### 15. Publish
 
@@ -1483,7 +1511,9 @@ subtitle, numbering is sequential, and blind screens carry no text →
 deliver the episode for user review → publish ONLY on the user's
 explicit 发. Weekly cadence: 1 episode per week for this collection
 (§20). On the first episode, create the Douyin collection
-沉浸式英语听力练习 and add every episode to it.
+沉浸式英语听力练习 and add every episode to it. Plus §24: every
+episode ships Simplified + Traditional (§24a) and passes the ASR
+gate (§24b).
 
 ## §19 沉浸式日常英语对话（2026-10-29 用户立项）
 
@@ -1599,7 +1629,8 @@ artwork. All dialogue is original, proprietary content.
 Same as §18b, with the trigger “做一期沉浸式对话” (+ optional theme).
 Weekly cadence: 1 episode per week for this collection (§20). On the
 first episode, create the Douyin collection 沉浸式日常英语对话 and add
-every episode to it.
+every episode to it. Plus §24: every episode ships Simplified +
+Traditional (§24a) and passes the ASR gate (§24b).
 
 ## §20 新线通用规则（§18 + §19 + §21，2026-10-29 用户立下）
 
@@ -1719,6 +1750,7 @@ every episode to it.
   - 每次编辑提交后复核清单：标题、简介、标签、合集、声明、定时时间——除本次授权改的项外其余必须与原来一致；列表缩略图已更新；封面检测通过。任一项不符先汇报、不擅自再提交。
   - 视频改名联动：视频标题改了，下载文档文件名须同步改为新标题并重新上传到百度网盘文件夹“英语视频文档”（同一文件夹、同一个分享），旧标题文档处理掉，保证一视频一份文档。
   - 话题标签（2026-10-30 晚用户定，仅三条新线）：每视频最多 5 个，优先顺序 #小学英语 #启蒙英语 #初中英语 #高中英语，第 5 个按本线补一个最贴切的——听力 #英语听力、对话 #英语口语、睡前 #睡前英语。添加方法：输入话题后点一次话题、再从下拉列表里选，字体变色才生效；上限 5 个。
+- 简繁双版（2026-11-01 用户立下）：周五批次自双版规则起，三线各出简繁两版（共 6 条成片＋对应封面），繁体版按 §24a（EK英語标记、YouTube＋TikTok）。
 
 ## §21 睡前英语静听（2026-10-30 用户立项，2026-10-30 晚由睡前深夜英语改名）
 
@@ -1746,9 +1778,12 @@ proprietary content.
   line height = size × 1.35; below the English, Chinese translation
   in Noto Sans CJK Regular color (217,217,217) #D9D9D9, starting
   44px, shrinking by 4px steps to a 34px floor until at most 2
-  lines, line height = size × 1.45, Simplified characters only.
+  lines, line height = size × 1.45, Simplified characters only
+  (Simplified version; Traditional version converts them — see
+  §24a).
   Top-right account mark “RealTalk英语精选” in Noto Sans CJK
-  Regular 28px white at (W − 40 − mark_width, 36). Subtitle text is
+  Regular 28px white at (W − 40 − mark_width, 36) (Simplified
+  version; Traditional version mark is EK英語 — see §24a). Subtitle text is
   pre-rendered per sentence onto the night still (images/sub_NNN.png)
   and the segment video loops that still. NOTE: the reference itself
   shows English-only subtitles on screen; the Chinese line is added
@@ -1774,9 +1809,14 @@ proprietary content.
   actual density. EP1 v1 (Helio): speech 2091.7 s, pause 0.64 s per
   sentence, content 2348.57 s. EP1 clone: speech 1524.86 s, pause
   2.12 s per sentence, content 2346.15 s, final 2351.37 s. Effective
-  density 102.5 wpm in both builds.
+  density 102.5 wpm in both builds. 2026-11-01: for paragraph
+  builds (§24c) the per-sentence pause formula is superseded —
+  pauses inside a paragraph come from the paragraph synthesis
+  itself; gaps between paragraphs are set longer than sentence
+  gaps and recorded per production (no fixed value set here).
+  The total-duration target (words / 102.5 × 60) still applies.
 - Segment encode (measured EP1 builds): night still looped at 30 fps
-  + sentence audio, audio apad pad_dur = pause, setsar=1, libx264
+  + sentence audio (paragraph builds: paragraph audio), audio apad pad_dur = pause, setsar=1, libx264
   veryfast yuv420p, AAC 48 kHz stereo; final assembly by concat
   demuxer -c copy in order: intro segment + body segments (+ xfade
   clip after sentence 145, + xfade clip after sentence 306) + 4 s
@@ -1807,15 +1847,21 @@ proprietary content.
   [clipA_t300.wav, clipB_t1000.wav, clipC_t3000.wav], language='en',
   file_path = out); torch threads 2; model files pre-downloaded
   (~1.8 GB — re-download only if the local model is missing).
-  Per-sentence outputs audio_clone/cNNN.wav (24 kHz mono wav);
-  synthesis is chunked (15-sentence chunks under a supervisor script)
-  so a VM restart resumes from the last completed sentence instead
-  of restarting. Validation: every cNNN.wav must exist and decode;
+  Paragraph outputs audio_clone/pNNN.wav (24 kHz mono wav) —
+  2026-11-01 user decision, supersedes per-sentence synthesis
+  (see §24c). One XTTS pass per natural story paragraph;
+  synthesis is chunked per paragraph under a supervisor script
+  so a VM restart resumes from the last completed paragraph
+  instead of restarting. Sentence boundaries inside paragraph
+  audio are recovered by word-timestamp alignment
+  (faster-whisper) against the known sentences and verified
+  sentence by sentence before the subtitle ASS is rebuilt.
+  Validation: every pNNN.wav must exist and decode;
   rebuild rejects any clip shorter than 0.3 s; segment build skips a
-  segment whose existing file is within 0.5 s of its expected
-  duration. Measured synthesis throughput on the 2-core VM: ~0.03
-  sentences/s (~33 s per sentence, real-time factor ~8) — re-base
-  time estimates from this rate every round (§Workflow estimate rule).
+  segment whose existing file is within 0.5 s of its expected duration. Synthesis throughput for paragraph synthesis is TBD
+  (re-measure; the old ~0.03 sentences/s rate was per-sentence
+  and no longer applies) — re-base time estimates from the
+  measured paragraph rate every round (§Workflow estimate rule).
   Before any model work, unset ALL proxy env vars (http_proxy,
   https_proxy, HTTP_PROXY, HTTPS_PROXY, ALL_PROXY, all_proxy,
   NO_PROXY, no_proxy) and set HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
@@ -1873,6 +1919,8 @@ proprietary content.
 ### §21b Pipeline
 
 Same as §18b, with the trigger “做一期睡前英语” (+ optional theme).
+Plus §24: every episode ships Simplified + Traditional (§24a),
+uses paragraph synthesis (§24c), and passes the ASR gate (§24b).
 Weekly cadence: Sunday 18:00 (§20d). On the first episode, create the
 Douyin collection 睡前英语静听 and add every episode to it. Topic log
 and style freeze follow §20c.
@@ -1989,6 +2037,9 @@ a number.
   2026-10-30 and verified by a test run emitting exactly the
   frozen values. Dots filled #F5D67B was already correct
   (shared _dots_str, used by v6d itself) and unchanged.
+- Bedtime synthesis granularity: §21a per-sentence clone vs
+  2026-11-01 paragraph decision → paragraph wins; §21a
+  corrected, §24c is the rule.
 
 ### §22d Previously reported missing items — verified present (2026-10-30)
 
@@ -2032,3 +2083,126 @@ a number.
   app, so create the share once via the Baidu web UI or App. Later docs
   go into the same folder under that same share; do not create a new
   share per video.
+
+## §24 简繁双版、音频校验与睡前段落生成（2026-11-01 用户立下）
+
+### §24a 简繁双版：4 种视频通用（从下一次新制作起执行）
+
+- Every new video in all 4 types (interview, listening,
+  conversation, bedtime) ships TWO versions: Simplified +
+  Traditional, plus covers for both versions. Already-published
+  videos and the in-progress SpaceX v2 are NOT retroactively
+  remade unless the user orders it.
+- What converts (Traditional version): ALL Chinese text —
+  subtitle Chinese lines, interview vocab Chinese glosses,
+  opening/ending card Chinese text, titles, descriptions, tags,
+  cover text. Conversion = OpenCC s2t + sentence-by-sentence
+  check for semantic mistranslations (EP1 lesson: blind s2t
+  mistranslates some words, e.g. 乾/幹-type errors — a blind
+  s2t pass is never trusted; every converted string is checked).
+- What NEVER converts: English text, IPA, audio, visuals,
+  durations, layout, fonts, colors. The Traditional version
+  reuses the Simplified version's audio and timing; only Chinese
+  text (and account marks, below) changes.
+- Interview implementation: §14b (convert via
+  clipper.to_traditional BEFORE composing; Traditional → TikTok,
+  Simplified → Douyin). Interview video frames carry no in-frame
+  account-name mark by design (unchanged). Interview Traditional
+  versions still follow the EK英語 rule (2026-11-01 user order):
+  any account identifier the Traditional version displays — outro
+  card badge (§14) if used, cover marks if ever added — uses
+  EK英語, never RealTalk英语精选, and the Traditional version
+  publishes under the EK英語 accounts. This rule adds no new
+  in-frame mark to interview video frames; it only governs what
+  mark is used wherever one appears.
+- New-line implementation: same audio + same timing as the
+  Simplified version; subtitles/cards/covers converted to
+  Traditional. Account marks: Simplified versions carry
+  RealTalk英语精选； Traditional versions carry EK英語
+  (2026-10-31 privacy order: Traditional YouTube/TikTok must not
+  be linkable to the Douyin account). New-line Traditional
+  versions go to YouTube + TikTok; Simplified versions go to
+  Douyin.
+- Covers (both versions): interview covers follow §11
+  (horizontal + vertical, episode-number / 完整版 rules) with
+  text in the version's script; new-line covers follow §20d
+  (opening-card text, centered, AI background) with text in the
+  version's script. A Traditional cover is never made by reusing
+  the Simplified cover image.
+- Friday batch (§20d) under this rule: 3 lines × 2 versions =
+  6 films + matching covers per week; Traditional versions follow
+  §24a marks and platforms.
+
+### §24b 音频识别回环校验（适用于听力、对话、睡前三条新线）
+
+- After audio generation for every listening / conversation /
+  bedtime episode, run an ASR round-trip check: transcribe the
+  full generated audio, diff it word by word against the script
+  (English), and report every missed, misread, or added word
+  with its timestamp.
+- Mismatches are reported to the user; never silently re-record,
+  never silently edit the script to match the audio. The fix
+  (re-generate the affected sentence / paragraph) needs the
+  user's go-ahead, same as any rework.
+- The check is a QC gate on the audio: a clean check is reported
+  with the delivery; a failed check blocks approval until the
+  user decides.
+- Interview line: NOT applicable — interview audio is the source
+  recording, not generated audio. Interview QC stays: Whisper
+  transcription proofread (§5b), translation audit (§5), vocab
+  audit (§7), junction/seam checks (§9L). Do not apply an ASR
+  round-trip check to interview audio.
+
+### §24c 睡前段落生成（仅睡前线，2026-11-01 用户决定，取代 §21a 逐句克隆）
+
+- Synthesis granularity: ONE XTTS pass per natural story
+  paragraph (same model, voice, speaker_wav, language, and
+  settings as §21a). Paragraph = the story's own paragraph
+  breaks; if the script has none, group sentences into coherent
+  paragraphs and record the grouping in the delivery.
+- Sentence timing inside paragraph audio is recovered by
+  word-timestamp alignment (faster-whisper) against the known
+  sentences, verified sentence by sentence (every sentence
+  present, no drift) before the subtitle ASS is rebuilt.
+- Pauses: pauses inside a paragraph come from the paragraph
+  synthesis itself; gaps BETWEEN paragraphs are set longer than
+  sentence gaps (sleep pacing). Gap values are recorded per
+  production — no fixed number is set here; do not invent one.
+- Everything else in §21a stands: night stills + mapping, intro
+  sting −9 dB, outro card, target total duration (words / 102.5
+  × 60), segment encode, new-filename rework rule.
+- The §24b ASR gate applies to paragraph audio.
+- Listening and conversation do NOT switch: listening
+  per-sentence generation is pedagogy (4-pass repetition per
+  sentence); conversation per-turn generation is structural
+  (multiple speakers). Only bedtime uses paragraph synthesis.
+
+### §24d 四线相同 / 不同对照（实现细节）
+
+- 成片版本：4 线相同 — 每条新作简体＋繁体两版＋两套封面（§24a）。
+- 音频来源：不同 — 采访：源片原声（不生成）；听力：TTS 女声
+  Aria＋男声 Helio（§18）；对话：TTS 多声（女＋男主＋客串，
+  §19）；睡前：XTTS-v2 克隆参考旁白（仅睡前，§21a）。
+- 生成粒度：不同 — 采访：不适用（源片）；听力：逐句；对话：
+  逐轮；睡前：逐段（§24c）。
+- 音频校验：不同 — 新线三线：ASR 回环校验（§24b）；采访：
+  转写校对＋翻译审计＋生词审计＋接缝检查，不做回环校验。
+- 生词界面：不同 — 采访有（§9L 面板）；新线三线无。
+- 封面文字：不同 — 采访：结论句标题＋生词数＋集数（§11）；
+  新线：开头卡全部文字（§20d）。
+- 账号标记：不同 — 采访：画面内无账号名标记；采访繁体版所显示的
+  任何账号标识（片尾卡 badge 等）一律 EK英語；新线简体：
+  RealTalk英语精选；新线繁体：EK英語。
+- 发布节奏：不同 — 采访：切片一天一支 18:20（§16/§17）；
+  新线：周五批次生成，周五/周六/周日 18:00 定时（§20d）。
+- 相同铁律（4 线共有）：用户说发才发；标题/描述/封面/标签一次
+  弄对、发后不删改重传；成片 ≤1 GB 不压缩；每视频一份英文
+  Word 下载文档（§23）；样例先批、批量后行。
+
+### §24e 已写入项
+
+- 生词圆点间距（采访 60pt 面板）：用户 2026-11-01 01:32 批复 v6
+  样例后写入 §9L——中文 y_en+39、圆点 y_en+69、行距 150、选中条
+  底 y_en+106 不动；实测条内空英文→中文约 12px、中文→圆点约
+  11px，条间空约 46px，末行圆点底 864、离字幕区 82px。v3 全量
+  重渲即按此值。

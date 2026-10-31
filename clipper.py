@@ -1517,7 +1517,19 @@ def make_covers(frame_png: str, title_lines: list, kicker: str,
             ImageFilter.GaussianBlur(40))
         bg = Image.blend(bg, Image.new("RGB", (W, H), (0, 0, 0)), 0.35)
         img = bg.copy()
-        fg = src.resize((fg_w, fg_h), Image.LANCZOS)
+        # v2 2026-10-31 (user review: heads stretched): foreground MUST
+        # keep the source aspect — scale by ONE factor to COVER the
+        # fg box, then center-crop the overflow. Never resize(w, h)
+        # directly: a 1150x1080 person crop stretched to 1080x608 is
+        # 1.67x horizontal stretch (the v1 cover defect). For a 16:9
+        # source frame the cover crop is ~lossless (scale 0.563/0.521,
+        # <=1 px cropped).
+        sw, sh = src.size
+        s = max(fg_w / sw, fg_h / sh)
+        nw, nh = round(sw * s), round(sh * s)
+        scaled = src.resize((nw, nh), Image.LANCZOS)
+        x0, y0 = (nw - fg_w) // 2, (nh - fg_h) // 2
+        fg = scaled.crop((x0, y0, x0 + fg_w, y0 + fg_h))
         img.paste(fg, ((W - fg_w) // 2, fg_y))
         return img
 
