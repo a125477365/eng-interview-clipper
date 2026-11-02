@@ -1146,6 +1146,11 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   no re-composition, no background repainting, no title or background
   color change. If a rework goes wrong, revert to the user's original
   attachment and stop producing new versions.
+- 16:9 covers (Bilibili/YouTube, 2026-11-01 SpaceX method): reuse
+  the approved design and the approved photo — crop the photo out
+  of the approved 4:3 cover, do not pick a new frame; copy text
+  character-for-character, only changing the aspect ratio. No
+  episode-number badge on 16:9, same as 4:3.
 
 ### 12. Episode splitting (content over 59 minutes)
 
@@ -1284,6 +1289,34 @@ stub of a few minutes at the end.
   confirms it, §16). If a tag group has more than 5 tags, the
   selection is TBD — the user decides which 5 ship; do not silently
   drop tags.
+- Interview AI declaration (all platforms, 2026-11-01 rule): real
+  interview footage is NEVER marked AI-generated. If a submission
+  form opens with AI-generated already selected, change it to
+  无需添加自主声明 before submitting (2026-11-01 Douyin case: the
+  form opened with AI-generated selected; changed). Bilibili: tick
+  自制声明, leave AI-generated unticked. New-line AI-generated
+  videos are the opposite (§20d requires the AI-generated tick) —
+  do not confuse the two lines.
+- Tag verification includes capitalization: after point-picking
+  tags, verify the page's actual display, including case. If the
+  platform normalizes case (2026-11-01 Douyin case: #spacex
+  lowercase vs requested #SpaceX), report it; do not re-edit on
+  your own. Same topic + same count is not a missing tag.
+- User-uploaded, unpublished drafts: when the user has already
+  uploaded the video file and left it unsubmitted, only complete
+  the metadata (title, description, tags, collection, covers,
+  declarations). Do not touch the video file and do not change
+  the user's scheduled publish time.
+- Post-submission re-open check (mandatory, all platforms): after
+  ANY submission, reopen the video/manuscript page and verify
+  title, description, tags, partition, cover, declarations, and
+  scheduled time against the assignment, using what the reopened
+  page shows — never what the submission form showed. Long-text
+  fields especially: a first fill does not always persist
+  (2026-11-01 Bilibili case: the first description fill did not
+  stick; reopening still showed the old placeholder, so it was
+  re-entered by direct key presses and re-verified). Any mismatch
+  is reported before any further submission.
 - Uploads go out directly: files marked for upload are uploaded
   without asking the user for permission each time (2026-10-27
   user rule).
@@ -1301,7 +1334,7 @@ stub of a few minutes at the end.
 - 上传节奏：通过后按一天一支的顺序上传（2026-10-28 用户改定，取代隔天一支）；窗口沿用 18:20。
 - 封面：切片一律使用其完整视频的封面，不再每支单独配封面帧；封面要横竖两张：横封面 4:3、竖封面 3:4（版本以完整视频所用为准）；每支封面写上第几集（如“第2集”，金色，照片下方黑底居中）。
 - 完整版封面：完整版视频的封面写上“完整版”（金色，照片下方黑底居中，与切片第X集同款式）；横竖两张：横封面 4:3、竖封面 3:4。完整版字一律居中，不放侧边（2026-10-29 用户纠正）。
-- 换封面方法：走已发布/已排视频的编辑页“设置封面”（发布页上传按钮对浏览器代理无响应，编辑页可用；提交后进修改审核）。
+- 换封面方法：走已发布/已排视频的编辑页“设置封面”（发布页上传按钮对浏览器代理无响应，编辑页可用；提交后进修改审核）。审核中的视频无编辑入口，换封面须等审核回到定时发布中或发布后。
 - 引流：每支切片发布后，在评论区发一条并置顶：“完整版在主页合集《访谈完整版》”。
 - 标题与描述：由助手自行把握，但必须遵守账号文案口径（只写客观事实，不自夸；描述末尾带来源行「原视频：{频道名}《{原标题}》」；标签沿用该访谈的标签组）；标题须为结论句，并写明是谁说的（说话人署名）。
 - 话题添加方法（2026-10-28 用户指点）：输入话题后要点一次话题、再从下拉列表里选，才生效（生效后字体颜色会变）；上限 5 个。
@@ -1554,9 +1587,7 @@ artwork. All dialogue is original, proprietary content.
   dialogue audio (EP1: aligned.json + words_turn_NNN.json, produced
   by faster-whisper word timestamps on the dialogue mix). Chinese
   translation in yellow, Simplified characters only.
-- Waveform (measured EP1 build, FROZEN): ffmpeg showwaves
-  s=900x120 mode=p2p rate=30 colors=white, overlaid at (510,940)
-  on the base image, bottom-center.
+- Waveform: none in finished videos. The EP1-build showwaves overlay (ffmpeg showwaves s=900x120 mode=p2p at (510,940), bottom-center) is not present in the shipped no-intro fix (verified on 300s/600s frames, 2026-11-01); do not add a waveform.
 - Voices: main pair female + male American English TTS, same pair as
   §18: female Aria (avocado_v2:MAI_01), male Helio (avocado_v2:MAI_03),
   both at tts speed 65, same tones as §18; the pair is frozen after
@@ -1754,14 +1785,19 @@ Traditional (§24a) and passes the ASR gate (§24b).
 - 发布元数据细则（2026-10-30 晚用户令：集合、视频封面，集合、视频标题，AI 声明，集合选择，发布时间逐项定死）：
   - 集合标题：固定三名——沉浸式英语听力练习、沉浸式日常英语对话、睡前英语静听（2026-10-30 晚由睡前深夜英语改名，旧名不再用）。改名走合集管理、只改标题一栏，不动简介、封面、公开范围、合集内视频；改名后合集进审核中属正常，新标题已显示即成功。
   - 集合封面：横版 4:3（1200×900），无文字，与集合主题一致的图片，绝不许用视频界面当背景（一个集合会有很多视频）；经合集管理更换；换封面后合集进审核中属正常。
-  - 视频封面：文字直接用开头卡上的全部文字（集合名中英、主题中英、期数，听力还有说明行），居中对称、好看；背景按本期内容 AI 生成（夜景话题用夜景背景、买早餐用 3D 卡通买早餐场景；背景图同样过政治筛查，见 §20a）；中文一律 PIL（Noto Sans CJK Bold）叠加，不靠图片模型渲染中文；横 4:3（1200×900）与竖 3:4（900×1200）各一张，3:4 的文字在裁切后画、保证不被裁切、居中留边。发布页“上传封面”按钮对浏览器无响应，一律走编辑页“设置封面”提交；提交时横竖封面检测须显示“封面检测通过、暂未发现封面低质问题”；换封面后视频进审核中属正常，定时时间不变；审核通过后回到定时发布中。封面不带“完整版”字样。本条仅针对三条新线视频（沉浸式英语听力练习、沉浸式日常英语对话、睡前英语静听），采访视频封面另见访谈线规则、不适用本条。
+  - 视频封面：文字直接用开头卡上的全部文字（集合名中英、主题中英、期数，听力还有说明行），居中对称、好看；背景按本期内容 AI 生成（夜景话题用夜景背景、买早餐用 3D 卡通买早餐场景；背景图同样过政治筛查，见 §20a）；中文一律 PIL（Noto Sans CJK Bold）叠加，不靠图片模型渲染中文；横 4:3（1200×900）与竖 3:4（900×1200）各一张，3:4 的文字在裁切后画、保证不被裁切、居中留边。发布页“上传封面”按钮对浏览器无响应，一律走编辑页“设置封面”提交；提交时横竖封面检测须显示“封面检测通过、暂未发现封面低质问题”；审核中的视频无编辑入口，换封面等审核回到定时发布中或发布后再换；换封面后视频进审核中属正常，定时时间不变；审核通过后回到定时发布中。封面不带“完整版”字样。本条仅针对三条新线视频（沉浸式英语听力练习、沉浸式日常英语对话、睡前英语静听），采访视频封面另见访谈线规则、不适用本条。
   - 视频标题：格式＝合集名-主题-第 N 期，直接用片头卡（音乐段界面）上显示的期数与标题，不另起、不加字。改标题走编辑页；定时视频有“继续编辑”入口时可改，提交后进审核中、定时不变；审核中的视频无编辑入口，等审核回到定时发布中或发布后再改。
   - AI 声明：三条新线上传时必须在发布表单里勾选“内容由AI生成”；漏勾的补救：发布后经编辑页补勾（定时视频距发布时间不足 2 小时时编辑保存被平台拒绝，见发布时间条）。每次编辑提交后复核声明仍已勾。
-  - 集合选择：只在第一次提交（上传表单）时可选；提交后、发布前（定时中/审核中）编辑页选不上；漏选的补救二选一：①视频尚未发布——删旧定时、原样重传，第一次提交即选上合集（重传须原标题/描述/标签/定时不变）；②视频已发布——经合集管理补加。已发布的视频绝不删了原样重传（平台去重机制判重复/搬运压推荐）。
+  - 集合选择：只在第一次提交（上传表单）时可选；提交后、发布前（定时中/审核中）编辑页选不上；合集下拉点不开时先看视频状态：已是定时发布中即属此规则，不要反复点；漏选的补救二选一：①视频尚未发布——删旧定时、原样重传，第一次提交即选上合集（重传须原标题/描述/标签/定时不变）；②视频已发布——经合集管理补加。已发布的视频绝不删了原样重传（平台去重机制判重复/搬运压推荐）。
   - 发布时间：周五批次——三条线周五上午集中生成（睡前 07:19、听力 08:19、对话 09:19），周五统一交用户审核，审核通过后周五一次上传全部三条，上传界面定时发布时间填原档期（听力周五 18:00、对话周六 18:00、睡前周日 18:00）；无批准绝不发；批准晚于档期则立即发。平台规则：定时视频编辑保存时，距发布时间不足 2 小时或超过 14 天会被拒（“定时时长不短于2小时，不长于14天”）；编辑提交后视频进审核中、无继续编辑入口，审核通过后回到定时发布中，定时时间不变。
   - 每次编辑提交后复核清单：标题、简介、标签、合集、声明、定时时间——除本次授权改的项外其余必须与原来一致；列表缩略图已更新；封面检测通过。任一项不符先汇报、不擅自再提交。
   - 视频改名联动：视频标题改了，下载文档文件名须同步改为新标题并重新上传到百度网盘文件夹“英语视频文档”（同一文件夹、同一个分享），旧标题文档处理掉，保证一视频一份文档。
   - 话题标签（2026-10-30 晚用户定，仅三条新线）：每视频最多 5 个，优先顺序 #小学英语 #启蒙英语 #初中英语 #高中英语，第 5 个按本线补一个最贴切的——听力 #英语听力、对话 #英语口语、睡前 #睡前英语。添加方法：输入话题后点一次话题、再从下拉列表里选，字体变色才生效；上限 5 个。
+- 多平台发布核对清单（2026-11-01 用户令：以抖音四项必办为模板；TikTok 标签＋YouTube 声明/类别漏写教训）：每平台发布前按其详情页字段逐项列出、逐项核对，含默认值项；核对只核任务单上的项等于没核，漏掉的项留默认值无人发现。
+  - 抖音：沿用上条四项必办＋复核清单（定时/合集/AI 声明/封面走编辑页；标题/简介/5 标签/合集/声明/定时）。
+  - B站：标题、描述、5 标签、16:9 封面、AI 生成声明、自制声明、分区（知识；无二级时只选知识、不代选其他二级）、发布时间按当期指令；合集仅 LV2 账号可用，LV1 时跳过合集项并记待涨粉后补（2026-11-01 实测：LV1·0 粉，合集需 LV2/100 粉解锁）。
+  - YouTube：标题、描述、标签、自定义缩略图、播放列表（繁体名）、公开设置、受众（按用户定）、AI 生成声明（altered/synthetic content 勾选）、类别（Education）；详情页其余字段逐项确认，不留默认值不核对。
+  - TikTok：文案（标题＋描述文字）、标签（须走 # 提示点选成选中态，粘贴 # 文本不算）、自定义封面（上传页支持时用）、公开设置；不建合集（2026-11-01 用户定）；文案一天只能改一次且限发布 7 天内（2026-11-01 Studio 实测）。
 - 简繁双版（2026-11-01 用户立下）：周五批次自双版规则起，三线各出简繁两版（共 6 条成片＋对应封面），繁体版按 §24a（EK英語标记、YouTube＋TikTok）。
 
 ## §21 睡前英语静听（2026-10-30 用户立项，2026-10-30 晚由睡前深夜英语改名）
@@ -2089,6 +2125,15 @@ a number.
   full versions and clips: subtitle sentences, numbered. Listening:
   sentences, numbered. Conversation: rounds labelled by speaker.
   Bedtime: sentences, numbered.
+- Interview videos: ONE file holding both (2026-11-01 user order):
+  the subtitle sentences (numbered, as above) first, then the
+  vocab table in the same .docx — never two separate files. The
+  vocab table columns: 英文｜音标｜中文释义｜出现次数 (phrases
+  with no IPA fill — for the IPA cell); ghost words 0; ×N equals
+  the film's vocab panel counts; data source the episode's
+  vocab_*_glossed.json. Subtitle docs are the default for every
+  line — a vocab table never replaces the subtitle doc; for
+  interviews it sits in the same file.
 - Simplified-only docs (2026-11-01 user order): generate the doc
   ONLY for the Simplified version (named after the Simplified
   title). Traditional versions get NO doc — neither a subtitle doc
@@ -2105,6 +2150,17 @@ a number.
   app, so create the share once via the Baidu web UI or App. Later docs
   go into the same folder under that same share; do not create a new
   share per video.
+
+- Baidu token lifetime and form rule (2026-11-01 re-authorization):
+  the access_token lasts 30 days; when it expires, re-authorize
+  through the simplified OAuth flow (response_type=token,
+  redirect_uri=oob, scope=basic,netdisk) and submit the new token
+  via the secure form. The form takes ONLY the access_token shown
+  on the authorize page — never the AppKey/SecretKey from the app
+  console, and never in chat. API calls must carry a browser-like
+  User-Agent header; the default Python-urllib User-Agent is
+  rejected with HTTP 403 (error code 1010). Full flow: the
+  custom.baidu-netdisk connector doc.
 
 ## §24 简繁双版、音频校验与睡前段落生成（2026-11-01 用户立下）
 
@@ -2156,6 +2212,20 @@ a number.
   must never sit on a plain or gradient background while its
   Traditional counterpart has a scene background (2026-11-01 user
   correction).
+- Traditional separator (2026-11-01 user approval): Traditional
+  versions use ・ as the separator (kicker, subtitle line, e.g.
+  馬斯克・SpaceX、高中・四六級・雅思）; Simplified versions use ·.
+  Do not convert one to the other.
+- OpenCC s2t does NOT convert 著-words (2026-11-02 SpaceX lesson,
+  not a conversion-script bug): 随着／意味着／紧接着／标志着／
+  着手 pass through s2t unchanged (隨著→隨着 is wrong, 意味着
+  and 着手 stay fully Simplified). Traditional versions need a
+  separate word-level replacement pass — 隨著／意味著／緊接著／
+  標誌著／著手 — and these 5 words belong in the residual-word
+  check list permanently, so a future check catches them. Note
+  the round-trip check is not reversible for 著 (t2s keeps 著,
+  e.g. 隨著→随著≠随着): normalize 著 before comparing, or the
+  fixed words will false-alarm as mismatches.
 - Friday batch (§20d) under this rule: 3 lines × 2 versions =
   6 films + matching covers per week; Traditional versions follow
   §24a marks and platforms.
@@ -2192,9 +2262,11 @@ a number.
   sentences, verified sentence by sentence (every sentence
   present, no drift) before the subtitle ASS is rebuilt.
 - Pauses: pauses inside a paragraph come from the paragraph
-  synthesis itself; gaps BETWEEN paragraphs are set longer than
-  sentence gaps (sleep pacing). Gap values are recorded per
-  production — no fixed number is set here; do not invent one.
+  synthesis itself; gaps BETWEEN paragraphs (2026-11-02 user
+  decision, from EP2 on): 1.0 s trailing silence (PARA_PAUSE=1.0)
+  + 2 s crossfade = 3.0 s voice gap, same for Simplified and
+  Traditional. EP1 keeps its earlier 6 s gap (4 s silence + 2 s
+  dissolve) and is NOT reworked.
 - Everything else in §21a stands: intro sting −9 dB, outro
   card, target total duration (words / 102.5 × 60), segment
   encode, new-filename rework rule. Backgrounds are NOT the
@@ -2209,6 +2281,16 @@ a number.
   carry no text). Record the paragraph→background mapping
   in the delivery.
 - The §24b ASR gate applies to paragraph audio.
+- Duration acceptance for paragraph builds: the expected total =
+  sum of the paragraph audios + between-paragraph gaps +
+  crossfades + outro card, within frame-rounding tolerance
+  (2026-11-01 bedtime EP1: expected 1687.759 s vs assembled
+  1687.989 s, 0.23 s difference = frame rounding). Never judge a
+  paragraph build missing content by comparing its duration to
+  the sentence version's duration — the two cuts pace
+  differently. Completeness is judged by the §24b ASR loop
+  confirming every sentence is present, not by the file
+  existing.
 - Listening and conversation do NOT switch: listening
   per-sentence generation is pedagogy (4-pass repetition per
   sentence); conversation per-turn generation is structural
