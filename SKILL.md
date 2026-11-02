@@ -59,6 +59,9 @@ into a build of the other. Three buckets only:
   immersive listening practice; §19 immersive daily conversation; §20
   new-line shared rules (screening, intro sting, collections, weekly
   cadence, style freeze); §21 bedtime late-night English.
+- §23 download docs (Word, Simplified-only, Baidu folder, one share);
+  §24 dual-version + ASR gate + paragraph build; §25 four-line full
+  review (highest gate, every frame + every sentence).
 - §9c shared items: verification screenshots must carry subtitles;
   illustration may sit left of the vocab panel; no quality
   compression for upload; never delete/re-upload after publishing;
@@ -69,8 +72,8 @@ into a build of the other. Three buckets only:
 
 ### Vertical only — §9, §7b, §9b, and the vertical items of §9c
 
-- §9 geometry, all of it: canvas 1080x1920; vocab panel top y=170
-  (see the y=170 vs y=180 note below); interview video 1080x608
+- §9 geometry, all of it: canvas 1080x1920; vocab panel top y=180
+  (resolved 2026-10-30, see Easy confusions); interview video 1080x608
   with top edge y=610; subtitles EN 64 px white bold anchor y=1330,
   ZH 60 px gold anchor y=1430 (100 px apart); picture vertical
   centerline y=960.
@@ -1092,6 +1095,9 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
 - Frame 0: no logo, no ident, clean interview picture.
 - Spot-check 3 subtitle sync points (beginning / middle / end).
 - Audio present, 30fps, yuv420p, `+faststart`.
+- Generated-audio sound standard (2026-11-01 user rule): clean and
+  bright - no noise, no muffled syllables. A noisy or muffled render
+  is reworked, not shipped.
 - **Trim precisely at user-visible cut points** (2026-10-19 lesson):
   NEVER use stream copy (`-c copy`) with `-ss` before `-i` for the
   video start/end — the cut snaps to the nearest keyframe and leaves
@@ -1135,9 +1141,9 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   「真实对话精练」 (never 「必练」); one subtitle line carrying
   「高中 · 四六级 · 雅思」 + vocab count + episode count; keep all
   copy minimal. Gold on covers is #FFD700.
-- Each cover carries: kicker line, the headline, `N个生词 · 中英逐句精讲`,
-  and the account badge. Title text must be large, centered, high
-  contrast.
+- Each cover carries: kicker line, the two-line headline, the
+  subtitle line (高中 · 四六级 · 雅思 + 生词数 + 集数）, and the account
+  badge. Title text must be large, centered, high contrast.
 - Cover heads must be real photos of real people — never AI-generated
   or spliced heads (2026-10-17 user rule).
 - Cover rework rule (2026-10-17 user rule): when the user asks to change
@@ -1190,16 +1196,17 @@ stub of a few minutes at the end.
 - Each episode is rendered as its own video (compose per episode range)
   with its own vocab panel. Own covers per episode too.
 - Title suffix per episode: （上）/（中）/（下） or 第1集/第2集…,
-  e.g. `黄仁勋：AI没有知觉，不比宠物石头更有生命｜英文精听（上）`.
+  e.g. `马斯克：SpaceX年化收入剑指5000亿美元至1万亿（上）`.
   Tags stay the same on every episode. Publish episodes in order.
 
-### 13. Excel vocab list (for the fan group)
+### 13. Excel vocab list - RETIRED 2026-11-01 (replaced by §23 Word docs)
 
-- After the vocab is final, generate `clipper.make_vocab_excel(vocab,
-  video_title, out_dir)` → `{video_title}.xlsx` (filename sanitized).
-- Columns: 序号 | 单词 | 中文释义 | 出现次数. Header styled, filter on,
-  frozen top row. This file is what gets shared in the fan group for
-  download — generate it for every video/episode.
+- Do NOT generate an Excel vocab list for new videos. The fan-group
+  download doc is the §23 Word doc (subtitle sentences; interviews
+  add the vocab table in the same file). History: the Excel file
+  (`clipper.make_vocab_excel` -> `{video_title}.xlsx`, columns 序号 |
+  单词 | 中文释义 | 出现次数） was the download doc before the
+  2026-11-01 Word-doc rule; it is no longer produced.
 
 ### 14. 4-second fan-group outro
 
@@ -1273,15 +1280,18 @@ stub of a few minutes at the end.
 
 ### 15. Publish
 
-- Upload the FULL-QUALITY master (the crf-20 `final_with_cards.mp4`,
-  ~200 MB) to the platforms — NEVER a recompressed preview. Heavily
+- Upload the FULL-QUALITY master (the final composed mp4) to the
+  platforms — NEVER a recompressed preview. Heavily
   compressed uploads (e.g. crf 28) soften subtitle/vocab text edges;
   platforms re-encode anyway, so give their encoder the best source.
   Compressed copies are for review links only.
-- Douyin creator platform: upload the mp4, title format
-  `《人物：金句｜英文精听》`, visibility 公开, publish immediately.
+- Douyin creator platform: upload the mp4, title = conclusion
+  sentence naming the speaker (§16), visibility 公开, publish time
+  per the user's slot (interview line fixed 18:20; a user-selected
+  time is never changed).
 - Account: Douyin tanjian89, display name RealTalk英语精选 — the
-  account mark text on all new-line videos (§18/§19/§21).
+  account mark text on Simplified new-line videos (§18/§19/§21);
+  Traditional versions carry EK英語 (§24a).
 - Topic tags: platform cap is 5 tags. Add the interview's tag group
   (up to 5); verify each tag actually landed — the platform
   sometimes drops tags, and adding a tag requires clicking the tag
@@ -1322,7 +1332,8 @@ stub of a few minutes at the end.
   user rule).
 - Report back the work ID. Deleting/replacing an already-published
   version is a separate user-confirmed step.
-- TikTok: same video, separate login — treat as phase 2.
+- TikTok: Traditional versions publish here (§24a); Simplified
+  goes to Douyin. TikTok handle @realtalkwithai, display EK英語.
 
 ### 16. 切片 — 从成片切短视频矩阵（2026-10-27 用户立下，通用）
 
@@ -1480,7 +1491,10 @@ topics or artwork. All scripts are original, proprietary content.
   frozen after the first episode and reused for every episode in this
   collection. Voices are similar in style to the reference's speakers;
   NEVER clone the reference speakers' actual voices, and never imitate
-  a real person.
+  a real person. Probe lesson (2026-11-01): an unknown MAI voice id
+  silently falls back to the default voice - always verify the
+  tool-reported voice field + audio md5, never trust the requested
+  id alone.
 - Rendition order and pauses (measured EP1 build): per sentence, in
   fixed order: blind female, blind male, subtitle female, subtitle
   male. Segment encode: still image looped at 30 fps + sentence audio,
@@ -1535,6 +1549,10 @@ topics or artwork. All scripts are original, proprietary content.
   to landscape 1920x1080, silent audio: gold speech-bubble icon with 群,
   加入粉丝群 / 下载本期对话内容 / {N} 句 · 中英对照 / account badge.
   The 4s does not count toward the 18–22 min content length.
+  (2026-11-01 user decision, wording TBD: the card's 中英对照 line
+  will be replaced with new wording the user has yet to set - until
+  then treat the current line as a placeholder, not final copy.
+  The download doc itself is unaffected.)
 
 ### §18b Pipeline
 
@@ -1612,21 +1630,20 @@ artwork. All dialogue is original, proprietary content.
   No politics, no news, no sensitive topics (§20 screening BEFORE
   synthesis).
 - Episode length: 18–22 min, roughly 3000 words of dialogue.
-  Structure: intro sting → theme dialogue in several scenes /
-  segments → one brief closing line. EP1 measured totals (reference
+  Structure: theme dialogue in several scenes /
+  segments → one brief closing line (no intro segment since
+  2026-11-01, §24f). EP1 measured totals (reference
   build): 78 turns, 2666 words, 234 sentences, 5 scenes (Friday
   evening plans, Saturday market, Sunday picnic, Sunday dinner,
   closing); Emma 34 turns, Jack 35 turns, guest Lily 9 turns; final
   1243.79 s, 58,970,665 bytes, 1920x1080, 30 fps, H.264 + AAC.
-- Style unity: same intro sting (§20), same host illustrations, same
-  subtitle style, same main voice pair in every episode.
+- Style unity: same host illustrations, same subtitle style, same
+  main voice pair in every episode (no intro sting since §24f).
 - Render (measured EP1 build): 2-pass ffmpeg. Pass 1: base image
-  looped at 30 fps + dialogue audio + showwaves overlay + ASS
-  burn-in in ONE encode (libx264 yuv420p 30 fps, AAC 48 kHz stereo).
-  Pass 2: intro segment (intro card looped at 30 fps + shared sting,
-  6.0 s, same encode settings) concatenated with the dialogue video
-  (concat filter, re-encode) and the 4 s outro appended, final with
-  +faststart. Verification: full decode with no errors; whisper
+  looped at 30 fps + dialogue audio + ASS burn-in in ONE encode
+  (libx264 yuv420p 30 fps, AAC 48 kHz stereo; no waveform - see
+  Waveform bullet). Pass 2 (intro concatenation cancelled per §24f):
+  dialogue video + 4 s outro appended, final with +faststart. Verification: full decode with no errors; whisper
   spot-check 3–5 sentences against the script; word-level alignment
   QC (EP1 measured: 98.3% — pass/fail threshold TBD, §22).
 - Covers (measured EP1 build): background = host artwork corner
@@ -1659,6 +1676,10 @@ artwork. All dialogue is original, proprietary content.
   silent audio: gold speech-bubble icon with 群, 加入粉丝群 /
   下载本期对话内容 / {N} 轮对话 · 中英对照 / account badge. The 4s
   does not count toward the 18–22 min content length.
+  (2026-11-01 user decision, wording TBD: the card's 中英对照 line
+  will be replaced with new wording the user has yet to set - until
+  then treat the current line as a placeholder, not final copy.
+  The download doc itself is unaffected.)
 
 ### §19b Pipeline
 
@@ -1697,22 +1718,25 @@ Traditional (§24a) and passes the ASR gate (§24b).
 ### §20b 片头音乐（三条新线共用）
 
 - 一个统一的轻柔入场音乐（约 5–8 秒，柔和钢琴风，符合账号
-  风格），只生成一次，之后三条新线的每一期都复用同一个片头，
-  不得每期重生成（风格统一即账号标识）。
-- 片头放在每期视频开头，正片开始前播完，不压正片台词。
+  风格），只生成一次，之后听力线每一期复用同一个片头，不得
+  每期重生成（风格统一即账号标识）。对话／睡前自 2026-11-01
+  起无开头段（§24f），不再用片头。
+- 片头只放在听力线每期视频开头，正片开始前播完，不压正片台词（对话／睡前无开头段，见 §24f）。
 - Shared sting file (measured, frozen 2026-10-30 unified version):
   `~/workspace/new-lines/assets/intro_sting.wav` — 6.0 s, PCM 16-bit
   little-endian WAV, 48000 Hz, stereo, 1,152,078 bytes, md5
   1dea3132cd41c4e41a2e474986992ebe. This file is the single source
   of truth for the intro sting; verify the md5 before reuse. The
-  bedtime line attenuates its own intro segment by 9 dB (§21a) but
-  NEVER modifies this shared file.
+  bedtime line's 9 dB attenuation applied only to its retired
+  sentence-version intro segment (§21a, retired per §24f) - NEVER
+  modify this shared file.
 
 ### §20c 风格冻结与话题不重复
 
 - 每条新线首期定版即冻结：片头音乐文件、界面布局、字幕字体
   与颜色、主声音色与语速、主持人形象。后续各期原样复用，不
   得擅自换风格；用户明确要求改风格时，改后重新冻结并注明。
+  语速冻结 65：错读不靠调速修，改法须逐句验（2026-11-01 用户立规）。
 - Frozen shared assets (paths): intro sting
   `~/workspace/new-lines/assets/intro_sting.wav`; host artwork
   `~/workspace/new-lines/assets/host_f.png` and `host_m.png`
@@ -1772,10 +1796,8 @@ Traditional (§24a) and passes the ASR gate (§24b).
   3:4 各一张，封面文字居中对称、好看；合集封面不许用视频界面当背景，生成与集合主题一
   致的封面，可以没有文字。封面不带“完整版”字样（新线各期
   均为独立单期，不是访谈完整版）。本条封面要求仅针对三条新线视频（沉浸式英语听力练习、沉浸式日常英语对话、睡前英语静听），采访视频封面另见访谈线规则、不适用本条。
-- 每视频一份英文 Word 下载文档（2026-10-30 用户立下）：文件名
-  ＝视频标题，正文只放英文 — 听力按句编号、对话按说话人标注
-  轮次、睡前/访谈按句编号；上传后用分享链接＋授权码（提取码）
-  下载。
+- 下载文档见 §23（简体版一份、字幕稿为准、采访字幕＋生词表
+  同一文件、百度网盘文件夹「英语视频文档」同一分享）。
 - 发布时四项必办（2026-10-30 用户立下，仅三条新线，不含采访
   视频）：上传时在发布表单里选好定时发布时间、合集、自主声明
   “内容由AI生成”；封面因发布页上传按钮对浏览器无响应，走
@@ -1793,7 +1815,7 @@ Traditional (§24a) and passes the ASR gate (§24b).
   - 每次编辑提交后复核清单：标题、简介、标签、合集、声明、定时时间——除本次授权改的项外其余必须与原来一致；列表缩略图已更新；封面检测通过。任一项不符先汇报、不擅自再提交。
   - 视频改名联动：视频标题改了，下载文档文件名须同步改为新标题并重新上传到百度网盘文件夹“英语视频文档”（同一文件夹、同一个分享），旧标题文档处理掉，保证一视频一份文档。
   - 话题标签（2026-10-30 晚用户定，仅三条新线）：每视频最多 5 个，优先顺序 #小学英语 #启蒙英语 #初中英语 #高中英语，第 5 个按本线补一个最贴切的——听力 #英语听力、对话 #英语口语、睡前 #睡前英语。添加方法：输入话题后点一次话题、再从下拉列表里选，字体变色才生效；上限 5 个。
-- 多平台发布核对清单（2026-11-01 用户令：以抖音四项必办为模板；TikTok 标签＋YouTube 声明/类别漏写教训）：每平台发布前按其详情页字段逐项列出、逐项核对，含默认值项；核对只核任务单上的项等于没核，漏掉的项留默认值无人发现。
+- 多平台发布核对清单（2026-11-01 用户令：以抖音四项必办为模板；TikTok 标签＋YouTube 声明/类别漏写教训）：每平台发布前按其详情页字段逐项列出、逐项核对，含默认值项；核对只核任务单上的项等于没核，漏掉的项留默认值无人发现。本清单针对三条新线；采访线按 §15（实拍一律不勾 AI 声明；B站自制勾选、AI 不勾）。
   - 抖音：沿用上条四项必办＋复核清单（定时/合集/AI 声明/封面走编辑页；标题/简介/5 标签/合集/声明/定时）。
   - B站：标题、描述、5 标签、16:9 封面、AI 生成声明、自制声明、分区（知识；无二级时只选知识、不代选其他二级）、发布时间按当期指令；合集仅 LV2 账号可用，LV1 时跳过合集项并记待涨粉后补（2026-11-01 实测：LV1·0 粉，合集需 LV2/100 粉解锁）。
   - YouTube：标题、描述、标签、自定义缩略图、播放列表（繁体名）、公开设置、受众（按用户定）、AI 生成声明（altered/synthetic content 勾选）、类别（Education）；详情页其余字段逐项确认，不留默认值不核对。
@@ -1860,15 +1882,16 @@ proprietary content.
   density 102.5 wpm in both builds. 2026-11-01: for paragraph
   builds (§24c) the per-sentence pause formula is superseded —
   pauses inside a paragraph come from the paragraph synthesis
-  itself; gaps between paragraphs are set longer than sentence
-  gaps and recorded per production (no fixed value set here).
+  itself; gaps between paragraphs are fixed by §24c (1.0 s silence
+  + 2 s crossfade = 3.0 s voice gap from EP2 on; EP1 keeps 6 s).
   The total-duration target (words / 102.5 × 60) still applies.
 - Segment encode (measured EP1 builds): night still looped at 30 fps
   + sentence audio (paragraph builds: paragraph audio), audio apad pad_dur = pause, setsar=1, libx264
   veryfast yuv420p, AAC 48 kHz stereo; final assembly by concat
-  demuxer -c copy in order: intro segment + body segments (+ xfade
-  clip after sentence 145, + xfade clip after sentence 306) + 4 s
-  outro. Rework versions use a NEW filename (EP1: bedtime_ep01_clone.mp4)
+  demuxer -c copy in order (sentence-version assembly; paragraph
+  builds follow §24c with no intro segment per §24f): intro segment
+  + body segments (+ xfade clip after sentence 145, + xfade clip
+  after sentence 306) + 4 s outro. Rework versions use a NEW filename (EP1: bedtime_ep01_clone.mp4)
   and never overwrite the approved final or v2 until the user approves
   the rework.
 - Voice: ONE male narrator. REJECTED for this line, 2026-10-30 user
@@ -1942,29 +1965,13 @@ proprietary content.
   silent audio: gold speech-bubble icon with 群, 加入粉丝群 /
   下载本期视频声音内容 / 完整故事音频 / account badge. The 4s does
   not count toward the 36–44 min content length.
-- Voice parameters (bedtime line): narrator = ONE male voice;
-  target articulation ≈147 wpm during speech, effective density
-  ≈100–105 wpm with pauses (both measured from the reference video
-  bedtime.webm). REJECTED for this line, 2026-10-30 user review:
-  Helio (avocado_v2:MAI_03) at tts speed 60 — user judged it too
-  harsh for late night. 2026-10-30 USER DECISION (overrides the
-  earlier no-clone rule FOR THIS LINE ONLY): clone the reference
-  narrator's voice directly for the bedtime narration. APPROVED
-  2026-10-30 (user listened to 3 cloned samples): XTTS-v2 via Coqui
-  TTS 0.22.0, venv ~/workspace/.venv-xtts, language en, speaker_wav
-  = 3 narration-only clips from bedtime.webm (t=300–330, 1000–1030,
-  3000–3030, 30 s each, mono 22050 Hz), no speed/pitch adjustment,
-  output 24 kHz mono wav. Sample measurements: opening 141.2 wpm,
-  F0 means 99.6/86.7/86.3 Hz (reference ≈147 wpm, F0 ≈95 Hz).
-  Full-episode re-voice uses these settings. Scope: bedtime line
-  only — listening (§18) and conversation (§19) keep TTS voices, no
-  cloning; §20's no-clone rule otherwise stands.
-- Intro sting volume (2026-10-30 user decision): the bedtime line
-  attenuates the shared sting by 9 dB via a volume=-9dB filter on
-  its own intro segment only (verified: new intro segment mean
-  −29.3 dB, max −18.2 dB, matching the narration mean −29.3 dB);
-  the shared intro_sting.wav file is unchanged (md5 verified,
-  listening and conversation keep full volume).
+- Intro sting volume (2026-10-30 user decision; retired with the
+  sentence-version intro segment per §24f — current paragraph builds
+  have no intro segment): the bedtime line attenuated the shared
+  sting by 9 dB via a volume=-9dB filter on its own intro segment
+  only (verified: intro segment mean −29.3 dB, max −18.2 dB,
+  matching the narration mean −29.3 dB); the shared intro_sting.wav
+  file is unchanged (md5 verified; listening keeps full volume).
 
 ### §21b Pipeline
 
@@ -2036,9 +2043,10 @@ a number.
 3. Listening key-word selection rule: EP1 sentences.json `key` field is
    the reference pattern (focal action word / phrase). Write the
    selection rule when EP2 is built; until then follow the EP1 pattern.
-4. Bedtime still-boundary rule: EP1 mapping 1–145 / 146–306 / 307–382
-   is the reference. Write the general section-break rule when EP2 is
-   built.
+4. Bedtime still-boundary rule (sentence version only): EP1 mapping
+   1–145 / 146–306 / 307–382 is the reference. Paragraph builds do
+   not use section breaks at all - one content-matched image per
+   paragraph (§24c) - so no section-break rule is needed for EP2.
 5. Conversation word-alignment QC threshold: EP1 measured 98.3%.
    Set a numeric pass/fail threshold when the next episode is built;
    until then report the measured percentage.
