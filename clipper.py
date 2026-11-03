@@ -1716,12 +1716,12 @@ def make_outro_card(vocab_count: int, out_png: str, badge: str = "",
     if traditional:
         tc(800, "加入粉絲群", 110, (255, 200, 70))
         tc(960, "領取本集生詞清單", 72, (255, 255, 255))
-        tc(1070, f"{vocab_count} 個生詞 · 中英對照 Excel", 48,
+        tc(1070, f"{vocab_count} 個生詞 · 中英對照 Word", 48,
            (255, 200, 70), fr)
     else:
         tc(800, "加入粉丝群", 110, (255, 200, 70))
         tc(960, "领取本集生词清单", 72, (255, 255, 255))
-        tc(1070, f"{vocab_count} 个生词 · 中英对照 Excel", 48,
+        tc(1070, f"{vocab_count} 个生词 · 中英对照 Word", 48,
            (255, 200, 70), fr)
     if badge:
         tc(H - 220, badge, 52, (255, 255, 255), fr)
@@ -2242,12 +2242,12 @@ def make_outro_card_landscape(vocab_count: int, out_png: str, badge: str = "",
     if traditional:
         tc(480, "加入粉絲群", 104, (255, 200, 70))
         tc(630, "領取本集生詞清單", 68, (255, 255, 255))
-        tc(724, f"{vocab_count} 個生詞 · 中英對照 Excel", 46,
+        tc(724, f"{vocab_count} 個生詞 · 中英對照 Word", 46,
            (255, 200, 70), fr)
     else:
         tc(480, "加入粉丝群", 104, (255, 200, 70))
         tc(630, "领取本集生词清单", 68, (255, 255, 255))
-        tc(724, f"{vocab_count} 个生词 · 中英对照 Excel", 46,
+        tc(724, f"{vocab_count} 个生词 · 中英对照 Word", 46,
            (255, 200, 70), fr)
     if badge:
         tc(H - 110, badge, 44, (255, 255, 255), fr)

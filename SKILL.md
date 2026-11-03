@@ -1213,7 +1213,7 @@ stub of a few minutes at the end.
 - Every published video/episode ends with a 4 s end card:
   `clipper.make_outro(vocab_count, out_mp4, badge)` renders the card to mp4.
 - Card design (1080x1920, brand style): gold speech-bubble icon,
-  `加入粉丝群` / `领取本集生词清单` / `{N} 个生词 · 中英对照 Excel`,
+  `加入粉丝群` / `领取本集生词清单` / `{N} 个生词 · 中英对照 Word`,
   account badge at the bottom. Silent audio.
 - Vertical outro measured geometry (clipper.make_outro_card, font
   Noto Sans CJK Bold unless noted): vertical gradient
@@ -1222,7 +1222,7 @@ stub of a few minutes at the end.
   (255,200,70), tail triangle [(470,650),(440,720),(530,650)];
   群 64px centered in bubble, dark text (12,18,44) at y=530;
   加入粉丝群 110px gold (255,200,70) at y=800; 领取本集生词清单
-  72px white at y=960; {N} 个生词 · 中英对照 Excel 48px gold,
+  72px white at y=960; {N} 个生词 · 中英对照 Word 48px gold,
   Regular font, at y=1070; account badge 52px white Regular at
   y=1700; source line 30px gray (150,160,175) Regular at y=1800.
   Outro segment encode: still loop 30 fps, libx264 veryfast crf 20
@@ -1238,7 +1238,7 @@ stub of a few minutes at the end.
   triangle [(890,350),(860,420),(980,350)]; 群 64px dark (12,18,44)
   at y=232; 加入粉丝群 104px gold (255,200,70) at y=480;
   领取本集生词清单 68px white at y=630; {N} 个生词 · 中英对照
-  Excel 46px gold Regular at y=724; account badge 44px white
+  Word 46px gold Regular at y=724; account badge 44px white
   Regular at y=970; source line 28px gray (150,160,175) Regular at
   y=1022. Same texts/brand as the vertical card, same 4 s silent
   segment encode.
@@ -1346,6 +1346,7 @@ stub of a few minutes at the end.
 - 封面：切片一律使用其完整视频的封面，不再每支单独配封面帧；封面要横竖两张：横封面 4:3、竖封面 3:4（版本以完整视频所用为准）；每支封面写上第几集（如“第2集”，金色，照片下方黑底居中）。
 - 完整版封面：完整版视频的封面写上“完整版”（金色，照片下方黑底居中，与切片第X集同款式）；横竖两张：横封面 4:3、竖封面 3:4。完整版字一律居中，不放侧边（2026-10-29 用户纠正）。
 - 换封面方法：走已发布/已排视频的编辑页“设置封面”（发布页上传按钮对浏览器代理无响应，编辑页可用；提交后进修改审核）。审核中的视频无编辑入口，换封面须等审核回到定时发布中或发布后。
+- 封面先行（2026-11-04 用户令）：新提交必须先传上自定义封面并确认预览，封面传不上去就不提交；不再先提交、后走编辑页补封面（EP2 教训：提交后编辑页提交按钮因修改审核中变灰，封面落不上）。
 - 引流：每支切片发布后，在评论区发一条并置顶：“完整版在主页合集《访谈完整版》”。
 - 标题与描述：由助手自行把握，但必须遵守账号文案口径（只写客观事实，不自夸；描述末尾带来源行「原视频：{频道名}《{原标题}》」；标签沿用该访谈的标签组）；标题须为结论句，并写明是谁说的（说话人署名）。
 - 话题添加方法（2026-10-28 用户指点）：输入话题后要点一次话题、再从下拉列表里选，才生效（生效后字体颜色会变）；上限 5 个。
@@ -1821,6 +1822,8 @@ Traditional (§24a) and passes the ASR gate (§24b).
   - YouTube：标题、描述、标签、自定义缩略图、播放列表（繁体名）、公开设置、受众（按用户定）、AI 生成声明（altered/synthetic content 勾选）、类别（Education）；详情页其余字段逐项确认，不留默认值不核对。
   - TikTok：文案（标题＋描述文字）、标签（须走 # 提示点选成选中态，粘贴 # 文本不算）、自定义封面（上传页支持时用）、公开设置；不建合集（2026-11-01 用户定）；文案一天只能改一次且限发布 7 天内（2026-11-01 Studio 实测）。
 - 简繁双版（2026-11-01 用户立下）：周五批次自双版规则起，三线各出简繁两版（共 6 条成片＋对应封面），繁体版按 §24a（EK英語标记、YouTube＋TikTok）。
+- 睡前线周二批量（2026-11-03 用户改定，取代睡前周更单期）：每周二批量生成 7 支睡前视频（EP2 起顺延），做完一支排一支，周三起每天 18:00 发一支（简体→抖音＋B站，繁体→YouTube＋TikTok），直接发布不审片（例外于“用户说发才发、样例先批”规则）；周五睡前单期任务停用；听力、对话仍周五批次＋周五/周六 18:00。
+- 听力、对话周更停更（2026-11-03 用户令）：沉浸式听力与沉浸式对话的周五批次任务停用，不再每周更新；已有 EP1 保持已发布状态，不删不改。
 
 ## §21 睡前英语静听（2026-10-30 用户立项，2026-10-30 晚由睡前深夜英语改名）
 
@@ -2322,9 +2325,11 @@ a number.
   RealTalk英语精选；新线繁体：EK英語。
 - 发布节奏：不同 — 采访：切片一天一支 18:20（§16/§17）；
   新线：周五批次生成，周五/周六/周日 18:00 定时（§20d）。
+  睡前线自 2026-11-03 起改周二批量＋日更（周三起每天 18:00，见 §20d 新规），听力/对话仍周五批次。
 - 相同铁律（4 线共有）：用户说发才发；标题/描述/封面/标签一次
   弄对、发后不删改重传；成片 ≤1 GB 不压缩；每视频一份英文
   Word 下载文档（§23）；样例先批、批量后行。
+  （2026-11-03 用户令例外：睡前线周二批量直接发布、不审片，样例先批规则不适用于该批量；其余铁律不变。）
 
 ### §24e 已写入项
 
