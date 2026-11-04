@@ -1502,6 +1502,11 @@ topics or artwork. All scripts are original, proprietary content.
   audio aresample 48000, apad to the segment duration, setsar=1,
   libx264 veryfast crf 20 yuv420p, AAC 48 kHz stereo; final assembly
   by concat demuxer -c copy (segments share identical parameters).
+- Concat demuxer list paths must be absolute (EP3 lesson, 2026-11-04):
+  ffmpeg resolves relative file entries against the list file's
+  directory, not the CWD, so CWD-relative entries fail with doubled
+  paths (ep03/ep03/...); batch_assemble.py and batch_asr.py write
+  os.path.abspath entries.
   Pause values: base p = 1.5 s after renditions 1, 2 and 3, p4 = 2.5 s
   after rendition 4 (i.e. between sentences). Total duration =
   sting 6.0 + 2 × audio_sum + 3N × p + N × p4 (N = sentence count;
