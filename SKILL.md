@@ -34,7 +34,8 @@ into a build of the other. Three buckets only:
 - §0 redistribution gate + source attribution; §1 download (1080p
   first, never below 720p); §2 opening/ending trims + frame-0 check
   on the RENDERED file; §3/§9a burned-in logos KEEP by default
-  (removal only when rare/brief); §3a source card cancelled.
+  (removal only when rare/brief); §3a 7 s title overlay (2 s source
+  card cancelled 2026-10-16).
 - §4 transcription + non-speech filtering; §5/§5a/§5b translation,
   proofreading, overlap fixing, final AI review, translation-shift
   audit; §6/§6a content screening (Taiwan zero tolerance, three-layer
@@ -223,11 +224,20 @@ supersedes the 2026-10-17 per-video stance)
   possible, but NEVER cut off speakers' heads (§9).
 - `clipper.compose()` does not blur anything by default.
 
-### 3a. Source card — CANCELLED (2026-10-16 user decision)
+### 3a. Title overlay — 7 s (2026-11-08 user order, §24f)
 
-- User cancelled the 2-second source/usage intro card. Videos now open
-  directly with the main content (no intro card). Do NOT generate or
-  prepend it. Final structure: main video + 4 s fan-group outro (§14).
+- The 2-second source/usage intro card stays cancelled (2026-10-16).
+  NEW 2026-11-08: the interview title/theme is shown as a 7.0 s
+  overlay burned directly onto the first 7.0 s of the video content
+  (no separate card, no added duration). Final structure: main video
+  + 4 s fan-group outro (§14) — unchanged; the overlay sits on the
+  first 7 s of the main video.
+- Overlay text: the same title/theme text as the interview cover
+  (kicker 嘉宾·话题, big title 英语听力精听课 / 真实对话精练,
+  subtitle 高中·四六级·雅思·N个生词；full-version videos also carry
+  完整版), centered, Noto Sans CJK Bold, no background card. Audio:
+  adds nothing (text over the existing audio). The overlay passes the
+  §25 frame check like any other on-screen text.
 
 ### 4. Transcribe
 
@@ -1637,19 +1647,21 @@ artwork. All dialogue is original, proprietary content.
   synthesis).
 - Episode length: 18–22 min, roughly 3000 words of dialogue.
   Structure: theme dialogue in several scenes /
-  segments → one brief closing line (no intro segment since
-  2026-11-01, §24f). EP1 measured totals (reference
+  segments → one brief closing line (title/theme overlay on the first
+  7.0 s, §24f — no added segment). EP1 measured totals (reference
   build): 78 turns, 2666 words, 234 sentences, 5 scenes (Friday
   evening plans, Saturday market, Sunday picnic, Sunday dinner,
   closing); Emma 34 turns, Jack 35 turns, guest Lily 9 turns; final
   1243.79 s, 58,970,665 bytes, 1920x1080, 30 fps, H.264 + AAC.
 - Style unity: same host illustrations, same subtitle style, same
-  main voice pair in every episode (no intro sting since §24f).
+  main voice pair in every episode; title overlay is silent text
+  (no sting, §24f).
 - Render (measured EP1 build): 2-pass ffmpeg. Pass 1: base image
   looped at 30 fps + dialogue audio + ASS burn-in in ONE encode
   (libx264 yuv420p 30 fps, AAC 48 kHz stereo; no waveform - see
-  Waveform bullet). Pass 2 (intro concatenation cancelled per §24f):
-  dialogue video + 4 s outro appended, final with +faststart. Verification: full decode with no errors; whisper
+  Waveform bullet). Pass 2: dialogue video (title overlay burned in
+  over the first 7.0 s in Pass 1, §24f) + 4 s outro appended, final
+  with +faststart. Verification: full decode with no errors; whisper
   spot-check 3–5 sentences against the script; word-level alignment
   QC (EP1 measured: 98.3% — pass/fail threshold TBD, §22).
 - Covers (measured EP1 build): background = host artwork corner
@@ -1663,20 +1675,20 @@ artwork. All dialogue is original, proprietary content.
   approved final; rework versions take a new suffix (EP1: final_v1.mp4
   backup) and never overwrite the approved final until the user
   approves the rework.
-- Intro card (2026-10-30 user review; content differs per line, never
-  copy another line's card): bilingual, ALL text in one font (Noto Sans
+- Title overlay (2026-11-08 user order, §24f): the title/theme text is
+  burned directly onto the first 7.0 s of the video content (no
+  separate card, no added duration); content differs per line, never
+  copy another line's card. Bilingual, ALL text in one font (Noto Sans
   CJK Bold) so Chinese and English match: collection ZH + EN
   (Immersive Everyday English Conversations); theme ZH in gold + EN
   translation in gold; episode ZH + EN (第 N 期 · Episode N). No
   format-explanation line (this line has no multi-pass format).
-  Layout (1920x1080, verified EP1 build): solid background (22,27,48)
-  sampled from the host artwork corner; collection ZH 72px white at
-  y=300; collection EN 40px white at y=390; theme ZH 110px gold
-  #FFD700 at y=490; theme EN 60px gold at y=620; episode 56px white
-  at y=730. All centered at x=960, font Noto Sans CJK Bold index=2.
-  Intro segment 6.0s with the shared sting. (Cancelled 2026-11-01
-  user decision: conversation has no opening segment at all —
-  see §24f.)
+  Layout (1920x1080, text positions from the verified EP1 intro card):
+  collection ZH 72px white at y=300; collection EN 40px white at y=390;
+  theme ZH 110px gold #FFD700 at y=490; theme EN 60px gold at y=620;
+  episode 56px white at y=730. All centered at x=960, font Noto Sans
+  CJK Bold index=2. NO background (the video content shows through).
+  Audio: adds nothing (text over the existing audio, no sting).
 - Outro (2026-10-30 user review): 4s fan-group card appended AFTER the
   closing line, same design as §14 adapted to landscape 1920x1080,
   silent audio: gold speech-bubble icon with 群, 加入粉丝群 /
@@ -1725,17 +1737,18 @@ Traditional (§24a) and passes the ASR gate (§24b).
 
 - 一个统一的轻柔入场音乐（约 5–8 秒，柔和钢琴风，符合账号
   风格），只生成一次，之后听力线每一期复用同一个片头，不得
-  每期重生成（风格统一即账号标识）。对话／睡前自 2026-11-01
-  起无开头段（§24f），不再用片头。
-- 片头只放在听力线每期视频开头，正片开始前播完，不压正片台词（对话／睡前无开头段，见 §24f）。
+  每期重生成（风格统一即账号标识）。2026-11-08 起对话／睡前／
+  采访的标题是覆盖在视频上的文字（§24f），不配片头音乐、不单独
+  成段；片头音乐只用在听力线。
+- 片头只放在听力线每期视频开头（说明卡段），正片开始前播完，不压正片台词。对话／睡前／采访的标题覆盖文字均为静音。
 - Shared sting file (measured, frozen 2026-10-30 unified version):
   `~/workspace/new-lines/assets/intro_sting.wav` — 6.0 s, PCM 16-bit
   little-endian WAV, 48000 Hz, stereo, 1,152,078 bytes, md5
   1dea3132cd41c4e41a2e474986992ebe. This file is the single source
   of truth for the intro sting; verify the md5 before reuse. The
   bedtime line's 9 dB attenuation applied only to its retired
-  sentence-version intro segment (§21a, retired per §24f) - NEVER
-  modify this shared file.
+  sentence-version intro segment (§21a) - NEVER modify this shared
+  file.
 
 ### §20c 风格冻结与话题不重复
 
@@ -1792,10 +1805,11 @@ Traditional (§24a) and passes the ASR gate (§24b).
   仍可随时一句话点名加做一期（§18/§19/§21 分发不变）。
 - 发布纪律与访谈线一致：先审片（用户看成片或抽查），用户说
   发才发；发后不删改重传；标题、描述、标签、封面一次弄对。
-- 标题（2026-10-30 晚用户定）：每视频发布标题直接用片头卡
-  （音乐段界面）上显示的期数与标题（合集名-主题-第 N 期），
-  不另起、不加字。对话/睡前无开头卡后（§24f），标题取自当期
-  元数据（topics.json / 脚本元数据），格式与文字内容不变。
+- 标题（2026-10-30 晚用户定）：每视频发布标题直接用标题覆盖
+  文字上显示的期数与标题（合集名-主题-第 N 期），不另起、不加字。
+  标题/主题文字取自当期元数据（topics.json / 脚本元数据），在视频
+  开头 7 秒以覆盖文字显示（§24f，听力除外、无主题），格式与文字
+  内容不变。
 - 封面（2026-10-30 晚用户改定，取代片头卡帧做法）：视频封面
   文字直接用开头卡上的全部文字（集合名中英、主题中英、期数，听力还有说明行），背景按视频内容 AI 生成（如夜
   景话题用夜景背景、买早餐用 3D 卡通买早餐场景），横 4:3 与竖
@@ -1895,10 +1909,10 @@ proprietary content.
 - Segment encode (measured EP1 builds): night still looped at 30 fps
   + sentence audio (paragraph builds: paragraph audio), audio apad pad_dur = pause, setsar=1, libx264
   veryfast yuv420p, AAC 48 kHz stereo; final assembly by concat
-  demuxer -c copy in order (sentence-version assembly; paragraph
-  builds follow §24c with no intro segment per §24f): intro segment
-  + body segments (+ xfade clip after sentence 145, + xfade clip
-  after sentence 306) + 4 s outro. Rework versions use a NEW filename (EP1: bedtime_ep01_clone.mp4)
+  demuxer -c copy in order: body segments (+ xfade clip after sentence
+  145, + xfade clip after sentence 306) + 4 s outro (paragraph builds
+  follow §24c; the 7 s title overlay is burned onto the first 7.0 s
+  of the body, §24f — no separate intro segment). Rework versions use a NEW filename (EP1: bedtime_ep01_clone.mp4)
   and never overwrite the approved final or v2 until the user approves
   the rework.
 - Voice: ONE male narrator. REJECTED for this line, 2026-10-30 user
@@ -1954,27 +1968,29 @@ proprietary content.
   license decision. Bedtime clone EP1 publish: 2026-11-01 18:00,
   Douyin scheduled publish + first creation of the 「睡前英语静听」
   collection (§20d Sunday slot).
-- Intro card (2026-10-30 user review; content differs per line, never
-  copy another line's card): night-still background unchanged,
-  bilingual, ALL text in one font (Noto Sans CJK Bold) so Chinese and
-  English match: collection ZH + EN (Bedtime English); theme ZH in
-  gold + EN translation in gold; episode ZH + EN (第 N 期 · Episode N).
-  No format-explanation line. Layout (1920x1080, verified EP1
-  build): background assets/night_1.png ×0.65 darkened; collection ZH
-  72px white (255,255,255) at y=300; collection EN 40px white at
-  y=395; theme ZH 110px gold (255,215,120) at y=480; theme EN 60px
-  gold at y=610; episode 48px white at y=710. All centered at x=960,
-  font Noto Sans CJK Bold index=2. (Cancelled 2026-11-01 user
-  decision: bedtime has no opening card at all — see §24f. This
-  layout is kept here only as the record of EP1 and earlier.)
+- Title overlay (2026-11-08 user order, §24f): the title/theme text is
+  burned directly onto the first 7.0 s of the video content (no
+  separate card, no added duration); content differs per line, never
+  copy another line's card. Bilingual, ALL text in one font (Noto Sans
+  CJK Bold) so Chinese and English match: collection ZH + EN (Bedtime
+  English); theme ZH in gold + EN translation in gold; episode ZH + EN
+  (第 N 期 · Episode N). No format-explanation line. Layout
+  (1920x1080, text positions from the verified EP1 intro card):
+  collection ZH 72px white (255,255,255) at y=300; collection EN 40px
+  white at y=395; theme ZH 110px gold (255,215,120) at y=480; theme EN
+  60px gold at y=610; episode 48px white at y=710. All centered at
+  x=960, font Noto Sans CJK Bold index=2. NO background (the video
+  content shows through; the night still is NOT used as a card
+  background). Audio: adds nothing (text over the existing audio, no
+  sting).
 - Outro (2026-10-30 user review): 4s fan-group card appended AFTER the
   closing line, same design as §14 adapted to landscape 1920x1080,
   silent audio: gold speech-bubble icon with 群, 加入粉丝群 /
   下载本期视频声音内容 / 完整故事音频 / account badge. The 4s does
   not count toward the 36–44 min content length.
 - Intro sting volume (2026-10-30 user decision; retired with the
-  sentence-version intro segment per §24f — current paragraph builds
-  have no intro segment): the bedtime line attenuated the shared
+  sentence-version intro segment — current paragraph builds use the
+  7 s silent title overlay, §24f): the bedtime line attenuated the shared
   sting by 9 dB via a volume=-9dB filter on its own intro segment
   only (verified: intro segment mean −29.3 dB, max −18.2 dB,
   matching the narration mean −29.3 dB); the shared intro_sting.wav
@@ -2343,46 +2359,52 @@ a number.
   11px，条间空约 46px，末行圆点底 864、离字幕区 82px。v3 全量
   重渲即按此值。
 
-### §24f 开头界面：听力保留，对话/睡前取消（2026-11-01 用户决定）
+### §24f 开头标题：7 秒覆盖文字（2026-11-08 用户令，取代 2026-11-01 无开头卡规则）
 
-- Listening KEEPS its opening instruction card, including the
-  explanation line 「每句话先盲听两次，再跟字幕听两次」 + English,
-  because the 4-pass format (blind ×2 + subtitled ×2) must be
-  explained to viewers. Listening is the ONLY line that keeps an
-  opening interface.
-- Conversation and bedtime: NO opening interface from this decision
-  onward. The ENTIRE opening card is deleted (user 2026-11-01:
-  whole card, not just an explanation line — neither line's card
-  ever carried one). The film starts directly with content, to cut
-  the first-5-seconds exit rate. The intro segment is removed as
-  one unit (card loop + shared sting): no card, no 6s sting lead-in.
-- Scope: all new productions AND reworks, including the
-  already-published conversation EP1 (user 2026-11-01 explicit order
-  to rework it — this is the explicit-order exception to the
-  never-delete-and-republish rule; a rework still stops for the
-  user's publish go-ahead before any delete/upload on the platform).
-- Titles and covers are unaffected in CONTENT: titles stay
-  集合名-主题-第 N 期 and cover text stays the opening-card text
-  (collection ZH+EN, theme ZH+EN, episode; listening also the
-  explanation line), now sourced from the episode metadata
-  (topics.json / script metadata) instead of the card image.
-  Covers of already-published episodes are NOT remade for this
-  change.
-- Traditional versions follow the same rule (no opening card on
-  either version); §24a marks (EK英語) and platforms unchanged.
-- General rule (2026-11-01 user statement): listening is the SOLE
-  exception — it is the only line with an opening card. Interview
-  already has none (§3a, 2-second source card cancelled 2026-10-16:
-  main video + outro only) and stays that way; conversation and
-  bedtime have none from this decision onward. No future line gets
-  an opening card unless the user explicitly orders one.
-- Cover guard (unchanged by the card removal): every cover MUST
-  keep (1) text consistent with the episode's actual content
-  (theme/topic, never generic) and (2) an explicit English-learning
-  purpose (line/collection name carries 英语; interview covers
-  carry the 英语听力精听课 framing + vocab count). The card removal
-  changes only where cover text is sourced from (metadata, not the
-  card image) — it never justifies a generic or purpose-free cover.
+- The 7-second bilingual title/theme is an OVERLAY, not a separate
+  segment: the title/theme text is burned directly onto the first
+  7.0 s of the video content (the video itself, no added card, no
+  added duration). User 2026-11-08: "7秒是直接在视频中显示，不需要
+  有一个单独的标题卡，也就是可以直接覆盖在视频上就行。"
+- Applies to interview (horizontal/vertical), conversation, and
+  bedtime. Listening is EXEMPT: listening has no theme (its episodes
+  are sets of everyday sentences, not a themed topic), so it gets no
+  overlay and no title. Listening keeps its existing 6 s explanation
+  card + shared sting exactly as before (§18a/§20b).
+- Overlay text: the same title/theme text as the cover — collection
+  ZH+EN, theme ZH+EN, episode (第 N 期 · Episode N); interview uses
+  its cover text (kicker 嘉宾·话题, big title 英语听力精听课 /
+  真实对话精练, subtitle 高中·四六级·雅思·N个生词；full-version
+  videos also carry 完整版). Layout: reuse each line's intro-card
+  text styling and positions (§19a/§21a for conversation/bedtime;
+  §3a for interview) — same font (Noto Sans CJK Bold), sizes,
+  colors, centered — but with NO background card (no solid color,
+  gradient, or night still); the video content shows through.
+- Audio: the overlay adds no audio (it is text over the existing
+  video audio). No sting on the overlay. The shared intro sting
+  (§20b) stays on listening's explanation card only.
+- Duration: the overlay does NOT extend the video. Total durations,
+  assembly orders, and the listening duration formula are unchanged.
+  This REPLACES the 2026-11-01 rule (no opening card except
+  listening) for conversation, bedtime, and interview; the 2026-11-01
+  listening rule (keeps its explanation card) stands.
+- Scope: all new productions from this decision onward. Already-
+  published videos are NOT reworked for this change (the never-
+  delete-and-republish rule stands). A rework still stops for the
+  user's publish go-ahead before any delete/upload on the platform.
+- Titles and covers: titles stay 集合名-主题-第 N 期; cover text
+  stays the opening-card text (collection ZH+EN, theme ZH+EN,
+  episode; listening also the explanation line), sourced from the
+  episode metadata (topics.json / script metadata). Covers of
+  already-published episodes are NOT remade for this change.
+- Traditional versions follow the same rule (7 s overlay on both
+  versions); §24a marks (EK英語) and platforms unchanged.
+- Cover guard (unchanged): every cover MUST keep (1) text
+  consistent with the episode's actual content (theme/topic, never
+  generic) and (2) an explicit English-learning purpose (line/
+  collection name carries 英语; interview covers carry the
+  英语听力精听课 framing + vocab count). The overlay never
+  justifies a generic or purpose-free cover.
 
 ## §25 四线全面审查（2026-11-01 用户令，4 种视频通用，最高 gate）
 
