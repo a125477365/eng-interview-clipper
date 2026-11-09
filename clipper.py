@@ -2087,8 +2087,8 @@ def build_ass_landscape(segments: list[dict], vocab: list[dict],
         for j, w in enumerate(win):
             is_cur = (w["word"] == cur_word)
             y_en = 200 + j * LROW_H
-            y_zh = y_en + 56
-            y_dots = y_en + 108
+            y_zh = y_en + 39
+            y_dots = y_en + 69
             word = w["word"]
             phon = w.get("phonetic", "")
             gloss = w.get("gloss", "")

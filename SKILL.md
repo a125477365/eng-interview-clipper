@@ -940,27 +940,32 @@ overlay; and replaces the v5 1150x864 + bottom-band layout, retired
   continuously until it is spoken, then advances without collapsing.
   Row pitch 150 px (was 178 — tightened 2026-10-25 so the list
   clears the subtitle zone); within a row (bottom-anchored): EN at
-  y_en, ZH gloss + phonetic at y_en+56, dots at y_en+108 — giving
-  ~14 px clear gaps between EN/ZH, ZH/dots, and dots/next-row EN,
-  so no two rows or row elements ever touch or overlap. Row 1 EN
-  y=200, row 5 EN y=800 (ZH 856, dots bottom 908).
+  y_en, ZH gloss + phonetic at y_en+39, dots at y_en+69 — the v6
+  spacing (user 2026-11-09: ALL future interview horizontals use
+  v6; supersedes the old +56/+108). Measured ink gaps (v6): EN
+  bottom → ZH top ~12 px, ZH bottom → dots top ~11 px, dots
+  bottom → next EN top ~46 px — within a row tight, between rows
+  loose, so no two rows or row elements ever touch or overlap.
+  Row 1 EN y=200, row 5 EN y=800 (ZH 839, dots bottom 869).
   BOUNDARY RULE (user 2026-10-25): the panel BACKGROUND (frost)
   runs to y=1080, but the vocab LIST never enters the subtitle
-  zone — the last row's dots bottom (908) must clear the subtitle
-  EN top (928) by ≥10 px (here 20 px). Only background sits under
+  zone — the last row's dots bottom (869) must clear the subtitle
+  EN top (928) by ≥10 px (here 59 px). Only background sits under
   the subtitles, never list text. Verify by frame check: no row
   element may touch or overlap any subtitle line.
-  60pt panel dots spacing (SpaceX, user-approved v6 2026-11-01,
-  supersedes +56/+108 for the 60pt panel only): EN 60pt at y_en,
-  ZH 42pt at y_en+39, dots 30pt at y_en+69, pitch 150, selected-bar
-  bottom y_en+106 unchanged. Measured ink gaps (black-background
-  renders, 3 frames): EN bottom → ZH top ~12 px mean (4–19),
-  ZH bottom → dots top ~11 px mean (9–15), dots bottom → next EN
-  top ~46 px mean (40–50); last-row dots ink bottom ~864 vs
-  subtitle EN ink top 946 (~82 px clear). The v2 offsets
+  Dots spacing v6 (user-approved 2026-11-01, extended to ALL
+  interview horizontals by user 2026-11-09): ZH 42pt at y_en+39,
+  dots 30pt at y_en+69, pitch 150, selected-bar bottom y_en+106
+  unchanged (EN size stays per panel: 60pt on the 60pt panel,
+  48px on the 48pt panel). Measured ink gaps (black-background
+  renders, 3 frames, 60pt panel): EN bottom → ZH top ~12 px mean
+  (4–19), ZH bottom → dots top ~11 px mean (9–15), dots bottom →
+  next EN top ~46 px mean (40–50); last-row dots ink bottom ~864
+  vs subtitle EN ink top 946 (~82 px clear). The v2 offsets
   (+56/+108) measured dots bottom → next EN top ~1 px — that is
-  why v6 moved ZH and dots up 17 px together. The 48pt generic
-  panel offsets above are unchanged pending measurement.
+  why v6 moved ZH and dots up 17 px together. This v6 spacing is
+  now the standard for every interview horizontal panel; the old
+  +56/+108 must not be used for any new interview horizontal.
 - Each row: EN word (48 px, pale #C7D8C7; current word 57 px gold
   bold; phrases / words over 14 chars render smaller: 38 px,
   current 41 px gold) — ZH gloss + phonetic below it (42 px white;
