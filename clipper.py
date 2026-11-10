@@ -335,7 +335,15 @@ def _argos_translate(texts: list[str]) -> list[str]:
         src = next((l for l in installed if l.code == "en"), None)
         if src is None:
             raise RuntimeError("argos en->zh model not installed")
-        dst = next(l for l in src.translations if l.to_lang.code == "zh")
+        dst_lang = next((l for l in installed if l.code == "zh"), None)
+        if dst_lang is None:
+            raise RuntimeError("argos en->zh model not installed")
+        # current API: Language.get_translation(target); older builds
+        # exposed .translations with .to_lang
+        if hasattr(src, "get_translation"):
+            dst = src.get_translation(dst_lang)
+        else:
+            dst = next(l for l in src.translations if l.to_lang.code == "zh")
         _argos = dst
     return [_argos.translate(t) for t in texts]
 
