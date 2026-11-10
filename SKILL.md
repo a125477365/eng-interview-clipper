@@ -148,6 +148,45 @@ into a build of the other. Three buckets only:
   (`TRANSLATE_BASE_URL` / `TRANSLATE_API_KEY` / `TRANSLATE_MODEL`) or the
   offline Argos en→zh model (`argospm install translate-en_zh`).
 
+### Execution routing — server first, local fallback (2026-11-10 user order)
+
+- Two codebases, one rule. **Server code** (`~/workspace/server-render-kit/`,
+  runs ON the home server) is preferred; **local code** (clipper.py /
+  run_all.py / compose_piece.py / assemble.py, runs on the VM) is kept
+  unchanged and used ONLY when there is no server available. The dispatcher
+  `render_dispatch.py` (runs on the VM) implements the priority: it tests
+  SSH to the server, renders on the server if reachable, otherwise falls
+  back to the local `run_all.py`. Never rewrite the local code to call the
+  server; the dispatcher is the only bridge.
+- All video work uses the user's home server as much as possible
+  (尽量). The server is the DEFAULT execution environment for
+  ffmpeg work: source download, encode/render, frame extraction,
+  stills, QC, and finished-file storage. Run these on the server
+  whenever a server address and credentials are available for the
+  task.
+- Fallback: use local (the VM) ONLY when no server address and
+  credentials are specified for the task, or the server is
+  unreachable. If the task supplies a server address + SSH
+  credentials, do not run ffmpeg locally.
+- Model work stays LOCAL, always: XTTS voice synthesis, ASR/whisper
+  transcription, and any torch / large-model inference run on the
+  VM, never on the server — the server has no large models, and its
+  CPU has no AVX2 so torch cannot run there. This exception covers
+  model steps only; all non-model steps still go to the server.
+- The server address, SSH credentials, and connection method are
+  supplied per task by the user — never hardcode them in the skill,
+  and never commit credentials. VM-side coordination (scripts,
+  scheduling, publication) stays on the VM.
+- Handoff rule (slow tunnel, ~0.7 MB/s): big files (source.mp4,
+  mini.mp4, full_audio.m4a) are produced ON the server (downloaded /
+  built there), never transferred per-piece. Only small files move
+  from the VM to the server: job.json, ASS files, outro PNGs.
+- Migration note: the interview pipeline code (clipper.py /
+  run_all.py) currently calls ffmpeg as a local subprocess; it has
+  no SSH/server mode, and it stays that way by design. New work
+  follows server-first via the separate server kit; existing
+  per-video scripts are not converted mid-production.
+
 ## Pipeline (run in order, do not skip steps)
 
 ### 0. Redistribution check — mandatory gate
