@@ -168,10 +168,13 @@ into a build of the other. Three buckets only:
   credentials are specified for the task, or the server is
   unreachable. If the task supplies a server address + SSH
   credentials, do not run ffmpeg locally.
-- Model work stays LOCAL, always: XTTS voice synthesis, ASR/whisper
+- Model work stays LOCAL by default, never on the home server: XTTS voice synthesis, ASR/whisper
   transcription, and any torch / large-model inference run on the
-  VM, never on the server — the server has no large models, and its
-  CPU has no AVX2 so torch cannot run there. This exception covers
+  VM — the server has no large models, and its
+  CPU has no AVX2 so torch cannot run there. XTTS synthesis routing: prefer the VM
+  (coqui-tts 0.28.0, venv ~/workspace/.venv-xtts); when VM free memory is below ~6 GB,
+  route synthesis to the 2223 box (system Python 3.13, private venv /home/box/venv-xtts,
+  coqui-tts 0.28.0, torch 2.8.0+cpu). This exception covers
   model steps only; all non-model steps still go to the server.
 - The server address, SSH credentials, and connection method are
   supplied per task by the user — never hardcode them in the skill,
@@ -1969,7 +1972,7 @@ proprietary content.
   earlier no-clone rule FOR THIS LINE ONLY): clone the reference
   narrator's voice directly for the bedtime narration. APPROVED
   2026-10-30 (user listened to 3 cloned samples): XTTS-v2 via Coqui
-  TTS 0.22.0, venv ~/workspace/.venv-xtts, language en, speaker_wav
+  TTS 0.28.0, venv ~/workspace/.venv-xtts, language en, speaker_wav
   = 3 narration-only clips from bedtime.webm (t=300–330, 1000–1030,
   3000–3030, 30 s each, mono 22050 Hz), no speed/pitch adjustment,
   output 24 kHz mono wav. Sample measurements: opening 141.2 wpm,
@@ -2001,9 +2004,9 @@ proprietary content.
   Before any model work, unset ALL proxy env vars (http_proxy,
   https_proxy, HTTP_PROXY, HTTPS_PROXY, ALL_PROXY, all_proxy,
   NO_PROXY, no_proxy) and set HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
-  when the model is already downloaded. Coqui TTS 0.22.0 requires
-  transformers pinned to 4.46.3 and torch 2.5.1+cpu (newer versions
-  break the checkpoint load).
+  when the model is already downloaded. coqui-tts 0.28.0 on the VM uses
+  transformers 5.22.2 and torch 2.5.1+cpu; on the 2223 box it requires
+  torch 2.8.0+cpu (2.15+ forces torchcodec, which needs CUDA).
 - Clone-voice license — RESOLVED 2026-10-30 (user decision, same day
   correction): use the cloned voice directly; the copyright /
   licensing question is NOT a publish gate and must not be presented
