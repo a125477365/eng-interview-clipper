@@ -173,8 +173,21 @@ into a build of the other. Three buckets only:
   VM — the server has no large models, and its
   CPU has no AVX2 so torch cannot run there. XTTS synthesis routing: prefer the VM
   (coqui-tts 0.28.0, venv ~/workspace/.venv-xtts); when VM free memory is below ~6 GB,
-  route synthesis to the 2223 box (system Python 3.13, private venv /home/box/venv-xtts,
-  coqui-tts 0.28.0, torch 2.8.0+cpu). This exception covers
+  route synthesis to the 2224 Mac (MacBook Air M5, 10-core, 16 GB,
+  macOS 27.0.1, ARM64; ssh -p 2224 tanjian@104.223.51.196 — public
+  port forward; direct VPN IP 10.8.0.30 is NOT reachable from the VM.
+  Private venv ~/venv-xtts, Python 3.11.9, coqui-tts 0.28.0,
+  torch 2.15.0 with MPS). VM public key is installed in the Mac
+  ~/.ssh/authorized_keys (key login; never store the password).
+  Mac SSH via the egress proxy: expect/pty sessions are reset at
+  kex — use BatchMode + key, non-PTY only. Two Mac pitfalls:
+  (1) first TTS() needs COQUI_TOS_AGREED=1 to bypass the TOS
+  prompt; (2) torchcodec needs Homebrew ffmpeg libs (absent on
+  the Mac), so batch synth scripts must monkey-patch
+  torchaudio.load with soundfile (see Mac ~/smoke_xtts.py).
+  The 2223 box (Debian 13, 8-core, AVX2) was the fallback until
+  2026-11-13 and is superseded by the Mac — keep it only as
+  history, not the preferred fallback. This exception covers
   model steps only; all non-model steps still go to the server.
 - The server address, SSH credentials, and connection method are
   supplied per task by the user — never hardcode them in the skill,
@@ -2005,8 +2018,10 @@ proprietary content.
   https_proxy, HTTP_PROXY, HTTPS_PROXY, ALL_PROXY, all_proxy,
   NO_PROXY, no_proxy) and set HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
   when the model is already downloaded. coqui-tts 0.28.0 on the VM uses
-  transformers 5.22.2 and torch 2.5.1+cpu; on the 2223 box it requires
-  torch 2.8.0+cpu (2.15+ forces torchcodec, which needs CUDA).
+  transformers 5.22.2 and torch 2.5.1+cpu; on the 2224 Mac it uses
+  torch 2.15.0 with MPS (single-sentence synth ~5.6 s, 2026-11-13
+  smoke test). The 2223 box used torch 2.8.0+cpu (2.15+ forces
+  torchcodec, which needs CUDA) — box is superseded, see routing.
 - Clone-voice license — RESOLVED 2026-10-30 (user decision, same day
   correction): use the cloned voice directly; the copyright /
   licensing question is NOT a publish gate and must not be presented
