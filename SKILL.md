@@ -1821,7 +1821,9 @@ Traditional (§24a) and passes the ASR gate (§24b).
   `~/workspace/new-lines/assets/host_f.png` and `host_m.png`
   (1600x1600 each); night stills
   `~/workspace/new-lines/assets/night_1.png`, `night_2.png`,
-  `night_3.png` (1920x1080 each).
+  `night_3.png` (1920x1080 each) — EP1-era frozen assets only;
+  from EP6 on, bedtime backgrounds are live video (§21a), these
+  stills are no longer used for new episodes.
 - 三线开头与结尾卡内容各不相同，不得互抄（2026-10-30 用户
   立下）：听力、对话、睡前三条线的开头卡与结尾卡文案各自独
   立（见 §18a/§19a/§21a 与 §14），不得把一条线的卡面文案复
@@ -1903,6 +1905,12 @@ Traditional (§24a) and passes the ASR gate (§24b).
 - 睡前线周二批量（2026-11-03 用户改定，取代睡前周更单期）：每周二批量生成 7 支睡前视频（EP2 起顺延），做完一支排一支，周三起每天 18:00 发一支（简体→抖音＋B站，繁体→YouTube＋TikTok），直接发布不审片（例外于“用户说发才发、样例先批”规则）；周五睡前单期任务停用；听力、对话仍周五批次＋周五/周六 18:00。
 - 听力、对话周更停更（2026-11-03 用户令）：沉浸式听力与沉浸式对话的周五批次任务停用，不再每周更新；已有 EP1 保持已发布状态，不删不改。
 
+### §20e 聊天重发缓存教训（2026-11-13 实测，适用于所有线）
+
+- 同一路径的音频/视频在聊天里反复发，App 会缓存旧版——用户听到的是旧声音/旧画面，不是新版。实测：P01 虫鸣 −28 dB→−34 dB 后用户说“没变”，查 md5 证实磁盘文件确是新版，换新文件名重发后用户才听到新版。
+- **铁律：重发改过的音频/视频，一律换新文件名**（改名即新文件，不走同一路径）；用户说“没变”时，先查文件 md5 再下结论，不要直接认定没改对。
+- 连带纠错：空间音频 v4 卷积版换新文件名重发后，用户确认“确实是缓存问题，这个有空间感了”——之前 9 版空间声被否，很可能是缓存导致用户没听到真版；2026-11-13 11:49“空间感已放弃”令是基于缓存失真评价作出的（见 §21a 声音条目）。
+
 ## §21 睡前英语静听（2026-10-30 用户立项，2026-10-30 晚由睡前深夜英语改名）
 
 Collection name on Douyin: 睡前英语静听. Same student audience as §18 /
@@ -1916,35 +1924,66 @@ proprietary content.
 
 - Landscape 1920x1080. No vocab panel, no vocab review segment, no
   interview-style vocab sidebar anywhere in this line.
-- Background: calm night stills (starry sky, moon, quiet night city,
-  moonlit clouds), dark and low-contrast, static or very slow crossfade
-  only. No fast cuts, no motion, nothing that disturbs sleep. (This
-  line's background is night stills by design; it is NOT the interview
-  line's real-world footage rule.)
-- Subtitles, centered, one sentence at a time (measured EP1 build,
-  FROZEN — EP1 approved for publishing 2026-10-30): English in
-  DejaVu Sans Regular white, plain (no word highlight, no color
-  coding, as in the reference), starting 56px, shrinking by 4px
-  steps to a 44px floor until the sentence fits at most 2 lines,
-  line height = size × 1.35; below the English, Chinese translation
-  in Noto Sans CJK Regular color (217,217,217) #D9D9D9, starting
-  44px, shrinking by 4px steps to a 34px floor until at most 2
-  lines, line height = size × 1.45, Simplified characters only
-  (Simplified version; Traditional version converts them — see
-  §24a).
+- Background — LIVE VIDEO, not stills (2026-11-13 user decision,
+  applies from EP6 on to every bedtime video now produced): each
+  paragraph's background is a fixed-camera live video made by
+  turning that paragraph's content-matched background image into
+  video with media.generate_video. Core aesthetic — 「固定的摄像机
+  观看这个世界的样子」 (a fixed camera watching this world): the
+  camera NEVER moves (no push, pull, pan or shake); the world
+  itself is alive (trees swaying in the wind, leaves falling from
+  the trees, rain falling gently, tides on the water). Steadiness
+  comes from the unmoving camera; life comes from the moving
+  world. Companion rules: move ONLY the necessary elements,
+  everything else stays still; time flows at normal speed (the
+  moon must show no visible change within 10 s); keep it as quiet
+  as possible — this is for falling asleep; clouds may stay still;
+  wind must be light; falling leaves may be absent, and if present
+  very few (one leaf or none — never generate them deliberately);
+  trees should sway MORE than grass in the wind (tall trees catch
+  the wind, low grass barely moves). Tech: output is fixed
+  1248x704, 10 s, 24 fps; for production upscale to 1920x1080 and
+  loop to the paragraph length. Screening: the model does not fully
+  obey "do not add things / do not move the moon" — screen EVERY
+  version by sampling frames; sky-freeze prompts ("sky/moon/clouds
+  completely frozen, still photograph") work best. Reference
+  approval: EP6 P01 background v10 (user "可以了" 2026-11-13
+  09:08), overall frame diff 2.30, sky region 1.55, almost no
+  falling leaves, moon and clouds still. Do NOT repeat the dead
+  ends: v1 = static image + 5 large leaf stickers in the foreground
+  (too fake); v2 = whole-frame Ken Burns + global sway (user:
+  "反而落后了"); v3 = ffmpeg tree-strip sway + leaves falling
+  from the canopy (user wanted the background image itself to
+  move). (This line's background is live video by design; it is NOT
+  the interview line's real-world footage rule.) EP1–EP5 used
+  night stills; they are NOT reworked for this change.
+- Subtitles, centered, one sentence at a time. EP1 format
+  (HISTORICAL — EP1 approved for publishing 2026-10-30, do not
+  apply to new episodes): English in DejaVu Sans Regular white,
+  plain (no word highlight, no color coding, as in the reference),
+  starting 56px, shrinking by 4px steps to a 44px floor until the
+  sentence fits at most 2 lines, line height = size × 1.35; below
+  the English, Chinese translation in Noto Sans CJK Regular color
+  (217,217,217) #D9D9D9, starting 44px, shrinking by 4px steps to
+  a 34px floor until at most 2 lines, line height = size × 1.45.
+  NEW FORMAT from EP6 on (2026-11-13 user decision, following the
+  interview-video format): subtitles move DOWN; English BIGGER;
+  English WHITE, Chinese GOLD — EN white 64pt, ZH gold 60pt (ASS
+  &H007BD6F5); the subtitle block is bottom-anchored 40px from the
+  bottom edge. Simplified characters only (Simplified version;
+  Traditional version converts them — see §24a).
   Top-right account mark “RealTalk英语精选” in Noto Sans CJK
   Regular 28px white at (W − 40 − mark_width, 36) (Simplified
   version; Traditional version mark is EK英語 — see §24a). Subtitle text is
-  pre-rendered per sentence onto the night still (images/sub_NNN.png)
-  and the segment video loops that still. NOTE: the reference itself
+  pre-rendered per sentence onto the background video
+  (images/sub_NNN.png) and the segment video loops that background
+  video. NOTE: the reference itself
   shows English-only subtitles on screen; the Chinese line is added
   per the user's explicit requirement for 中英文字幕. If the user
   later says English-only, drop the Chinese line.
-- Background: calm night stills (starry sky, moon, quiet night city,
-  moonlit clouds), dark and low-contrast, static or very slow crossfade
-  only. No fast cuts, no motion, nothing that disturbs sleep. (This
-  line's background is night stills by design; it is NOT the interview
-  line's real-world footage rule.) Still files: `assets/night_1.png`
+- Background (EP1 sentence version only — HISTORICAL): EP1 used
+  calm night stills (starry sky, moon, quiet night city, moonlit
+  clouds), dark and low-contrast. Still files: `assets/night_1.png`
   (moon + hills), `assets/night_2.png` (moon + lake reflection),
   `assets/night_3.png` (moon + tent + fireflies), all 1920x1080.
   EP1 still mapping (reference): sentences 1–145 night_1, 146–306
@@ -1966,7 +2005,7 @@ proprietary content.
   itself; gaps between paragraphs are fixed by §24c (1.0 s silence
   + 2 s crossfade = 3.0 s voice gap from EP2 on; EP1 keeps 6 s).
   The total-duration target (words / 102.5 × 60) still applies.
-- Segment encode (measured EP1 builds): night still looped at 30 fps
+- Segment encode (measured EP1 builds): background video looped at 30 fps
   + sentence audio (paragraph builds: paragraph audio), audio apad pad_dur = pause, setsar=1, libx264
   veryfast yuv420p, AAC 48 kHz stereo; final assembly by concat
   demuxer -c copy in order: body segments (+ xfade clip after sentence
@@ -2022,6 +2061,65 @@ proprietary content.
   torch 2.15.0 with MPS (single-sentence synth ~5.6 s, 2026-11-13
   smoke test). The 2223 box used torch 2.8.0+cpu (2.15+ forces
   torchcodec, which needs CUDA) — box is superseded, see routing.
+- Final mix — narration IN THE HEAD, ambient placed FAR
+  (2026-11-13 18:25 user decision — FINAL, supersedes all spatial-
+  audio experiments of 2026-11-13): narration stays in the head,
+  EP5-style — plain centered (mono duplicated to stereo, no HRTF,
+  no reverb, no spatialization). Ambient sounds are placed in
+  space by the assistant, judged per scene from what the sound
+  actually is (e.g. wind belongs outside the window or far away).
+  CRITICAL — crickets are ONLY EP6's example, NOT the universal
+  ambient sound: every episode has its own ambient sounds, each
+  placed and leveled per its own environment — EP7 winter fireplace
+  (fire crackle, right-front, slightly near), EP8 spring garden
+  (stream behind, birds to the sides, slightly far), rain, wind,
+  etc. NEVER apply EP6's cricket level/position to another
+  episode's sounds. UNIVERSAL RULE (2026-11-13 21:18 user order):
+  ambient/background sounds MUST be very quiet — a faint presence
+  only, NEVER loud enough to become noise. If a background sound
+  can be noticed as noise, it is too loud; turn it down until it
+  is barely there. VETTING RULE (2026-11-13 21:18 user order):
+  which sounds can serve as background must be carefully analyzed
+  before use — every candidate ambient file gets a full spectral
+  analysis first: check for low-frequency rumble (the cricket
+  file's 0–200 Hz rumble was ~89% of its energy and turned into
+  noise unfiltered), clipping/bursts, unwanted content (frogs,
+  voices, traffic, anything that reads as noise), and level
+  stability. If it has rumble, filter it (highpass/lowpass) and
+  re-check; if it cannot be cleaned, REJECT it — soft_wind.mp3
+  was rejected and deleted for this reason. EP7 fireplace and EP8
+  stream/birds have NOT had this analysis yet — do it before
+  assembling EP7/EP8. EP6 final levels: crickets −30 dB, three-point diffuse (left-
+  rear −110° / right-rear +110° / direct-rear 180°, delays 0/12/
+  25 ms decorrelated), tens of meters away, never pinned to one
+  point; falling leaves −18 dB, left-rear point source. Cricket
+  volume history (do NOT re-try the rejected levels): −16 dB too
+  loud → −22 dB still too loud → −28 dB still too loud → −34 dB
+  inaudible ("一点虫声都没有了") → −30 dB FINAL ("刚好一点点" —
+  audible but very light, ambient steady RMS 42 dB below
+  narration). Cricket source: night_crickets_ep06.mp3, MUST pass
+  highpass 2 kHz + lowpass 10 kHz (the raw file's 0–200 Hz rumble
+  is ~89% of its energy and turns into noise unfiltered); leaves
+  source: leaves_ep06_gated.mp3. Mix: 3 s fade-in, last 3 s
+  fade-out; final stage ONLY alimiter 0.95 — NEVER add acompressor
+  (measured 2026-11-13: the acompressor in the spatial scripts ate
+  ~3 dB of mean level; it has been removed). Reference file:
+  p01_voice_in_head_crickets_far_20261113.wav (md5 9a8f0ddb…).
+  History — why this is final (do NOT reopen without a user
+  order): (a) Dry-front HRTF REJECTED — the dry-HRTF front-center
+  version (p01_front_dry_20261113.wav) still sounded inside the
+  head; dry HRTF does not externalize for this listener, and the
+  externalization in earlier versions came from the reverb tail —
+  the user does not want any echo/reverb feeling, so narration
+  goes back in the head. (b) Spatial-audio cache correction —
+  after the v4 convolution version was re-sent under a fresh
+  filename, the user confirmed (2026-11-13 13:20) "确实是缓存问题，
+  这个有空间感了": the 9 spatial versions were likely rejected
+  because caching meant the user never heard the real versions,
+  not because spatialization itself failed; the 2026-11-13 11:49
+  order abandoning spatial audio was made on cache-distorted
+  evaluation. Spatialization is NOT the current direction anyway —
+  the user finally chose narration in-head (this bullet).
 - Clone-voice license — RESOLVED 2026-10-30 (user decision, same day
   correction): use the cloned voice directly; the copyright /
   licensing question is NOT a publish gate and must not be presented
@@ -2042,7 +2140,7 @@ proprietary content.
   white at y=395; theme ZH 110px gold (255,215,120) at y=480; theme EN
   60px gold at y=610; episode 48px white at y=710. All centered at
   x=960, font Noto Sans CJK Bold index=2. NO background (the video
-  content shows through; the night still is NOT used as a card
+  content shows through; the background video is NOT used as a card
   background). Audio: adds nothing (text over the existing audio, no
   sting).
 - Outro (2026-10-30 user review): 4s fan-group card appended AFTER the
@@ -2130,8 +2228,9 @@ a number.
    selection rule when EP2 is built; until then follow the EP1 pattern.
 4. Bedtime still-boundary rule (sentence version only): EP1 mapping
    1–145 / 146–306 / 307–382 is the reference. Paragraph builds do
-   not use section breaks at all - one content-matched image per
-   paragraph (§24c) - so no section-break rule is needed for EP2.
+   not use section breaks at all - one content-matched live
+   background video per paragraph (§24c) - so no section-break rule
+   is needed for EP2.
 5. Conversation word-alignment QC threshold: EP1 measured 98.3%.
    Set a numeric pass/fail threshold when the next episode is built;
    until then report the measured percentage.
@@ -2364,16 +2463,27 @@ a number.
   card, target total duration (words / 102.5 × 60), segment
   encode, new-filename rework rule. Backgrounds are NOT the
   §21a 3-still mapping: paragraph builds use ONE content-
-  matched background image per paragraph (2026-11-01 user
-  decision for this paragraph build), each image a calm night
-  scene (dark, low-contrast, static, sleep-safe — the §21a
-  sleep constraint stands), generated per paragraph content
-  and screened per §20a visual screening (prompt + output
-  checked; regenerate or drop on hit). Same background set
-  serves both Simplified and Traditional versions (images
-  carry no text). Record the paragraph→background mapping
-  in the delivery.
+  matched FIXED-CAMERA LIVE BACKGROUND VIDEO per paragraph
+  (2026-11-13 user decision, from EP6 on, applies to every
+  bedtime video now produced — see §21a live-background rule
+  for the full spec: fixed camera, move only necessary
+  elements, normal time flow, as quiet as possible, screen
+  every version by sampling frames). Each paragraph's video is
+  made from that paragraph's content-matched background image
+  via media.generate_video (1248x704, 10 s, 24 fps; upscale to
+  1920x1080 and loop to the paragraph length), each source image
+  a calm night scene (dark, low-contrast, sleep-safe — the §21a
+  sleep constraint stands) screened per §20a visual screening
+  (prompt + output checked; regenerate or drop on hit). Same
+  background set serves both Simplified and Traditional versions
+  (videos carry no text). Record the paragraph→background
+  mapping in the delivery.
 - The §24b ASR gate applies to paragraph audio.
+- Final mix follows the §21a sound rule (2026-11-13 final):
+  narration in-head (EP5-style plain centered, no HRTF, no
+  reverb), crickets −30 dB three-point diffuse far away, leaves
+  −18 dB left-rear, ambient placed per scene by the assistant;
+  final stage ONLY alimiter 0.95, NEVER acompressor.
 - Duration acceptance for paragraph builds: the expected total =
   sum of the paragraph audios + between-paragraph gaps +
   crossfades + outro card, within frame-rounding tolerance
@@ -2441,7 +2551,7 @@ a number.
   text styling and positions (§19a/§21a for conversation/bedtime;
   §3a for interview) — same font (Noto Sans CJK Bold), sizes,
   colors, centered — but with NO background card (no solid color,
-  gradient, or night still); the video content shows through.
+  gradient, or background video); the video content shows through.
 - Audio: the overlay adds no audio (it is text over the existing
   video audio). No sting on the overlay. The shared intro sting
   (§20b) stays on listening's explanation card only.
