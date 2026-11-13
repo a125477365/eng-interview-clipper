@@ -2474,8 +2474,17 @@ a number.
   1920x1080 and loop to the paragraph length), each source image
   a calm night scene (dark, low-contrast, sleep-safe — the §21a
   sleep constraint stands) screened per §20a visual screening
-  (prompt + output checked; regenerate or drop on hit). Same
-  background set serves both Simplified and Traditional versions
+  (prompt + output checked; regenerate or drop on hit). FIRST-
+  SECOND TRIM (2026-11-13 user verdict — P03 v3/P09 v1): the
+  model ALWAYS has a first-second settling in the generated
+  video — the picture visibly jitters / goes from blurry to
+  sharp in the first second, even when the frame-diff numbers
+  pass. ALWAYS trim the first 1 s off every generated
+  background video before use and loop the remaining 9 s
+  (verified 2026-11-13: trimmed P03 v3 starts at frame-diff
+  ~1.0 and constant sharpness, P09 v1 at ~0.7 — the jump is
+  gone). A version whose blur-to-sharp is still visible after
+  trimming is rejected. Same background set serves both Simplified and Traditional versions
   (videos carry no text). Record the paragraph→background
   mapping in the delivery.
 - The §24b ASR gate applies to paragraph audio.
