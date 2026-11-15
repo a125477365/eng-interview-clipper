@@ -173,22 +173,44 @@ into a build of the other. Three buckets only:
   VM — the server has no large models, and its
   CPU has no AVX2 so torch cannot run there. XTTS synthesis routing: prefer the VM
   (coqui-tts 0.28.0, venv ~/workspace/.venv-xtts); when VM free memory is below ~6 GB,
-  route synthesis to the 2224 Mac (MacBook Air M5, 10-core, 16 GB,
-  macOS 27.0.1, ARM64; ssh -p 2224 tanjian@104.223.51.196 — public
-  port forward; direct VPN IP 10.8.0.30 is NOT reachable from the VM.
-  Private venv ~/venv-xtts, Python 3.11.9, coqui-tts 0.28.0,
-  torch 2.15.0 with MPS). VM public key is installed in the Mac
-  ~/.ssh/authorized_keys (key login; never store the password).
-  Mac SSH via the egress proxy: expect/pty sessions are reset at
-  kex — use BatchMode + key, non-PTY only. Two Mac pitfalls:
-  (1) first TTS() needs COQUI_TOS_AGREED=1 to bypass the TOS
-  prompt; (2) torchcodec needs Homebrew ffmpeg libs (absent on
-  the Mac), so batch synth scripts must monkey-patch
-  torchaudio.load with soundfile (see Mac ~/smoke_xtts.py).
-  The 2223 box (Debian 13, 8-core, AVX2) was the fallback until
-  2026-11-13 and is superseded by the Mac — keep it only as
-  history, not the preferred fallback. This exception covers
-  model steps only; all non-model steps still go to the server.
+  route synthesis to the 2225 Windows machine (Intel Xeon E5-2676 v3,
+  12-core/24-thread, 32 GB, AVX2, NVIDIA GeForce RTX 3070 Laptop 8 GB,
+  CUDA 12.3, Windows 11 64-bit; ssh -p 2225 administrator@104.223.51.196
+  — public port forward. Conda env `xtts` at E:\miniconda3\envs\xtts,
+  Python 3.11.18, coqui-tts 0.28.0, torch 2.5.1+cu121, xtts_v2 model
+  cached at E:\xtts\hf_cache; batch script E:\xtts\batch_synth_win.py,
+  wrapper E:\xtts\run_batch.bat). VM public key is installed on the
+  Windows box (C:\ProgramData\ssh\administrators_authorized_keys —
+  for an administrator account Windows sshd reads THAT file, not
+  ~/.ssh/authorized_keys; key login, BatchMode, never store the
+  password). Dispatcher `batch_synth_dispatch.py` (runs on the VM)
+  implements local-first then Windows-2225 fallback; it syncs
+  script.jsonl + paras.json + ref clips + batch_synth_win.py, runs the
+  synth in the FOREGROUND over SSH, verifies the wav count, and syncs
+  audio_para back. Windows pitfalls (2026-11-15, verified):
+  (1) detached launch via PowerShell Start-Process HANGS — the child
+  python starts but never progresses (empty log, ~7 s CPU, no wavs);
+  always run the synth synchronously in the foreground SSH session
+  (resume-safe: the batch script skips wavs >500 KB, so a dropped
+  connection just means re-running to resume);
+  (2) first TTS() needs COQUI_TOS_AGREED=1 — set it with cmd's quoted
+  form `set "COQUI_TOS_AGREED=1"` (unquoted set with & leaves a
+  trailing space, "1 " != "1", and the TOS prompt blocks forever);
+  (3) torchcodec needs Homebrew ffmpeg libs (absent on the Mac),
+  so batch synth scripts must monkey-patch torchaudio.load with
+  soundfile (see batch_synth_win.py);
+  (4) transformers 5.x requires torch >= 2.6 and breaks the TTS import
+  with torch 2.5.1 — pin transformers==4.57.0 on both the VM and
+  Windows (fixed 2026-11-15);
+  (5) scp -r host:dir/ dest/ copies the directory itself
+  (dest/audio_para/pNN.wav) — use the '/.' suffix
+  (host:dir/. dest/) to copy the CONTENTS (dest/pNN.wav).
+  The 2224 Mac (MacBook Air M5) was the fallback until 2026-11-15
+  and is RETIRED by user order — do not use 2224 anymore. The 2223
+  box (Debian 13, 8-core, AVX2) was the fallback until 2026-11-13
+  and is superseded — keep both only as history, not fallbacks.
+  This exception covers model steps only; all non-model steps still
+  go to the server.
 - The server address, SSH credentials, and connection method are
   supplied per task by the user — never hardcode them in the skill,
   and never commit credentials. VM-side coordination (scripts,
@@ -2057,10 +2079,15 @@ proprietary content.
   https_proxy, HTTP_PROXY, HTTPS_PROXY, ALL_PROXY, all_proxy,
   NO_PROXY, no_proxy) and set HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
   when the model is already downloaded. coqui-tts 0.28.0 on the VM uses
-  transformers 5.22.2 and torch 2.5.1+cpu; on the 2224 Mac it uses
-  torch 2.15.0 with MPS (single-sentence synth ~5.6 s, 2026-11-13
-  smoke test). The 2223 box used torch 2.8.0+cpu (2.15+ forces
-  torchcodec, which needs CUDA) — box is superseded, see routing.
+  transformers 4.57.0 (pinned 2026-11-15 — transformers 5.x requires
+  torch >= 2.6 and breaks the TTS import with torch 2.5.1) and torch
+  2.5.1+cpu. On the 2225 Windows machine it uses torch 2.5.1+cu121
+  with transformers 4.57.0 (GPU synthesis on the RTX 3070; single
+  paragraph of 12 sentences ~2 min including model load, 2026-11-15
+  verified). The 2224 Mac used torch 2.15.0 with MPS — Mac is retired
+  2026-11-15, see routing. The 2223 box used torch 2.8.0+cpu
+  (2.15+ forces torchcodec, which needs CUDA) — box is superseded,
+  see routing.
 - Final mix — narration IN THE HEAD, ambient placed FAR
   (2026-11-13 18:25 user decision — FINAL, supersedes all spatial-
   audio experiments of 2026-11-13): narration stays in the head,
