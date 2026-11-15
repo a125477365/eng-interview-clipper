@@ -205,6 +205,30 @@ into a build of the other. Three buckets only:
   (5) scp -r host:dir/ dest/ copies the directory itself
   (dest/audio_para/pNN.wav) — use the '/.' suffix
   (host:dir/. dest/) to copy the CONTENTS (dest/pNN.wav).
+  (6) Samba Z: drive — every SSH session to the Windows box MUST
+  map the shared drive FIRST, before touching Z:. Z: is
+  \\192.168.6.3\istore (home-server OpenWRT Samba) and Z:\Public\muse
+  is the server's /mnt/data_md0/Public/muse — the shared work
+  directory: XTTS and other tools run on the Windows box (code/model
+  on E:) but ALL process and result files go on Z:\Public\muse.
+  Mapped drives are per logon session, so Z: is INVISIBLE in a fresh
+  SSH session even with /persistent:yes. Map it with the full
+  command `net use Z: \\192.168.6.3\istore /user:admin <Samba
+  password> /persistent:yes` (password supplied by the user in chat,
+  transient use only, never written to a file or memory). The bare
+  form `net use \\192.168.6.3\istore` (no drive letter, no
+  credentials) does NOT work over SSH — it pops a credential prompt
+  nobody can answer and fails with system error 1223.
+  (7) VM public key can change — the VM regenerates its SSH key on
+  restart/replacement, so key auth to Windows can suddenly fail with
+  "Permission denied (publickey...)". Fix: append the CURRENT VM
+  public key to C:\ProgramData\ssh\administrators_authorized_keys
+  (use PowerShell Add-Content so the file's strict ACL is preserved;
+  .ssh\authorized_keys is ignored for the administrator account).
+  Never rely on ~/.ssh/config Host aliases on the VM — the ssh client
+  reads /root/.ssh/config (ephemeral, lost on VM replacement), not
+  /home/hatch/.ssh/config, so aliases never take effect; always use
+  explicit -i/-p/-o parameters.
   The 2224 Mac (MacBook Air M5) was the fallback until 2026-11-15
   and is RETIRED by user order — do not use 2224 anymore. The 2223
   box (Debian 13, 8-core, AVX2) was the fallback until 2026-11-13
