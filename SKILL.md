@@ -286,12 +286,15 @@ into a build of the other. Three buckets only:
   one by one. Principle: the GPU never waits for the agent; the
   agent waits for the GPU. Keep the GPU fed — queue the next
   shot before the current one finishes.
-- GPU START GATE (2026-11-17 user order): other agents also use
-  the 2225 GPU, so video work on the GPU starts ONLY when the
-  user explicitly instructs it. Do NOT auto-start GPU video work
-  (including the Tuesday batch's GPU steps) on a schedule or on
-  your own initiative — wait for the user's go-ahead, then run
-  the pipeline. The user coordinates GPU time between agents.
+- GPU START GATE (2026-11-17 user order, refined same day):
+  other agents also use the 2225 GPU. The Tuesday batch cron
+  still RUNS AUTOMATICALLY on schedule — but its GPU steps wait
+  for the user. Non-GPU work (cloud generation, scripts, file
+  prep, publishing) runs on schedule without asking; GPU work
+  (XTTS, LatentSync, GFPGAN, ffmpeg assembly/encoding on 2225)
+  starts ONLY when the user explicitly instructs it. The user
+  coordinates GPU time between agents. Do not auto-start GPU
+  video work on your own initiative.
 - The server address, SSH credentials, and connection method are
   supplied per task by the user — never hardcode them in the skill,
   and never commit credentials. VM-side coordination (scripts,
