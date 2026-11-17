@@ -2035,25 +2035,43 @@ proprietary content.
   everything else stays still; time flows at normal speed (the
   moon must show no visible change within 10 s); keep it as quiet
   as possible — this is for falling asleep; clouds may stay still;
-  wind must be light; falling leaves may be absent, and if present
-  very few (one leaf or none — never generate them deliberately);
-  trees should sway MORE than grass in the wind (tall trees catch
-  the wind, low grass barely moves). Tech: output is fixed
-  1248x704, 10 s, 24 fps; for production upscale to 1920x1080 and
-  loop to the paragraph length. Screening: the model does not fully
-  obey "do not add things / do not move the moon" — screen EVERY
-  version by sampling frames; sky-freeze prompts ("sky/moon/clouds
-  completely frozen, still photograph") work best. Reference
-  approval: EP6 P01 background v10 (user "可以了" 2026-11-13
-  09:08), overall frame diff 2.30, sky region 1.55, almost no
-  falling leaves, moon and clouds still. Do NOT repeat the dead
-  ends: v1 = static image + 5 large leaf stickers in the foreground
-  (too fake); v2 = whole-frame Ken Burns + global sway (user:
-  "反而落后了"); v3 = ffmpeg tree-strip sway + leaves falling
-  from the canopy (user wanted the background image itself to
-  move). (This line's background is live video by design; it is NOT
-  the interview line's real-world footage rule.) EP1–EP5 used
-  night stills; they are NOT reworked for this change.
+  wind must be light; falling leaves: ZERO by default — the prompt
+  must say "no falling leaves, no leaves in the air, zero leaves"
+  and any visible falling leaf in screening is a HARD REJECT
+  (regenerate, do not approve); trees should sway MORE than grass
+  in the wind (tall trees catch the wind, low grass barely moves).
+  Tech: output is fixed 1248x704, 10 s, 24 fps — the model makes
+  ONLY ~10 s clips, there is no duration control, so a full
+  50–60 s paragraph can NEVER be generated in one shot; looping
+  is unavoidable. For production upscale to 1920x1080 and loop
+  to the paragraph length — BUT never a hard loop: the loop point
+  is a visible jump (measured EP6 P02: hard-loop boundary mean
+  abs frame diff 2.81 vs 0.15 for normal adjacent frames). Make
+  every trimmed clip LOOPABLE first with a 1 s crossfade that
+  blends its end into its own beginning, then loop the loopable
+  version: ffmpeg -i clip_trim1s.mp4 -filter_complex
+  "[0:v]trim=0:8,setpts=PTS-STARTPTS[A];[0:v]trim=0:1,setpts=PTS-
+  STARTPTS[B];[A][B]xfade=transition=fade:duration=1:offset=7,
+  format=yuv420p[out]" -map "[out]" -c:v libx264 -crf 18 -r 24
+  clip_loopable.mp4 (8 s). This cuts the loop-boundary jump to
+  1.73 (about 38% less abrupt, measured 2026-11-17) and replaces
+  the hard cut with a gentle 1 s dissolve. It cannot make the
+  loop perfectly seamless — the clip's end and beginning are 9 s
+  apart, so some difference remains — but it is the best
+  available fix, and a 1 s fade beats a 0.5 s fade (1.91).
+  Screening: the model does not fully obey "do not add things /
+  do not move the moon" — screen EVERY version by sampling frames;
+  sky-freeze prompts ("sky/moon/clouds completely frozen, still
+  photograph") work best. Reference approval: EP6 P01 background
+  v10 (user "可以了" 2026-11-13 09:08), overall frame diff 2.30,
+  sky region 1.55, almost no falling leaves, moon and clouds still.
+  Do NOT repeat the dead ends: v1 = static image + 5 large leaf
+  stickers in the foreground (too fake); v2 = whole-frame Ken Burns
+  + global sway (user: "反而落后了"); v3 = ffmpeg tree-strip sway
+  + leaves falling from the canopy (user wanted the background
+  image itself to move). (This line's background is live video by
+  design; it is NOT the interview line's real-world footage rule.)
+  EP1–EP5 used night stills; they are NOT reworked for this change.
 - Subtitles, centered, one sentence at a time. EP1 format
   (HISTORICAL — EP1 approved for publishing 2026-10-30, do not
   apply to new episodes): English in DejaVu Sans Regular white,
@@ -2582,7 +2600,11 @@ a number.
   video — the picture visibly jitters / goes from blurry to
   sharp in the first second, even when the frame-diff numbers
   pass. ALWAYS trim the first 1 s off every generated
-  background video before use and loop the remaining 9 s
+  background video before use, then make the remaining 9 s
+  LOOPABLE with the 1 s end-to-beginning crossfade (§21a loop
+  rule — never loop the trimmed clip with a hard cut; the hard
+  loop point is a visible jump), and loop the 8 s loopable
+  version to the paragraph length
   (verified 2026-11-13: trimmed P03 v3 starts at frame-diff
   ~1.0 and constant sharpness, P09 v1 at ~0.7 — the jump is
   gone). A version whose blur-to-sharp is still visible after
