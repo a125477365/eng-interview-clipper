@@ -2054,8 +2054,17 @@ proprietary content.
   wind must be light; falling leaves: ZERO by default — the prompt
   must say "no falling leaves, no leaves in the air, zero leaves"
   and any visible falling leaf in screening is a HARD REJECT
-  (regenerate, do not approve); trees should sway MORE than grass
-  in the wind (tall trees catch the wind, low grass barely moves).
+  (regenerate, do not approve); SNOW AND RAIN STAY OUTSIDE — in any
+  interior scene (room, fireplace, house) snow/rain may appear ONLY
+  outside the window, never falling inside the room: the prompt must
+  say snow/rain is outside the window only, and any snowflake or
+  raindrop visible over interior surfaces (walls, fireplace,
+  furniture, floor) in screening is a HARD REJECT (regenerate, do
+  not approve) — EP7 lesson (2026-11-18 user rejection: winter
+  fireplace backgrounds had snowflakes drifting over the wooden
+  interior wall and fireplace, not just outside the window); trees
+  should sway MORE than grass in the wind (tall trees catch the
+  wind, low grass barely moves).
   Tech: output is fixed 1248x704, 10 s, 24 fps — the model makes
   ONLY ~10 s clips, there is no duration control, so a full
   50–60 s paragraph can NEVER be generated in one shot; looping
@@ -2105,7 +2114,15 @@ proprietary content.
   Traditional version converts them — see §24a).
   Top-right account mark “RealTalk英语精选” in Noto Sans CJK
   Regular 28px white at (W − 40 − mark_width, 36) (Simplified
-  version; Traditional version mark is EK英語 — see §24a). Subtitle text is
+  version; Traditional version mark is EK英語 — see §24a). MARK
+  VERIFICATION (hard gate, EP7 lesson 2026-11-18): the Traditional
+  version MUST show EK英語 in the top-right corner — NEVER
+  “RealTalk英语精选” (Simplified) or any RealTalk text. After
+  assembling the Traditional version, frame-check the top-right
+  corner: if the mark reads RealTalk anything, the assembly used the
+  wrong mark — rebuild with the EK英語 mark. EP7 shipped this
+  violation (Traditional video carried the Simplified RealTalk mark)
+  and was NOT fixed at the user's order — the fix goes into EP8. Subtitle text is
   pre-rendered per sentence onto the background video
   (images/sub_NNN.png) and the segment video loops that background
   video. NOTE: the reference itself
