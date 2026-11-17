@@ -160,9 +160,9 @@ into a build of the other. Three buckets only:
   server; the dispatcher is the only bridge.
 - All video work: generation comes from Muse's cloud models;
   ALL post-processing runs on the 2225 Windows machine (see the
-  Task split below). The home server is file sharing only (Z:);
-  its SSH port 2222 is retired for compute — do not run ffmpeg,
-  rendering, or downloads on the server anymore.
+  Task split below). The home server is the file archive, reached
+  by SSH (not Z:); its SSH port 2222 is retired for compute — do
+  not run ffmpeg, rendering, or downloads on the server anymore.
 - Model work runs on 2225 by default, never on the home server:
   XTTS voice synthesis, ASR/whisper transcription, LatentSync
   1.5 lip-sync (use the CORRECT code version), GFPGAN face
@@ -204,20 +204,26 @@ into a build of the other. Three buckets only:
   (5) scp -r host:dir/ dest/ copies the directory itself
   (dest/audio_para/pNN.wav) — use the '/.' suffix
   (host:dir/. dest/) to copy the CONTENTS (dest/pNN.wav).
-  (6) Samba Z: drive — every SSH session to the Windows box MUST
-  map the shared drive FIRST, before touching Z:. Z: is
-  \\192.168.6.3\istore (home-server OpenWRT Samba) and Z:\Public\muse
-  is the server's /mnt/data_md0/Public/muse — the shared work
-  directory: XTTS and other tools run on the Windows box (code/model
-  on E:) but ALL process and result files go on Z:\Public\muse.
-  Mapped drives are per logon session, so Z: is INVISIBLE in a fresh
-  SSH session even with /persistent:yes. Map it with the full
-  command `net use Z: \\192.168.6.3\istore /user:admin <Samba
-  password> /persistent:yes` (password supplied by the user in chat,
-  transient use only, never written to a file or memory). The bare
-  form `net use \\192.168.6.3\istore` (no drive letter, no
-  credentials) does NOT work over SSH — it pops a credential prompt
-  nobody can answer and fails with system error 1223.
+  (6) Server access is SSH, not Z: (2026-11-17 user order,
+  supersedes Samba). Do NOT use the Z: drive
+  (\\192.168.6.3\istore) anymore — its per-logon-session
+  mapping drops out of fresh SSH sessions and is unreliable.
+  Reach the server by SSH: from the VM, key login via the
+  104.223.51.196:2222 port forward (public key installed in
+  /etc/dropbear/authorized_keys; never store the password).
+  Server work directory is /mnt/data_md0/Public/muse.
+  STORAGE RULE (2026-11-17 user order): process files go in
+  D:\muse\ on the 2225 Windows box — that is the assistant's
+  working directory (episode dirs epNN, audio segments, scripts,
+  paras.json). E:\xtts\ keeps ONLY the XTTS tool itself
+  (batch_synth_win.py, run_batch.bat, hf_cache, conda env) —
+  never put episode work there. Final files go ONLY to the
+  server /mnt/data_md0/Public/muse/video/ (the single archive;
+  scp/sftp them up over SSH). CLEANUP: once a video is finished
+  AND its final file is verified on the server, delete the
+  final + process files from D:\muse\ AND from the VM local
+  copy — no duplicates left behind. Do not delete E:\xtts\
+  tool files. In-progress work is exempt until it completes.
   (7) VM public key can change — the VM regenerates its SSH key on
   restart/replacement, so key auth to Windows can suddenly fail with
   "Permission denied (publickey...)". Fix: append the CURRENT VM
@@ -263,17 +269,18 @@ into a build of the other. Three buckets only:
   streets, clothes, scenes, cover base images — and all text
   generation (stories, translations, vocab, titles). The user's
   GPU is never used for image/video generation.
-  (d) Home server / router (192.168.6.3, iStoreOS) — FILE SHARING
-  ONLY. Its Samba share (\\192.168.6.3\istore) is the Z: drive
-  (Z:\Public\muse = the server's /mnt/data_md0/Public/muse) and
-  stays the shared work directory. Its SSH port 2222 is RETIRED
-  for compute — no more ffmpeg, no more rendering, no more
-  downloads on the server. The server-render-kit is retired with
-  it. Do not SSH to 2222 for work anymore.
+  (d) Home server / router (192.168.6.3, iStoreOS) — FILE
+  ARCHIVE ONLY, reached by SSH (not Z:). Final files live
+  in /mnt/data_md0/Public/muse/video/ and nowhere else.
+  Its SSH port 2222 is RETIRED for compute — no more ffmpeg,
+  no more rendering, no more downloads on the server. The
+  server-render-kit is retired with it. Do not SSH to 2222
+  for work anymore.
   Rule of thumb: generation comes from Muse's cloud; ALL
   post-processing (voiceover, lip-sync, face restoration,
-  assembly/encoding, ASR) runs on 2225; the home server is only
-  a file share (Z:); the VM only orchestrates.
+  assembly/encoding, ASR) runs on 2225; process files live in
+  D:\muse\; final files live ONLY on the server video/ via
+  SSH; the VM only orchestrates.
 - 2225 GPU pipeline — never let the GPU idle (2026-11-17 user
   order). Pipeline, do not serialize: the moment shot 1 is
   generated in the cloud, start LatentSync + GFPGAN on it on
