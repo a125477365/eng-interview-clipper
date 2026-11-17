@@ -274,6 +274,18 @@ into a build of the other. Three buckets only:
   post-processing (voiceover, lip-sync, face restoration,
   assembly/encoding, ASR) runs on 2225; the home server is only
   a file share (Z:); the VM only orchestrates.
+- 2225 GPU pipeline — never let the GPU idle (2026-11-17 user
+  order). Pipeline, do not serialize: the moment shot 1 is
+  generated in the cloud, start LatentSync + GFPGAN on it on
+  2225 IMMEDIATELY, while the cloud generates shot 2. Overlap
+  cloud generation and GPU processing so the GPU never sits
+  idle for the ~1.5 hours it takes the cloud to generate a whole
+  batch of shots. GPU tasks are BATCHED: write ALL LatentSync +
+  GFPGAN work for a video into ONE batch script and run it in a
+  single go; the agent only watches the log, never sends tasks
+  one by one. Principle: the GPU never waits for the agent; the
+  agent waits for the GPU. Keep the GPU fed — queue the next
+  shot before the current one finishes.
 - The server address, SSH credentials, and connection method are
   supplied per task by the user — never hardcode them in the skill,
   and never commit credentials. VM-side coordination (scripts,
