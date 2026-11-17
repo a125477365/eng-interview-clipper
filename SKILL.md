@@ -2054,17 +2054,23 @@ proprietary content.
   wind must be light; falling leaves: ZERO by default — the prompt
   must say "no falling leaves, no leaves in the air, zero leaves"
   and any visible falling leaf in screening is a HARD REJECT
-  (regenerate, do not approve); SNOW AND RAIN STAY OUTSIDE — in any
-  interior scene (room, fireplace, house) snow/rain may appear ONLY
-  outside the window, never falling inside the room: the prompt must
-  say snow/rain is outside the window only, and any snowflake or
-  raindrop visible over interior surfaces (walls, fireplace,
-  furniture, floor) in screening is a HARD REJECT (regenerate, do
-  not approve) — EP7 lesson (2026-11-18 user rejection: winter
-  fireplace backgrounds had snowflakes drifting over the wooden
-  interior wall and fireplace, not just outside the window); trees
-  should sway MORE than grass in the wind (tall trees catch the
-  wind, low grass barely moves).
+  (regenerate, do not approve); PHYSICAL AND LOGICAL COHERENCE —
+  the background must make sense as a real place: every element must
+  behave the way it would in reality for that scene. Snow/rain may
+  appear ONLY outside (through windows, in outdoor scenes), never
+  falling inside a room; leaves fall only from trees that are in
+  frame; fire burns only where fuel is; water stays in its container
+  or body; no floating objects, no day/night or indoor/outdoor
+  contradictions, no impossible physics. Snow-outside-only is ONE
+  EXAMPLE, not the whole rule — screening must catch ANY illogical
+  image, not just the listed ones (EP7 lesson, 2026-11-18 user
+  order: 举一反三 — the winter fireplace backgrounds had snowflakes
+  drifting over the wooden interior wall and fireplace; the fix is
+  not "snow stays outside" alone, it is "no unreasonable imagery,
+  period"). Any frame that looks wrong to a human eye for physical
+  or logical reasons is a HARD REJECT (regenerate, do not approve);
+  trees should sway MORE than grass in the wind (tall trees catch
+  the wind, low grass barely moves).
   Tech: output is fixed 1248x704, 10 s, 24 fps — the model makes
   ONLY ~10 s clips, there is no duration control, so a full
   50–60 s paragraph can NEVER be generated in one shot; looping
