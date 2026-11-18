@@ -2692,7 +2692,11 @@ a number.
   Simplified = RealTalk英语精选, Traditional = EK英語
   (see §21a MARK VERIFICATION — EP7 shipped the Simplified
   mark on the Traditional version because one mark file was
-  shared by both versions).
+  shared by both versions). Encode size (2026-11-18 user
+  decision): bedtime segments on 2225 use h264_nvenc CQ 23 from
+  the next batch on, NOT CQ 19 — EP8 at CQ 19 came out ~2.6 GB
+  per 28-min version (~12 Mbps); CQ 23 halves that to ~1.3 GB
+  with no visible difference on calm backgrounds + subtitles.
 
 ### §24d 四线相同 / 不同对照（实现细节）
 
