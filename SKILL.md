@@ -276,11 +276,15 @@ into a build of the other. Three buckets only:
   no more rendering, no more downloads on the server. The
   server-render-kit is retired with it. Do not SSH to 2222
   for work anymore.
-  Rule of thumb: generation comes from Muse's cloud; ALL
-  post-processing (voiceover, lip-sync, face restoration,
-  assembly/encoding, ASR) runs on 2225; process files live in
-  D:\muse\; final files live ONLY on the server video/ via
-  SSH; the VM only orchestrates.
+  Rule of thumb (REVISED 2026-11-18 user order): generation
+  comes from Muse's cloud; GPU work (XTTS, LatentSync, GFPGAN,
+  NVENC encoding) runs on 2225; NON-GPU work runs on the VM
+  FIRST — ASR, alignment, subtitle stills, covers, audio mix,
+  concat assembly, file prep — and moves to 2225 ONLY when the
+  VM's resources are insufficient. 2225 is reserved for work
+  that actually needs its GPU. Process files live in D:\muse\;
+  final files live ONLY on the server video/ via SSH; the VM
+  only orchestrates.
 - 2225 GPU pipeline — never let the GPU idle (2026-11-17 user
   order). Pipeline, do not serialize: the moment shot 1 is
   generated in the cloud, start LatentSync + GFPGAN on it on
