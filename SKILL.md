@@ -2670,6 +2670,29 @@ a number.
   per-sentence generation is pedagogy (4-pass repetition per
   sentence); conversation per-turn generation is structural
   (multiple speakers). Only bedtime uses paragraph synthesis.
+- 2225 assembly scripts (EP8 lessons, 2026-11-18): the four win
+  scripts (mix/segments/xfades/assemble, D:\muse\epNN\win\) are
+  adapted per episode from the previous episode's scripts. When
+  adapting by sed, CHECK THE VERSION NUMBER SEPARATELY — sed
+  on "ep07" does NOT catch `NN = '07'` in assemble (EP8 first
+  run output bedtime_ep07 files until NN was fixed to '08').
+  Concat demuxer Windows path rule: ffmpeg's concat demuxer on
+  Windows PREPENDS the concat file's directory to absolute
+  paths, forward slash or backslash alike — the list must use
+  paths RELATIVE to the episode dir and ffmpeg must run with
+  cwd=D:\muse\epNN. Pre-assembly sync checklist (run before
+  xfades/assemble on 2225): bg_para/ (bg_pNN.png, for xfades —
+  the script silently skips missing backgrounds with "WAIT bg")
+  and outro/ (shared outro_simp.mp4/outro_trad.mp4 from
+  batch/outro/ — assemble fails on missing outro). Title/mark
+  overlays: batch_title_p01.py renders P01 test segments but
+  does NOT create sample_title_p01.png / sample_mark_p01.png —
+  the standalone transparent overlays must be created separately,
+  and the segments script MUST use separate marks per version:
+  Simplified = RealTalk英语精选, Traditional = EK英語
+  (see §21a MARK VERIFICATION — EP7 shipped the Simplified
+  mark on the Traditional version because one mark file was
+  shared by both versions).
 
 ### §24d 四线相同 / 不同对照（实现细节）
 
