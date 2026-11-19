@@ -141,6 +141,12 @@ into a build of the other. Three buckets only:
 - Install: `pip install -r requirements.txt` (yt-dlp, faster-whisper,
   wordfreq, argostranslate, Pillow).
 - Install ffmpeg (system package) and a CJK font (Noto Sans CJK).
+- 2225 GPU envs (one time, 2026-11-19): conda env `asr` (Python 3.11,
+  `pip install faster-whisper nvidia-cublas-cu12 nvidia-cudnn-cu12`)
+  for GPU ASR — run batch_asr.py with
+  E:\miniconda3\envs\asr\python.exe. clipper.py needs cv2, which
+  lives in the `xtts` env (E:\miniconda3\envs\xtts\python.exe),
+  not base python. 2225 ffmpeg is E:\miniconda3\Library\bin\ffmpeg.exe.
 - Build the exam word lists once: `python run.py --build-exam-words`
   (downloads ECDICT ~66MB, writes `exam_words.json`). The pipeline refuses
   to run the vocab stage without this file.
@@ -148,16 +154,15 @@ into a build of the other. Three buckets only:
   (`TRANSLATE_BASE_URL` / `TRANSLATE_API_KEY` / `TRANSLATE_MODEL`) or the
   offline Argos en→zh model (`argospm install translate-en_zh`).
 
-### Execution routing — server first, local fallback (2026-11-10 user order)
+### Execution routing — GPU-first on 2225 (REVISED 2026-11-19 user order)
 
-- Two codebases, one rule. **Server code** (`~/workspace/server-render-kit/`,
-  runs ON the home server) is preferred; **local code** (clipper.py /
-  run_all.py / compose_piece.py / assemble.py, runs on the VM) is kept
-  unchanged and used ONLY when there is no server available. The dispatcher
-  `render_dispatch.py` (runs on the VM) implements the priority: it tests
-  SSH to the server, renders on the server if reachable, otherwise falls
-  back to the local `run_all.py`. Never rewrite the local code to call the
-  server; the dispatcher is the only bridge.
+- RETIRED 2026-11-17/2026-11-19: the old "server first, local fallback"
+  routing (server-render-kit on the home server, render_dispatch.py
+  testing SSH to 2222) is DEAD. The home server is file archive only;
+  2222 is retired for compute. Do NOT follow the old server-first
+  bullets below — they are kept only as history. Current rule: all
+  post-processing runs on the 2225 Windows machine (GPU-first,
+  see Task split); the VM only orchestrates.
 - All video work: generation comes from Muse's cloud models;
   ALL post-processing runs on the 2225 Windows machine (see the
   Task split below). The home server is the file archive, reached
@@ -181,12 +186,11 @@ into a build of the other. Three buckets only:
   for an administrator account Windows sshd reads THAT file, not
   ~/.ssh/authorized_keys; key login, BatchMode, never store the
   password). Dispatcher `batch_synth_dispatch.py` (runs on the VM)
-  implements local-first then Windows-2225 fallback; it syncs
+  implements GPU-first: 2225 first, VM CPU only as fallback; it syncs
   script.jsonl + paras.json + ref clips + batch_synth_win.py, runs the
   synth in the FOREGROUND over SSH, verifies the wav count, and syncs
-  audio_para back. (NOTE: the dispatcher still prefers the VM when
-  memory allows — under the 2026-11-17 rule, prefer 2225; update
-  the dispatcher when the next batch runs.) Windows pitfalls (2026-11-15, verified):
+  audio_para back. (2026-11-19: the old local-first dispatcher order
+  is superseded by GPU-first — 2225 first, never VM-first.) Windows pitfalls (2026-11-15, verified):
   (1) detached launch via PowerShell Start-Process HANGS — the child
   python starts but never progresses (empty log, ~7 s CPU, no wavs);
   always run the synth synchronously in the foreground SSH session
@@ -338,10 +342,9 @@ into a build of the other. Three buckets only:
   decode + hash; NVDEC decode (h264_cuvid) could speed the
   decode half but the hash is CPU-bound, so keep CPU decode
   unless a run proves decode-bound.
-  GPU START GATE still applies: GPU-first routing decides
-  WHERE a step runs, not WHEN it starts — GPU work still
-  starts only on the user's explicit instruction (shared
-  card); ASR counts as a GPU step once it moves to 2225.
+  GPU START GATE still applies (see the standalone GPU START GATE
+  bullet below): GPU-first routing decides WHERE a step runs, not
+  WHEN it starts.
 - 2225 GPU pipeline — never let the GPU idle (2026-11-17 user
   order). Pipeline, do not serialize: the moment shot 1 is
   generated in the cloud, start LatentSync + GFPGAN on it on
@@ -368,14 +371,18 @@ into a build of the other. Three buckets only:
   and never commit credentials. VM-side coordination (scripts,
   scheduling, publication) stays on the VM.
 - Handoff rule (slow tunnel, ~0.7 MB/s): big files (source.mp4,
-  mini.mp4, full_audio.m4a) are produced ON the server (downloaded /
-  built there), never transferred per-piece. Only small files move
-  from the VM to the server: job.json, ASS files, outro PNGs.
+  mini.mp4, full_audio.m4a) are produced ON 2225 or the VM
+  (downloaded / built there), never transferred per-piece. Only
+  small files move between machines: job.json, ASS files, outro
+  PNGs. Final files go to the home server video/ via SSH only.
 - Migration note: the interview pipeline code (clipper.py /
-  run_all.py) currently calls ffmpeg as a local subprocess; it has
-  no SSH/server mode, and it stays that way by design. New work
-  follows server-first via the separate server kit; existing
-  per-video scripts are not converted mid-production.
+  run_all.py) calls ffmpeg as a local subprocess; it has no
+  SSH/server mode, and it stays that way by design. To run a
+  clipper.py step on 2225's GPU, scp the script + its data files
+  (exam_words.json, vocab_exemptions.json) to D:\muse\ and run
+  with the conda env that has cv2 (E:\miniconda3\envs\xtts\python.exe
+  — base python has no cv2). batch_asr.py runs on 2225 with
+  E:\miniconda3\envs\asr\python.exe (see §0 per-step routing).
 
 ## Pipeline (run in order, do not skip steps)
 
