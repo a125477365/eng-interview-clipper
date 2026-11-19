@@ -1266,23 +1266,30 @@ def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280
     x1, y1, x2, y2 = logo_box
     mask = np.zeros((720, 1280), dtype=np.uint8)
     mask[y1:y2, x1:x2] = 255
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    tmp1 = os.path.join(workdir, "_src_part1_raw.mp4")
-    out1 = cv2.VideoWriter(tmp1, fourcc, fps, (1280, 720))
+    # GPU-first (2026-11-19): pipe raw inpainted frames straight to
+    # ffmpeg NVENC instead of writing a lossy mp4v intermediate with
+    # cv2.VideoWriter (CPU-only; standard OpenCV has no NVENC/CUDA).
+    # cv2.inpaint itself is CPU-only, but the encode is now GPU and
+    # the lossy intermediate is gone.
+    proc = subprocess.Popen(
+        ["ffmpeg", "-y", "-v", "error",
+         "-f", "rawvideo", "-pix_fmt", "bgr24",
+         "-s", "1280x720", "-r", str(fps), "-i", "-",
+         "-i", source, "-t", str(name_end),
+         "-map", "0:v", "-map", "1:a",
+         "-vf", "scale=1080:608,setsar=1",
+         *_vcodec_args(18),
+         "-c:a", "aac", part1],
+        stdin=subprocess.PIPE)
     for _ in range(int(fps * name_end)):
         ret, frame = cap.read()
         if not ret:
             break
-        out1.write(cv2.inpaint(frame, mask, 3, cv2.INPAINT_TELEA))
+        proc.stdin.write(cv2.inpaint(frame, mask, 3, cv2.INPAINT_TELEA).tobytes())
     cap.release()
-    out1.release()
-    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", tmp1,
-                    "-i", source, "-t", str(name_end),
-                    "-map", "0:v", "-map", "1:a",
-                    "-vf", "scale=1080:608,setsar=1",
-                    *_vcodec_args(18),
-                    "-c:a", "aac", part1], check=True)
-    os.remove(tmp1)
+    proc.stdin.close()
+    if proc.wait() != 0:
+        raise RuntimeError("ffmpeg NVENC pipe encode failed (logo inpaint)")
     cx, cy, cw, ch = crop
     subprocess.run(["ffmpeg", "-y", "-v", "error",
                     "-ss", str(name_end), "-i", source,

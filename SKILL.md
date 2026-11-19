@@ -315,7 +315,14 @@ into a build of the other. Three buckets only:
     (the VM's ffmpeg lists h264_nvenc but has no GPU — an
     NVENC encode there would fail at runtime). Verified
     2026-11-19: 2225 detects NVENC, VM falls back to libx264;
-    10 s test encode NVENC 1.24 s vs libx264 1.94 s.
+    10 s test encode NVENC 1.24 s vs libx264 1.94 s. The logo
+    inpaint intermediate (prepare_source) no longer writes a
+    lossy mp4v file with cv2.VideoWriter (CPU-only; standard
+    OpenCV has no NVENC/CUDA) — raw inpainted frames are piped
+    straight to ffmpeg NVENC. cv2.inpaint itself is CPU-only
+    and stays, but the encode is GPU and the lossy intermediate
+    is gone. Verified 2026-11-19 on 2225 with real footage
+    (prepare_source, 10 s sample, PREPARE_OK).
   - Listening/conversation segment encode: listening
     build_video.py seg() now uses _vcodec_args(20); conversation
     render.sh/render2.sh now use ${VENC[@]} (NVENC CQ 21 when a
