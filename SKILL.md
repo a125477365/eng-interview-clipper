@@ -283,22 +283,38 @@ into a build of the other. Three buckets only:
   2225's RTX 3070; steps with no GPU path stay on the VM CPU.
   Process files live in D:\muse\; final files live ONLY on
   the server video/ via SSH; the VM only orchestrates.
-  Per-step routing (verified 2026-11-19, both lines):
-  GPU on 2225 (already): XTTS voiceover (CUDA); LatentSync
-  1.5 lip-sync (CUDA); GFPGAN face restoration (CUDA); all
-  video encoding — segments, xfades, final assembly
-  (h264_nvenc; CQ 23 for sleep from EP9 on).
-  GPU on 2225 (to move): faster-whisper ASR loop check — the
-  ONLY CPU step with a real GPU path. The VM currently runs
-  it as device='cpu', compute_type='int8' (batch_asr.py); on
-  2225 it runs CUDA and is much faster on a ~28 min episode.
-  2225's faster-whisper is being installed by another agent —
-  verify it exists (python -c "import faster_whisper") before
-  routing ASR to 2225; until then ASR stays on the VM CPU.
-  CPU on VM (no GPU path, stays): alignment (text
-  timestamps); subtitle stills and covers (PIL single-image
-  render); audio mixing (ffmpeg audio); Word docs. Trivial
-  text/image/audio work — the GPU cannot help.
+  Per-step routing (verified 2026-11-19, all four lines —
+  bedtime, interview, listening, conversation):
+  GPU on 2225 (already): bedtime XTTS voiceover (CUDA);
+  LatentSync 1.5 lip-sync (CUDA); GFPGAN face restoration
+  (CUDA); bedtime video encoding — segments, xfades, final
+  assembly (h264_nvenc; CQ 23 for sleep from EP9 on).
+  GPU on 2225 (to move):
+  - faster-whisper ASR (ALL lines: bedtime loop check,
+    interview transcription, listening/conversation check).
+    The VM currently runs it as device='cpu',
+    compute_type='int8' (batch_asr.py); on 2225 it runs CUDA
+    and is much faster on a ~28 min episode. 2225's
+    faster-whisper is being installed by another agent —
+    verify it exists (python -c "import faster_whisper")
+    before routing ASR to 2225; until then ASR stays on the
+    VM CPU.
+  - Interview render (clipper.py): currently libx264 CPU
+    throughout (veryfast crf 18/20, medium preset) — switch
+    the encoder to h264_nvenc on 2225. Filters (ass burn-in,
+    crop, scale) stay as-is; only -c:v changes. Verify
+    quality on one clip first (NVENC CQ ~19-20 as the
+    starting point vs libx264 crf 18/20).
+  - Listening/conversation segment encode: currently
+    libx264 veryfast crf 20 (still image looped + audio) —
+    switch to h264_nvenc on 2225; final concat is -c copy
+    (no re-encode) and stays as-is.
+  CPU (no GPU path, stays): TTS for listening/conversation
+  (/opt/hatch/bin/tts — hosted cloud tool, not local, no
+  user-GPU path); alignment (text timestamps); subtitle
+  stills and covers (PIL single-image render); audio mixing
+  (ffmpeg audio); Word docs. Trivial text/image/audio work
+  — the GPU cannot help.
   CPU on 2225 (marginal): framecheck framemd5 — plain CPU
   decode + hash; NVDEC decode (h264_cuvid) could speed the
   decode half but the hash is CPU-bound, so keep CPU decode
