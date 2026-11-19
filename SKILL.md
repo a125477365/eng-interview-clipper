@@ -2886,3 +2886,132 @@ a number.
 - 国名豁免（2026-11-01 用户令）：国名本身没有问题（如刚果民主
   共和国中的“民主”属国名组成部分，不命中）；唯一例外是台湾——
   不得出现台湾字眼及一切台湾相关内容。
+
+## §26 儿童英语动画片线（2026-11-19 用户立项）
+
+- Full series bible: `~/workspace/kids-cartoon-tiger/analysis-and-series-bible.md`
+  (reference-video frame-by-frame analysis, character library, episode
+  template, four-library mass-production mechanism, first 10 episode
+  outlines). This section is the execution contract; the bible is the
+  detail. Scripts are refined when a video is actually made — the
+  outlines in the bible are starting points, not final scripts.
+- Reference (2026-11-19 analysis): 小小梦工厂《狼：这群羊怎么不按套路来》
+  (Douyin video 7698392281234295161, 2026-10-19, 70 s, 16:9, 3D Pixar-style,
+  29K likes). Learn ONLY its structure and teaching method, never its
+  character designs or specific scenes/lines (copyright boundary —
+  see the health/boundary rules below).
+- Positioning: series name 《小老虎学英语》/《灰灰学英语》
+  (English: Huihui Learns English). Audience 3–8 years old, English
+  enlightenment. Each episode 60–120 s (standard 70–90 s). 16:9
+  landscape. 3D animation, Pixar-style rounded shapes, bright
+  saturated colors. Long-running series, target thousands of episodes.
+  Values: healthy, fun, never preachy — one small good trait per
+  episode (brave, friendly, sharing, honest, helpful), hidden inside
+  the joke, never stated as a lesson.
+- Main character 灰灰 (Huihui), little tiger (user-set 2026-11-19):
+  orange-yellow fur + black stripes, round face, big eyes, pink nose,
+  round ears, red vest (fixed outfit). Personality (all four, user-set):
+  strong (falls down, gets up himself; "I can try!"), boyish
+  (loves running, jumping, adventure, curious, a little naughty but
+  never bullies), brave (stands up for friends, admits mistakes,
+  "I'm not afraid!"), friendly (shares, helps, hugs). Expression
+  library (build fully, reuse every episode): big laugh, curious wide
+  eyes, scared shaking, brave fist, shy head-scratch, moved teary eyes,
+  proud hands-on-hips, exhausted flop. NEVER in disguise, NEVER
+  pretending to be another animal — 灰灰 is always himself; the plot
+  never runs on disguise (biggest difference from the reference video).
+  Catchphrases (at least one per episode): "I can try!" / "Don't worry,
+  I'm here!" / "We are friends!"
+- Younger sister 宁宁 (Ningning), little lamb, permanent supporting
+  character (user-set 2026-11-19): white little sheep, round face, big
+  eyes, pink nose, pink scarf (fixed accessory). Gentle, curious, loves
+  to cling, admires her brother; a little timid, calls "哥哥!" when
+  scared; asks "为什么" — she is the episode's question-asker, 灰灰
+  answers and demonstrates. Sibling beats (reusable): 宁宁 asks, 灰灰
+  answers; 宁宁 has a small problem, 灰灰 helps; 宁宁 praises her
+  brother, 灰灰 scratches his head shyly; both laugh and hug at the end.
+  Do NOT copy the reference video's lamb designs (blue/green/bell
+  collars) or scenes; 宁宁 is family, not prey — the relationship is
+  completely different.
+- World: Sunny Forest Town — a forest town with grassland, river,
+  orchard, wooden houses, mushroom house, swing, stone bridge. All
+  animals speak English (and Chinese) and are neighbours. NO real
+  villain — only friends with small flaws (a fox who likes to grab
+  things, a timid hedgehog, a boastful peacock). Conflict comes from
+  misunderstandings and personality, never good-vs-evil. Always daytime
+  or dusk, never scary night scenes; rain is fine but a rainbow must
+  follow. Four seasons rotate (spring planting, summer swimming,
+  autumn fruit-picking, winter snowman) for thousands of episodes.
+- Supporting cast (10, rotate 1–2 per episode; expand to 30 over time):
+  rabbit 跳跳 Tia (white, long ears, pink bow, red dress; lively,
+  jumpy, impatient); bear 嘟嘟 Dudu (brown, round, yellow hat, honey
+  pot; greedy, slow, kind-hearted); monkey 皮皮 Pipi (brown, red hat,
+  long tail holding a banana; clever, prankster, climbs); deer 花花 Hua
+  (light brown, white spots, flower crown; gentle, pretty, fast);
+  elephant 壮壮 Zhuang (grey-blue, big ears, sprays water; strong,
+  timid, loves bathing); fox 红红 Hong (orange-red, pointed ears, green
+  scarf; smart, plays small tricks, always apologises in the end);
+  hedgehog 球球 Qiu (brown spines, carries a small apple; timid, shy,
+  actually brave); squirrel 松松 Song (grey, big tail, holds an acorn;
+  hoards things, forgetful, helpful); penguin 冰冰 Bing (black-white,
+  orange scarf, loves skating; hates heat, clean, polite); owl 睿睿 Rui
+  (brown, big eyes, small glasses; bookish, loves reading, dozes in
+  daytime). Design rule: each character recognisable at a glance
+  (colour + one fixed accessory); personality in one sentence; max
+  1–2 supporting characters per episode.
+- Episode structure template (70–90 s standard): opening 0–8 s (灰灰
+  does a small everyday thing, meets a friend; 1–2 intro words);
+  small problem 8–25 s (ball rolls into the river, kite stuck in a
+  tree, friend is sad; one core question); Q&A rounds 25–50 s (3–4
+  rounds of question and answer while acting — climbing, building a
+  bridge, searching; picture shows first, line names it after; 3–4
+  core words, repeated twice); twist 50–65 s (unexpected small turn:
+  thought it would fail but 灰灰's way works, or thought it was bad
+  but it turns out good; one core line — a catchphrase); warm ending
+  65–75 s (hug / high-five / laughing together, freeze on 灰灰's big
+  laugh; 1–2 closing words: friend / happy / best). Variant structures
+  (rotate every 10 episodes): new friend / small misunderstanding /
+  small competition / small help.
+- Teaching design (mandatory every episode): 5–8 core words, each
+  strongly tied to the picture (an apple must be in hand when saying
+  apple); 2–3 core sentence patterns, each max 8 words, each repeated
+  at least twice (different characters say it); at least 3 Q&A rounds,
+  concrete questions only (Where is...? / What is this? / Can you help
+  me?); picture first, line second; burned-in bilingual subtitles
+  centred low, English on top (white bold, black outline, large),
+  Chinese below, each line 2–4 s synced to speech; one pinned-comment
+  multiple-choice quiz per episode testing the core word's confusion
+  point (same method as the reference video's Africa quiz). Do NOT
+  teach: grammar rules, phonetic symbols, sentences over 8 words,
+  negative vocabulary.
+- Humour (at least 2 per episode): reversal (thought it would fail,
+  it worked; thought it was bad, it was good); misunderstanding
+  (灰灰 mishears one line, small joke, then clarifies); exaggerated
+  expressions (灰灰's expression library is the #1 joke source);
+  physical gags (small trip, water in the face, tackled by friends —
+  a small ouch, immediate laugh, no injury, nothing scary).
+- Health red lines (check every episode, same gate as §25): no violent
+  ending — nobody is hit, hurt, or driven away; no scary pictures —
+  no night, no monsters, no sudden loud sounds; no negative values —
+  no mocking, no bullying, no lying that pays off (a lie is always
+  found out and apologised for); conflict comes from misunderstanding
+  and personality, never good-vs-evil; ending is always reconciliation,
+  a hug, or laughing together; animal designs healthy and cute, never
+  uglified or horrified. §25 political screening applies to every
+  frame and every line of this line too.
+- Mass production (how to reach thousands of episodes): four libraries
+  — scenes (20: grassland, orchard, river, wooden house, mushroom
+  house, swing, stone bridge, hillside, flower field, snow, beach,
+  library, market, vegetable garden, pond, treehouse, sports field,
+  picnic spot, rainbow after rain, starry camp); characters (10
+  supporting, expandable to 30); sentence patterns (30 core patterns,
+  see bible); story routines (12: new friend / small misunderstanding /
+  small competition / small help / finding something / birthday / rainy
+  day / sick / sharing food / working together / lost / learning a new
+  skill). Formula: 1 scene × 1–2 characters × 1 pattern × 1 routine.
+  Production rhythm: first 10 sample episodes to prove the pipeline
+  and read the data, then 3–5 episodes per week steady.
+- Production routing (GPU-first, §0): 3D animation generation is cloud
+  model work (never the user's GPU); encoding/assembly on 2225 NVENC;
+  subtitles and covers are CPU work. Same §0 GPU start gate: GPU work
+  starts only on the user's explicit instruction.
