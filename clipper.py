@@ -31,6 +31,35 @@ def _run(cmd):
     return r
 
 
+# Video encoder, GPU-first (2026-11-19 user order): use h264_nvenc
+# when the local ffmpeg has it (2225 RTX 3070), else fall back to
+# libx264 (VM has no GPU). NVENC CQ starts at crf+1; verify quality
+# on one clip when switching a line to NVENC.
+_NVENC = None
+
+
+def _has_nvenc() -> bool:
+    global _NVENC
+    if _NVENC is None:
+        # A GPU must actually be present: ffmpeg can list h264_nvenc
+        # even on machines with no NVIDIA GPU (e.g. this VM), where
+        # an NVENC encode would fail at runtime.
+        try:
+            r = subprocess.run(["nvidia-smi", "-L"],
+                               capture_output=True, text=True, timeout=30)
+            _NVENC = r.returncode == 0 and "GPU" in r.stdout
+        except Exception:
+            _NVENC = False
+    return _NVENC
+
+
+def _vcodec_args(crf: int = 18, preset: str = "veryfast") -> list[str]:
+    if _has_nvenc():
+        return ["-c:v", "h264_nvenc", "-preset", "hq", "-rc", "vbr",
+                "-cq", str(crf + 1)]
+    return ["-c:v", "libx264", "-preset", preset, "-crf", str(crf)]
+
+
 def download(url: str, out_dir: str, basename: str = "source",
              max_height: int = 1080, section: str | None = None) -> str:
     """Download url to out_dir/basename.mp4. Returns the file path.
@@ -1226,7 +1255,7 @@ def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280
         _norm = os.path.join(workdir, "_src_norm.mp4")
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", source,
                         "-vf", "scale=1280:720,setsar=1",
-                        "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                        *_vcodec_args(18),
                         "-c:a", "aac", _norm], check=True)
         source = _norm
     # Use workdir for temp files (not /tmp which is a small tmpfs)
@@ -1251,14 +1280,14 @@ def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280
                     "-i", source, "-t", str(name_end),
                     "-map", "0:v", "-map", "1:a",
                     "-vf", "scale=1080:608,setsar=1",
-                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                    *_vcodec_args(18),
                     "-c:a", "aac", part1], check=True)
     os.remove(tmp1)
     cx, cy, cw, ch = crop
     subprocess.run(["ffmpeg", "-y", "-v", "error",
                     "-ss", str(name_end), "-i", source,
                     "-vf", f"crop={cw}:{ch}:{cx}:{cy},scale=1080:608,setsar=1",
-                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                    *_vcodec_args(18),
                     "-c:a", "aac", part2], check=True)
     lst = os.path.join(workdir, "_src_list.txt")
     with open(lst, "w") as f:
@@ -1268,7 +1297,7 @@ def prepare_source(source: str, out_path: str, logo_box: tuple = (1110, 10, 1280
                     "-i", part1, "-i", part2,
                     "-filter_complex", "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[outv][outa]",
                     "-map", "[outv]", "-map", "[outa]",
-                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                    *_vcodec_args(18),
                     "-c:a", "aac", out_path], check=True)
     for p in (part1, part2, lst):
         if os.path.exists(p):
@@ -1335,7 +1364,7 @@ def compose(source: str, segments: list[dict], vocab: list[dict],
            "-i", source,
            "-filter_complex", vf,
            "-map", "[out]", "-map", "0:a?",
-           "-c:v", "libx264", "-preset", preset, "-crf", "20",
+           *_vcodec_args(20, preset),
            "-pix_fmt", "yuv420p", "-r", "30",
            "-c:a", "aac", "-b:a", "128k",
            "-t", f"{total:.3f}", "-movflags", "+faststart", out_path]
@@ -1389,7 +1418,7 @@ def trim_opening(video: str, seconds: float, segments: list, out_video: str):
     Returns the shifted segment list. Word timestamps shift too.
     """
     _sp.run(["ffmpeg", "-y", "-v", "error", "-ss", str(seconds), "-i", video,
-             "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+             *_vcodec_args(18),
              "-c:a", "aac", out_video], check=True)
     out = []
     for s in segments:
@@ -1420,7 +1449,7 @@ def cut_ranges(video: str, segments: list, ranges: list, out_video: str):
     _sp.run(["ffmpeg", "-y", "-v", "error", "-i", video,
              "-vf", f"select='not({cond})',setpts=N/FRAME_RATE/TB",
              "-af", f"aselect='not({cond})',asetpts=N/SR/TB",
-             "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+             *_vcodec_args(18),
              "-c:a", "aac", tmp_v], check=True)
     os.replace(tmp_v, out_video)
     # shift subtitles: subtract total cut time before each segment start
@@ -1750,7 +1779,7 @@ def make_outro(vocab_count: int, out_mp4: str, badge: str = "",
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
          "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-         "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p",
+         "-t", str(duration), *_vcodec_args(20), "-pix_fmt", "yuv420p",
          "-r", str(fps), "-c:a", "aac", "-shortest", out_mp4],
         check=True)
     return out_mp4
@@ -1763,8 +1792,7 @@ def append_outro(main_mp4: str, outro_mp4: str, out_mp4: str) -> str:
         ["ffmpeg", "-y", "-v", "error", "-i", main_mp4, "-i", outro_mp4,
          "-filter_complex",
          "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[outv][outa]",
-         "-map", "[outv]", "-map", "[outa]", "-c:v", "libx264",
-         "-preset", "veryfast", "-crf", "20", "-c:a", "aac",
+         "-map", "[outv]", "-map", "[outa]", *_vcodec_args(20), "-c:a", "aac",
          "-movflags", "+faststart", out_mp4],
         check=True)
     return out_mp4
@@ -1824,7 +1852,7 @@ def make_source_intro(source_name: str, out_mp4: str,
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
          "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-         "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p",
+         "-t", str(duration), *_vcodec_args(20), "-pix_fmt", "yuv420p",
          "-r", str(fps), "-c:a", "aac", "-shortest", out_mp4],
         check=True)
     return out_mp4
@@ -1841,8 +1869,7 @@ def concat_mp4s(parts: list[str], out_mp4: str) -> str:
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error"] + inputs +
         ["-filter_complex", "".join(filt),
-         "-map", "[outv]", "-map", "[outa]", "-c:v", "libx264",
-         "-preset", "veryfast", "-crf", "20", "-c:a", "aac",
+         "-map", "[outv]", "-map", "[outa]", *_vcodec_args(20), "-c:a", "aac",
          "-movflags", "+faststart", out_mp4],
         check=True)
     return out_mp4
@@ -1867,7 +1894,7 @@ def crop_speaker(source: str, start: float, dur: float,
         ["ffmpeg", "-y", "-v", "error",
          "-ss", str(start), "-i", source, "-t", str(dur),
          "-vf", f"crop={crop_w}:{crop_h}:{crop_x}:{crop_y},scale=1080:608",
-         "-c:v", "libx264", "-preset", preset, "-crf", "20",
+         *_vcodec_args(20, preset),
          "-c:a", "aac", "-b:a", "128k", out_path],
         check=True)
     return out_path
@@ -2206,7 +2233,7 @@ def compose_landscape(source: str, segments: list[dict], vocab: list[dict],
            "-i", source,
            "-filter_complex", vf,
            "-map", "[out]", "-map", "1:a?",
-           "-c:v", "libx264", "-preset", preset, "-crf", "20",
+           *_vcodec_args(20, preset),
            "-pix_fmt", "yuv420p", "-r", "30",
            "-c:a", "aac", "-b:a", "128k",
            "-t", f"{total:.3f}", "-movflags", "+faststart", out_path]
@@ -2277,7 +2304,7 @@ def make_outro_landscape(vocab_count: int, out_mp4: str, badge: str = "",
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(fps),
          "-i", png, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-         "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p",
+         "-t", str(duration), *_vcodec_args(20), "-pix_fmt", "yuv420p",
          "-r", str(fps), "-c:a", "aac", "-shortest", out_mp4],
         check=True)
     return out_mp4

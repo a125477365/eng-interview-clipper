@@ -284,31 +284,43 @@ into a build of the other. Three buckets only:
   Process files live in D:\muse\; final files live ONLY on
   the server video/ via SSH; the VM only orchestrates.
   Per-step routing (verified 2026-11-19, all four lines —
-  bedtime, interview, listening, conversation):
+  bedtime, interview, listening, conversation). GPU-first is
+  now STRICT: every step with a GPU path runs on the GPU.
   GPU on 2225 (already): bedtime XTTS voiceover (CUDA);
   LatentSync 1.5 lip-sync (CUDA); GFPGAN face restoration
   (CUDA); bedtime video encoding — segments, xfades, final
   assembly (h264_nvenc; CQ 23 for sleep from EP9 on).
-  GPU on 2225 (to move):
+  GPU on 2225 (MIGRATED 2026-11-19, verified):
   - faster-whisper ASR (ALL lines: bedtime loop check,
     interview transcription, listening/conversation check).
-    The VM currently runs it as device='cpu',
-    compute_type='int8' (batch_asr.py); on 2225 it runs CUDA
-    and is much faster on a ~28 min episode. 2225's
-    faster-whisper is being installed by another agent —
-    verify it exists (python -c "import faster_whisper")
-    before routing ASR to 2225; until then ASR stays on the
-    VM CPU.
-  - Interview render (clipper.py): currently libx264 CPU
-    throughout (veryfast crf 18/20, medium preset) — switch
-    the encoder to h264_nvenc on 2225. Filters (ass burn-in,
-    crop, scale) stay as-is; only -c:v changes. Verify
-    quality on one clip first (NVENC CQ ~19-20 as the
-    starting point vs libx264 crf 18/20).
-  - Listening/conversation segment encode: currently
-    libx264 veryfast crf 20 (still image looped + audio) —
-    switch to h264_nvenc on 2225; final concat is -c copy
-    (no re-encode) and stays as-is.
+    batch_asr.py auto-detects a GPU (nvidia-smi) and uses
+    device='cuda', compute_type='float16', else CPU int8.
+    2225 runs it in a dedicated conda env `asr` (Python 3.11,
+    faster-whisper 1.2.1 + ctranslate2 4.9.0). Two install
+    lessons: (1) pip install nvidia-cublas-cu12 +
+    nvidia-cudnn-cu12, and the script must prepend the nvidia
+    bin dirs to PATH — ctranslate2 loads cublas64_12.dll via
+    PATH, NOT via os.add_dll_directory; (2) the asr env has no
+    ffmpeg — the script adds E:\miniconda3\Library\bin to PATH.
+    Windows path lesson: ffmpeg 4.3.1's concat demuxer only
+    recognises BACKSLASH absolute paths — all paths in
+    batch_asr.py use os.path.join / abspath (native
+    separators), never forward slashes. Verified 2026-11-19:
+    EP8 full run on 2225 GPU, 99.55% (expected 4230, heard
+    4225, matched 4211) — identical accuracy to the VM CPU run.
+  - Interview render (clipper.py): all 14 encode call sites
+    now use _vcodec_args() — h264_nvenc (preset hq, rc vbr, CQ
+    = crf+1) when a real GPU is present, else libx264
+    fallback. Detection is nvidia-smi -L, NOT ffmpeg -encoders
+    (the VM's ffmpeg lists h264_nvenc but has no GPU — an
+    NVENC encode there would fail at runtime). Verified
+    2026-11-19: 2225 detects NVENC, VM falls back to libx264;
+    10 s test encode NVENC 1.24 s vs libx264 1.94 s.
+  - Listening/conversation segment encode: listening
+    build_video.py seg() now uses _vcodec_args(20); conversation
+    render.sh/render2.sh now use ${VENC[@]} (NVENC CQ 21 when a
+    GPU is present, else libx264 veryfast crf 20); final concat
+    is -c copy (no re-encode) and stays as-is.
   CPU (no GPU path, stays): TTS for listening/conversation
   (/opt/hatch/bin/tts — hosted cloud tool, not local, no
   user-GPU path); alignment (text timestamps); subtitle
@@ -1327,7 +1339,7 @@ Do NOT use tight per-speaker crops — they don't suit vertical display
   NEVER use stream copy (`-c copy`) with `-ss` before `-i` for the
   video start/end — the cut snaps to the nearest keyframe and leaves
   a sub-second residue of the removed footage. For any cut the viewer
-  will see, re-encode (`-ss` before `-i` + libx264 is both fast AND
+  will see, re-encode (`-ss` before `-i` + NVENC/libx264 is both fast AND
   frame-accurate); reserve `-c copy` for mid-video joins only.
 - **Find the TRUE start of a segment to cut** (2026-10-20 lesson):
   when locating a segment for removal, do NOT cut at the first keyword
@@ -1450,7 +1462,7 @@ stub of a few minutes at the end.
   72px white at y=960; {N} 个生词 · 中英对照 Word 48px gold,
   Regular font, at y=1070; account badge 52px white Regular at
   y=1700; source line 30px gray (150,160,175) Regular at y=1800.
-  Outro segment encode: still loop 30 fps, libx264 veryfast crf 20
+  Outro segment encode: still loop 30 fps, NVENC (h264_nvenc, CQ 21) when a GPU is present, else libx264 veryfast crf 20 (see §0 routing)
   yuv420p, AAC 48 kHz stereo, silent audio, 4.0 s, +faststart.
 - No QR code on any fan-group card (2026-10-30 user rule: the user
   has not provided a group QR code; do not invent or place one).
@@ -1725,7 +1737,7 @@ topics or artwork. All scripts are original, proprietary content.
   fixed order: blind female, blind male, subtitle female, subtitle
   male. Segment encode: still image looped at 30 fps + sentence audio,
   audio aresample 48000, apad to the segment duration, setsar=1,
-  libx264 veryfast crf 20 yuv420p, AAC 48 kHz stereo; final assembly
+  NVENC (h264_nvenc, CQ 21) when a GPU is present, else libx264 veryfast crf 20, yuv420p, AAC 48 kHz stereo; final assembly
   by concat demuxer -c copy (segments share identical parameters).
 - Concat demuxer list paths must be absolute (EP3 lesson, 2026-11-04):
   ffmpeg resolves relative file entries against the list file's
@@ -1873,7 +1885,7 @@ artwork. All dialogue is original, proprietary content.
   (no sting, §24f).
 - Render (measured EP1 build): 2-pass ffmpeg. Pass 1: base image
   looped at 30 fps + dialogue audio + ASS burn-in in ONE encode
-  (libx264 yuv420p 30 fps, AAC 48 kHz stereo; no waveform - see
+  (NVENC when a GPU is present, else libx264, yuv420p 30 fps, AAC 48 kHz stereo; no waveform - see
   Waveform bullet). Pass 2: dialogue video (title overlay burned in
   over the first 7.0 s in Pass 1, §24f) + 4 s outro appended, final
   with +faststart. Verification: full decode with no errors; whisper
@@ -2125,7 +2137,7 @@ proprietary content.
   version: ffmpeg -i clip_trim1s.mp4 -filter_complex
   "[0:v]trim=0:8,setpts=PTS-STARTPTS[A];[0:v]trim=0:1,setpts=PTS-
   STARTPTS[B];[A][B]xfade=transition=fade:duration=1:offset=7,
-  format=yuv420p[out]" -map "[out]" -c:v libx264 -crf 18 -r 24
+  format=yuv420p[out]" -map "[out]" -c:v h264_nvenc -preset hq -rc vbr -cq 19 -r 24
   clip_loopable.mp4 (8 s). This cuts the loop-boundary jump to
   1.73 (about 38% less abrupt, measured 2026-11-17) and replaces
   the hard cut with a gentle 1 s dissolve. It cannot make the
@@ -2202,7 +2214,8 @@ proprietary content.
   + 2 s crossfade = 3.0 s voice gap from EP2 on; EP1 keeps 6 s).
   The total-duration target (words / 102.5 × 60) still applies.
 - Segment encode (measured EP1 builds): background video looped at 30 fps
-  + sentence audio (paragraph builds: paragraph audio), audio apad pad_dur = pause, setsar=1, libx264
+  + sentence audio (paragraph builds: paragraph audio), audio apad pad_dur = pause, setsar=1, NVENC
+  (h264_nvenc, CQ 21) when a GPU is present, else libx264
   veryfast yuv420p, AAC 48 kHz stereo; final assembly by concat
   demuxer -c copy in order: body segments (+ xfade clip after sentence
   145, + xfade clip after sentence 306) + 4 s outro (paragraph builds
@@ -2384,11 +2397,14 @@ a number.
 
 - Canvas: interview vertical 1080x1920, interview landscape 1920x1080,
   new lines 1920x1080.
-- Video codec libx264, pixel format yuv420p, frame rate 30 fps, audio
-  AAC 48 kHz stereo, final files with +faststart.
-- Interview compose: libx264 preset medium (default, overridable by
-  CLIP2VERTICAL_PRESET) crf 20; intermediates libx264 veryfast crf 18.
-  New-line segments: libx264 veryfast crf 20.
+- Video codec h264_nvenc (CQ = crf+1) when a GPU is present, else
+  libx264, pixel format yuv420p, frame rate 30 fps, audio
+  AAC 48 kHz stereo, final files with +faststart (GPU-first, 2026-11-19).
+- Interview compose: NVENC (preset hq, rc vbr, CQ 21) when a GPU is
+  present, else libx264 preset medium (default, overridable by
+  CLIP2VERTICAL_PRESET) crf 20; intermediates NVENC CQ 19 when a GPU
+  is present, else libx264 veryfast crf 18.
+  New-line segments: NVENC (h264_nvenc, CQ 21) when a GPU is present, else libx264 veryfast crf 20.
 - Final published video size ≤ 1 GB; never recompress a finished master
   for upload (§9c).
 - Fonts: ASS subtitle/panel font Noto Sans CJK SC; new-line card text
