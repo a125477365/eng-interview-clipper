@@ -276,15 +276,37 @@ into a build of the other. Three buckets only:
   no more rendering, no more downloads on the server. The
   server-render-kit is retired with it. Do not SSH to 2222
   for work anymore.
-  Rule of thumb (REVISED 2026-11-18 user order): generation
-  comes from Muse's cloud; GPU work (XTTS, LatentSync, GFPGAN,
-  NVENC encoding) runs on 2225; NON-GPU work runs on the VM
-  FIRST — ASR, alignment, subtitle stills, covers, audio mix,
-  concat assembly, file prep — and moves to 2225 ONLY when the
-  VM's resources are insufficient. 2225 is reserved for work
-  that actually needs its GPU. Process files live in D:\muse\;
-  final files live ONLY on the server video/ via SSH; the VM
-  only orchestrates.
+  Rule of thumb (REVISED 2026-11-19 user order, supersedes the
+  2026-11-18 "VM first" rule): generation comes from Muse's
+  cloud; for video work, use the GPU wherever it can help —
+  GPU-FIRST routing. Any step that has a GPU path runs on
+  2225's RTX 3070; steps with no GPU path stay on the VM CPU.
+  Process files live in D:\muse\; final files live ONLY on
+  the server video/ via SSH; the VM only orchestrates.
+  Per-step routing (verified 2026-11-19, both lines):
+  GPU on 2225 (already): XTTS voiceover (CUDA); LatentSync
+  1.5 lip-sync (CUDA); GFPGAN face restoration (CUDA); all
+  video encoding — segments, xfades, final assembly
+  (h264_nvenc; CQ 23 for sleep from EP9 on).
+  GPU on 2225 (to move): faster-whisper ASR loop check — the
+  ONLY CPU step with a real GPU path. The VM currently runs
+  it as device='cpu', compute_type='int8' (batch_asr.py); on
+  2225 it runs CUDA and is much faster on a ~28 min episode.
+  2225's faster-whisper is being installed by another agent —
+  verify it exists (python -c "import faster_whisper") before
+  routing ASR to 2225; until then ASR stays on the VM CPU.
+  CPU on VM (no GPU path, stays): alignment (text
+  timestamps); subtitle stills and covers (PIL single-image
+  render); audio mixing (ffmpeg audio); Word docs. Trivial
+  text/image/audio work — the GPU cannot help.
+  CPU on 2225 (marginal): framecheck framemd5 — plain CPU
+  decode + hash; NVDEC decode (h264_cuvid) could speed the
+  decode half but the hash is CPU-bound, so keep CPU decode
+  unless a run proves decode-bound.
+  GPU START GATE still applies: GPU-first routing decides
+  WHERE a step runs, not WHEN it starts — GPU work still
+  starts only on the user's explicit instruction (shared
+  card); ASR counts as a GPU step once it moves to 2225.
 - 2225 GPU pipeline — never let the GPU idle (2026-11-17 user
   order). Pipeline, do not serialize: the moment shot 1 is
   generated in the cloud, start LatentSync + GFPGAN on it on
@@ -302,8 +324,8 @@ into a build of the other. Three buckets only:
   still RUNS AUTOMATICALLY on schedule — but its GPU steps wait
   for the user. Non-GPU work (cloud generation, scripts, file
   prep, publishing) runs on schedule without asking; GPU work
-  (XTTS, LatentSync, GFPGAN, ffmpeg assembly/encoding on 2225)
-  starts ONLY when the user explicitly instructs it. The user
+  (XTTS, LatentSync, GFPGAN, ffmpeg assembly/encoding on 2225,
+  ASR once it moves to 2225's GPU — 2026-11-19) starts ONLY when the user explicitly instructs it. The user
   coordinates GPU time between agents. Do not auto-start GPU
   video work on your own initiative.
 - The server address, SSH credentials, and connection method are
