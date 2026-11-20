@@ -2908,9 +2908,20 @@ a number.
   Values: healthy, fun, never preachy — one small good trait per
   episode (brave, friendly, sharing, honest, helpful), hidden inside
   the joke, never stated as a lesson.
-- Main character 灰灰 (Huihui), little tiger (user-set 2026-11-19):
-  orange-yellow fur + black stripes, round face, big eyes, pink nose,
-  round ears, red vest (fixed outfit). Personality (all four, user-set):
+- Main character 灰灰 (Huihui), little tiger (user-set 2026-11-19),
+  about 7 years old — 5 was too young, 8 too old, 7 is the middle:
+  round chubby face, slightly taller than his sister, still clearly
+  a young kid. Voice: speaks firmly and confidently, but must still
+  sound like a 7-year-old child, never like an adult.
+  Face rule (2026-11-19 user correction — an earlier long-face /
+  slanted-brow version looked like a villain and was discarded): the
+  face must stay round and friendly — big round innocent eyes, soft
+  arched eyebrows that are NEVER angled or slanted, warm gentle smile;
+  the face must never look long, sly, cunning, or villainous. Colour
+  (user-set 2026-11-19): WHITE tiger — white fur with grey-black
+  stripes (the name 灰灰 fits the grey-white colouring); red vest
+  (fixed outfit); round ears, pink nose. Personality (all four,
+  user-set):
   strong (falls down, gets up himself; "I can try!"), boyish
   (loves running, jumping, adventure, curious, a little naughty but
   never bullies), brave (stands up for friends, admits mistakes,
@@ -2922,17 +2933,89 @@ a number.
   never runs on disguise (biggest difference from the reference video).
   Catchphrases (at least one per episode): "I can try!" / "Don't worry,
   I'm here!" / "We are friends!"
-- Younger sister 宁宁 (Ningning), little lamb, permanent supporting
-  character (user-set 2026-11-19): white little sheep, round face, big
-  eyes, pink nose, pink scarf (fixed accessory). Gentle, curious, loves
-  to cling, admires her brother; a little timid, calls "哥哥!" when
-  scared; asks "为什么" — she is the episode's question-asker, 灰灰
-  answers and demonstrates. Sibling beats (reusable): 宁宁 asks, 灰灰
-  answers; 宁宁 has a small problem, 灰灰 helps; 宁宁 praises her
-  brother, 灰灰 scratches his head shyly; both laugh and hug at the end.
-  Do NOT copy the reference video's lamb designs (blue/green/bell
-  collars) or scenes; 宁宁 is family, not prey — the relationship is
-  completely different.
+- Younger sister 宁宁 (Ningning), little goat/lamb, permanent
+  supporting character (user-set 2026-11-19; briefly changed to a
+  rabbit the same evening because the lamb's fur looked bad, then
+  changed BACK to the lamb/goat because the shot-5 lamb looked the
+  best — the rabbit is the new friend 跳跳 again), about 4 years old
+  — shorter than 灰灰， which makes the big-brother / little-sister
+  dynamic visible at a glance: white little goat, round face, big
+  eyes, pink nose, pink scarf (fixed accessory). Gentle, curious,
+  loves to cling, admires her brother; a little timid, calls "哥哥!"
+  when scared; asks "为什么" — she is the episode's question-asker,
+  灰灰 answers and demonstrates. Sibling beats (reusable): 宁宁 asks,
+  灰灰 answers; 宁宁 has a small problem, 灰灰 helps; 宁宁 praises her
+  brother, 灰灰 scratches his head shyly; both laugh and hug at the
+  end. Do NOT copy the reference video's lamb scenes; 宁宁 is family,
+  not prey — the relationship is completely different. Voice: MUST be
+  clearly a girl's voice, never boy-like (user correction 2026-11-19:
+  in some shots the lamb sounded like a boy). Shot-5 is the visual
+  standard for 宁宁 — the shot-5 lamb is the best-looking version;
+  all other shots use it as reference.
+- Generation method (2026-11-20 user order — replaces the 2026-11-19
+  pipeline): generate VOICED video DIRECTLY on Kaggle (LTX-2.5 +
+  Wan2GP), one clip at a time, audio and picture together. The old
+  pipeline — cloud model silent clips + TTS dubbing + rubberband
+  pitch-shift + LatentSync lip sync — is RETIRED for this line.
+  Kaggle setup (verified 2026-11-20): account ggfdhj, Notebook
+  https://www.kaggle.com/code/ggfdhj/ltx-2-5-kaggle-t4x2-wan2gp
+  (single GPU, T4 x2, Internet On), models from private Dataset
+  https://www.kaggle.com/datasets/ggfdhj/ltx25-models (LTX-2.5 22B
+  Distilled NVFP4 14.7GB + Gemma 4 INT8 encoder 12.9GB). GPU quota
+  30 h/week; a session burns quota while open even when idle — stop
+  the session when done. Per-clip cost ~12 min for 480p ~5 s; 720p
+  is made by generating at 480p then latent x2 upscale, never direct
+  720p (slow, may OOM). A 70–90 s episode needs ~10–14 clips
+  stitched; keep dialogue per clip to 1–2 short lines so the model
+  can finish the speech inside the clip.
+- Child voices on Kaggle (replaces the TTS + rubberband rule): the
+  model invents the voices from the prompt — there is no TTS voice
+  to pitch-shift and no Helio/Aria to assign. Direct each clip's
+  voice in the prompt itself: write the speaker, the line, and a
+  voice anchor every clip, e.g. "Huihui (7-year-old boy tiger,
+  bright cheerful young child voice, clear, a little high-pitched):
+  'Hello! Are you new here?'" — repeat the same anchor wording for
+  the same character in every clip so the voice does not drift. The
+  model cannot hit an exact F0; judge by ear (must sound clearly
+  like a young child, never adult) and regenerate the clip if the
+  voice sounds adult or if two characters sound identical. 宁宁 must
+  sound clearly like a little girl; 跳跳 a little higher and livelier
+  than 宁宁. If a clip's voice is wrong, regenerate that clip only —
+  do not rebuild the whole episode.
+- Lip sync (retired 2026-11-20): no LatentSync, no separate dubbing.
+  Kaggle generates the speech and the mouth movement together, so
+  the lips match the words by construction. If a clip's mouth is
+  visibly off (wrong speaker's mouth moving, or mouth moving with no
+  speech), regenerate that clip. Do NOT run LatentSync on
+  Kaggle-generated clips — the audio is already baked in.
+- Limb-count rule (user correction 2026-11-19, apply to EVERY shot
+  and EVERY frame — the 举一反三 check): every animal in every frame
+  must have the correct number of limbs — a bipedal character has 2
+  arms + 2 legs (4 limbs total); NEVER 6 legs, never an extra arm or
+  paw. **All three main characters are BIPEDAL (2026-11-19 user order):
+  the lamb 宁宁 stands upright on 2 legs like a person, NEVER on all
+  fours — the video model defaults to a quadruped sheep in full-body
+  walking/standing shots, so force bipedal by composing group close-ups
+  (lamb between the tiger and rabbit) or by feeding a reference frame
+  where the lamb is already bipedal; a lone full-body lamb shot will
+  come back on all fours and must be regenerated.** Shot 5 (three
+  friends hugging, all bipedal) is the series' pose reference —
+  regenerate other shots from a shot-5 frame or from the small-head
+  reference. Also: NEVER a duplicated character in one shot (shot 1
+  once had two rabbits). Kaggle clip audio IS the dialogue — use it
+  as-is in assembly; do NOT mute it and do NOT dub over it.
+- Tiger head (user correction 2026-11-19, 21:26): the tiger's head
+  was too big and a bit scary. New character reference
+  `media-generation-ep01-ref-smallhead-0-47f5cf79-44de-4a4c-8715-37884d9f9074.webp`
+  (all three standing, tiger head ~1/4 of body height, gentle
+  closed-mouth smile, NO visible teeth) is now the series reference
+  — regenerate every shot from it. Avoid extreme close-ups that let
+  the head fill the frame. Ball play: the tiger stands UPRIGHT and
+  holds the ball up in both paws — NEVER crouch over the ball on the
+  ground (that makes the model put him on all fours, shot1-v6 t3–t4).
+  Video model output size varies with the reference: v6 clips came
+  out 1152×768 (3:2), convert with `crop=1152:648,scale=1280:720`
+  for 16:9 assembly (feet and heads stay in frame).
 - World: Sunny Forest Town — a forest town with grassland, river,
   orchard, wooden houses, mushroom house, swing, stone bridge. All
   animals speak English (and Chinese) and are neighbours. NO real
@@ -3011,7 +3094,16 @@ a number.
   skill). Formula: 1 scene × 1–2 characters × 1 pattern × 1 routine.
   Production rhythm: first 10 sample episodes to prove the pipeline
   and read the data, then 3–5 episodes per week steady.
-- Production routing (GPU-first, §0): 3D animation generation is cloud
-  model work (never the user's GPU); encoding/assembly on 2225 NVENC;
-  subtitles and covers are CPU work. Same §0 GPU start gate: GPU work
-  starts only on the user's explicit instruction.
+- Production routing (Kaggle, 2026-11-20 user order — replaces the
+  §0 GPU-first routing for this line only): voiced clips are generated
+  on Kaggle (LTX-2.5 + Wan2GP, see Generation method above) — never
+  Muse cloud models, never the user's 2225 GPU. Assembly (stitch clips,
+  burn bilingual subtitles, add the pinned-quiz card) is CPU work on
+  the VM or 2225; no NVENC, no XTTS, no LatentSync, no GFPGAN for this
+  line. The §0 GPU start gate does NOT apply here — Kaggle GPU quota
+  is the user's Kaggle account, not the shared 2225 card — but keep
+  sessions short and stop them when done (quota burns while open).
+  Subtitles: burned-in bilingual (English white on top, Chinese gold
+  below), synced to the Kaggle audio; verify each line's timing against
+  the clip audio before assembly. Covers are still Muse-generated
+  stills, same as before.
