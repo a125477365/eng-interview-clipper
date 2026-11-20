@@ -3103,6 +3103,14 @@ a number.
   line. The §0 GPU start gate does NOT apply here — Kaggle GPU quota
   is the user's Kaggle account, not the shared 2225 card — but keep
   sessions short and stop them when done (quota burns while open).
+  Why assembly is CPU, not GPU: stitching is a stream copy
+  (`-c copy`, no re-encode) — the GPU has nothing to do; burning
+  subtitles and overlaying the quiz card are CPU filters (text
+  rasterisation and image overlay run on CPU); only the final
+  re-encode could use NVENC, but a 70–90 s episode encodes in
+  ~1–2 min on CPU, so GPU acceleration is not worth reintroducing
+  a dependency on the shared 2225 card. Keep the cartoon line fully
+  GPU-free.
   Subtitles: burned-in bilingual (English white on top, Chinese gold
   below), synced to the Kaggle audio; verify each line's timing against
   the clip audio before assembly. Covers are still Muse-generated
