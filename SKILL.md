@@ -3115,3 +3115,43 @@ a number.
   below), synced to the Kaggle audio; verify each line's timing against
   the clip audio before assembly. Covers are still Muse-generated
   stills, same as before.
+- Character consistency (user order 2026-11-20 — 形象统一): character
+  designs are EXACTLY the ones set on 2026-11-19 (see the character
+  entries above — white tiger Huihui with red vest, head ~1/4 body
+  height, round friendly face, eyebrows never slanted; Ningning the
+  white goat with pink scarf; Tia, Pipi, Dudu, Qiu, Hua, Zhuang as
+  listed). Never invent a new look. Repeat the full character
+  description in EVERY shot's prompt so the model does not drift.
+  After each shot, check the characters against the reference:
+  colours, accessories, proportions, head size, face shape. If a
+  shot's characters drift (wrong colour, missing accessory, wrong
+  proportions, slanted brows), regenerate that shot — never stitch
+  a drifted shot in.
+- Shot-to-shot continuity (user order 2026-11-20 — 段段衔接): the
+  LAST frame of each shot and the FIRST frame of the next shot must
+  match — same character positions, same ball/prop position, same
+  background, no jump. Method: from Shot 2 onward, generate each shot
+  with image-to-video using the PREVIOUS shot's last frame as the
+  first-frame reference image, so the next shot literally continues
+  from where the previous one ended. After generating a shot, extract
+  its first frame and compare it against the previous shot's last
+  frame; if they do not match, regenerate that shot.
+- Crowd scenes (user order 2026-11-20): like the reference video's
+  flock of sheep, each shot should have MANY cute animal companions —
+  3–6 animals per shot, not just 1–2. Supporting characters (Tia,
+  Pipi, Dudu, Qiu, Hua) appear as background companions: watching,
+  clapping, cheering, laughing. They do NOT speak and do NOT steal
+  the scene; only 1–2 characters speak per shot. Describe each
+  background animal's look and position in the prompt so the model
+  does not duplicate or merge them. Background animals are bipedal
+  too and their limb counts are checked the same way.
+- Story and child-suitability (user order 2026-11-20): every episode
+  must be a complete story a 3–8-year-old can follow — opening
+  (friends playing), problem (a small trouble), trying (a funny
+  failed attempt), help arrives (a friend), twist (almost fails,
+  then succeeds), warm ending (hug / laugh together + a gentle
+  moral, never a lecture). All daylight, sunny, no night, no
+  monsters, no loud scares, no bullying, no mocking, no lying that
+  pays off. Humour is gentle and physical (a wobbling trunk, a
+  stick that cannot reach) — never mean. Every line max 5 words;
+  core sentences repeat so children can say them along.
