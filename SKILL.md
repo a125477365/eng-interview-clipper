@@ -3155,3 +3155,35 @@ a number.
   pays off. Humour is gentle and physical (a wobbling trunk, a
   stick that cannot reach) — never mean. Every line max 5 words;
   core sentences repeat so children can say them along.
+- Rich, fun story with a full arc (user order 2026-11-20, EP2
+  rewrite — match the reference video's richness): every episode
+  must have a proper setup and payoff (来龙去脉). The FIRST episode
+  of a story — and every episode's opening — introduces the
+  characters first (who they are, how they are related: sister,
+  best friend, new friend) BEFORE the plot starts. Every shot must
+  have ONE clear action (wave, introduce, kick the ball, chase,
+  reach, swing, splash, lift, grab, hug) — never a shot of
+  characters standing still just smiling. Build the story like the
+  reference video: each attempt to solve the problem fails in a
+  funny, unexpected way (stick too short, monkey splashes into the
+  water, trunk just a little too short), then the friends solve it
+  TOGETHER with a team idea (elephant lifts the tiger so the tiger
+  can reach). One reversal minimum per episode. The ball / key prop
+  must stay visible in every shot — never vanish between frames
+  (EP2 v1 lesson: the ball disappeared by the last frame).
+- Text is ALWAYS added in post-production, never generated with the
+  video (user order 2026-11-20 — subtitles, on-screen English,
+  title cards, quiz cards): Kaggle generates ONLY the picture and
+  the characters' spoken voices. ALL text — bilingual subtitles
+  (English white on top, Chinese gold below), title cards, quiz
+  cards, any on-screen English — is burned in during assembly on
+  CPU, timed to the measured audio timestamps of each clip. NEVER
+  ask the video model to render text in the picture: it garbles
+  letters and the timing cannot be known before generation. This
+  applies to every episode, no exceptions.
+- Resolution (user order 2026-11-20 — EP2 looked soft at 480p):
+  generate at 480p, then latent x2 upscale to 720p inside Kaggle;
+  never generate direct 720p (slow, may OOM on T4). The final
+  episode is 720p. If 720p upscaled still looks soft, report it
+  and try direct 720p for one test clip before committing the
+  whole episode to it.
