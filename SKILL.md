@@ -2940,7 +2940,20 @@ a number.
   best — the rabbit is the new friend 跳跳 again), about 4 years old
   — shorter than 灰灰， which makes the big-brother / little-sister
   dynamic visible at a glance: white little goat, round face, big
-  eyes, pink nose, pink scarf (fixed accessory). Gentle, curious,
+  eyes, pink nose, pink scarf (fixed accessory). **Bipedal, ALWAYS
+  standing upright on 2 legs with 2 arms, NEVER on all fours.**
+  Goat bipedal is the hardest rule to enforce (2026-11-21 lesson —
+  EP2 Shot 1 v1 failed it: the model drew Ningning on four legs
+  like a real goat and a browser report wrongly verified it as
+  bipedal): the video model has a very strong quadruped prior for
+  goats, so EVERY shot's prompt must say, in the goat's own
+  description, "STANDING UPRIGHT ON TWO LEGS LIKE A HUMAN CHILD,
+  two arms, two legs, NEVER on all fours, NEVER quadruped". After
+  generation, the ASSISTANT must personally look at the extracted
+  frames and count the goat's legs — do NOT trust a browser or
+  agent report that says "bipedal: OK" without looking. If the
+  goat is on four legs in ANY frame, the shot is rejected and
+  regenerated. Gentle, curious,
   loves to cling, admires her brother; a little timid, calls "哥哥!"
   when scared; asks "为什么" — she is the episode's question-asker,
   灰灰 answers and demonstrates. Sibling beats (reusable): 宁宁 asks,
@@ -2968,6 +2981,30 @@ a number.
   720p (slow, may OOM). A 70–90 s episode needs ~10–14 clips
   stitched; keep dialogue per clip to 1–2 short lines so the model
   can finish the speech inside the clip.
+- Kaggle session & disk lessons (2026-11-21, EP2): (a) a session can
+  die without warning after ~5 h (the 01:53 session died ~06:56 while
+  Shot 2 was being set up — Gradio "No interface is running right
+  now"); finished clips must be downloaded to the VM as soon as each
+  one is generated, because /kaggle/working does NOT persist across
+  sessions. (b) The working volume is only 20 GB. Wan2GP
+  auto-downloads the 14 GB diffusion model into
+  /kaggle/working/Wan2GP/ckpts on first load if the checkpoint
+  folders are not set yet — that fills the disk to 100% and
+  generation then fails at save with "No space left on device".
+  ALWAYS set the checkpoint folders to "/tmp/ltx2.5", "ckpts", "."
+  in that order BEFORE selecting/loading the model, so it loads from
+  /tmp/ltx2.5 (the Dataset copy, on the 2.5 TB overlay) and never
+  re-downloads into ckpts. (c) If the disk does fill, the only
+  large file that can go is the ckpts diffusion-model copy — it is
+  a byte-identical duplicate of /tmp/ltx2.5 (verify by size + head
+  and tail md5 first); deleting it frees ~13.7 GiB. The other ckpts
+  files (projection, VAE, upscalers, vocoder, audio VAE, ic-lora)
+  are NOT duplicates and must stay. Cleanup needs the kernel free:
+  interrupt the Wan2GP cell, run the rm, re-run the cell (new
+  Gradio URL), and do NOT restart the session itself. (d) The
+  notebook editor can get stuck on "Draft Session Starting..." with
+  all controls disabled while the kernel is busy running Wan2GP —
+  interrupting the Wan2GP cell frees it.
 - Child voices on Kaggle (replaces the TTS + rubberband rule): the
   model invents the voices from the prompt — there is no TTS voice
   to pitch-shift and no Helio/Aria to assign. Direct each clip's
@@ -3136,6 +3173,23 @@ a number.
   from where the previous one ended. After generating a shot, extract
   its first frame and compare it against the previous shot's last
   frame; if they do not match, regenerate that shot.
+  **Start-image gallery trap (2026-11-21 lesson — EP2 Shot 4)**:
+  the Wan2GP start-image gallery KEEPS old reference images, and
+  consecutive shots' last frames look almost identical (same circle
+  scene), so the browser can upload the right file yet generate
+  from the WRONG (older, ball-less) image — Shot 4 started from
+  Shot 2's frame instead of Shot 3's and the ball was invisible for
+  the first 2 s. ALWAYS clear/remove every existing image from the
+  start-image gallery BEFORE uploading, then verify in the preview
+  that the uploaded image shows the expected content (e.g. the red
+  ball at the goat's feet) before generating. **Camera-drift trap
+  (2026-11-21 — EP2 Shots 3-retake and 4)**: the model likes to pan
+  the camera away mid-shot and let the main characters run out of
+  frame, which breaks the NEXT shot's continuity (its start image
+  then has no main characters). For every shot, the prompt must say
+  the camera stays FIXED on the main characters and they stay in
+  the center of the frame for the whole shot; verify the LAST frame
+  still shows all main characters.
 - Crowd scenes (user order 2026-11-20): like the reference video's
   flock of sheep, each shot should have MANY cute animal companions —
   3–6 animals per shot, not just 1–2. Supporting characters (Tia,
@@ -3155,6 +3209,29 @@ a number.
   pays off. Humour is gentle and physical (a wobbling trunk, a
   stick that cannot reach) — never mean. Every line max 5 words;
   core sentences repeat so children can say them along.
+  **Dialogue share (user order 2026-11-21 — 对话占比)**: keep
+  raising the share of dialogue in every episode — every shot
+  carries TWO lines (a short question-and-answer or a reply), never
+  just one line; a shot with only one line gets a second line added
+  (a question, a suggestion, a reaction). Dialogue should fill most
+  of each 5-second shot so children hear English most of the time,
+  not just watch silent action.
+  **Decide-and-go, never wait for a tap (user order 2026-11-21)**:
+  when a shot fails twice, report both versions to the user WITH a
+  clear recommendation — then proceed with the recommended version
+  IMMEDIATELY and start the next shot. Do NOT wait for the user to
+  tap an option: no answer means "go with the recommendation".
+  (Lesson: Shot 6 — options sent 10:59, user tapped 12:13, 74
+  minutes wasted waiting.)
+  **Never let a Kaggle session idle (user order 2026-11-21)**:
+  a running session burns GPU quota whether or not it is
+  generating — the low quota is mostly idle time (waiting for a
+  decision, waiting for verification, gaps between tasks). Generate
+  shots back-to-back with no gaps; verify fast and start the next
+  shot at once. If a wait of more than ~30 minutes is coming
+  (waiting for the user, waiting for the next batch), STOP the
+  session and restart when ready — a restart costs ~26 minutes, so
+  stopping only pays off for gaps longer than that.
 - Rich, fun story with a full arc (user order 2026-11-20, EP2
   rewrite — match the reference video's richness): every episode
   must have a proper setup and payoff (来龙去脉). The FIRST episode
@@ -3181,9 +3258,39 @@ a number.
   ask the video model to render text in the picture: it garbles
   letters and the timing cannot be known before generation. This
   applies to every episode, no exceptions.
-- Resolution (user order 2026-11-20 — EP2 looked soft at 480p):
-  generate at 480p, then latent x2 upscale to 720p inside Kaggle;
-  never generate direct 720p (slow, may OOM on T4). The final
-  episode is 720p. If 720p upscaled still looks soft, report it
-  and try direct 720p for one test clip before committing the
-  whole episode to it.
+- Resolution (user order 2026-11-20 — EP2 looked soft at 480p;
+  user confirmed 2026-11-21 03:03: 720p is enough): generate at
+  480p, then latent x2 upscale to 720p inside Kaggle; never
+  generate direct 720p (slow, may OOM on T4). The final episode
+  is 720p — no higher needed. Frames per second: NO requirement
+  (user corrected 2026-11-21 03:04 — not "minimum frames", just
+  no fps requirement; whatever the generation produces, e.g.
+  24 fps / 121 frames per ~5 s shot, is fine). If 720p upscaled
+  still looks soft, report it and try direct 720p for one test
+  clip before committing the whole episode to it.
+- Picture clarity — why the reference looks sharp (2026-11-21
+  lesson, learned from watching 小蚂蚁安特的英语频道 EP14
+  《牙疼的花豹》, Douyin 7708790521417747750, 2026-11-16, 30 s,
+  4.4万 followers — a second clarity benchmark alongside 小小梦工厂;
+  learn its CRAFT, not its characters or lines). What it actually
+  is: NOT razor-sharp — zoomed in, edges are soft, fur is a smooth
+  overall texture (not individual hairs), paws are AI-simplified
+  (4 smooth clawless fingers, slightly fused). What makes it LOOK
+  clear: (a) high still-frame detail density — hedgehog spines,
+  leaves, apple/berry highlights, warm saturated colours; (b)
+  near-static shots — slow head/body micro-movements plus cuts,
+  no fast action and NO camera moves: the model is best at
+  near-static frames, so the picture stays stable with no jitter
+  or flicker; (c) shallow depth of field — foreground/background
+  deliberately blurred so the subject pops (a photography trick,
+  not resolution). Rules for this line: prefer STATIC shots with
+  small, slow movements (blinks, small gestures, head turns) and
+  cut between shots — never push in, zoom or pan (the camera-drift
+  trap above: push-ins blur the picture and push characters out of
+  frame); a shot may use shallow depth of field with the subject
+  sharp; ask the prompt for rich texture (fur, leaves, highlights)
+  so frames read as detailed. Resolution: EP2 stays 480p → latent
+  x2 to 720p (do NOT switch mid-episode — mixed sharpness looks
+  inconsistent); EP3 tests direct 720p on ONE clip first, then
+  decides. This bullet is animation-line only — the other four
+  lines are untouched.
