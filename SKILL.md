@@ -2976,9 +2976,13 @@ a number.
   https://www.kaggle.com/datasets/ggfdhj/ltx25-models (LTX-2.5 22B
   Distilled NVFP4 14.7GB + Gemma 4 INT8 encoder 12.9GB). GPU quota
   30 h/week; a session burns quota while open even when idle — stop
-  the session when done. Per-clip cost ~12 min for 480p ~5 s; 720p
-  is made by generating at 480p then latent x2 upscale, never direct
-  720p (slow, may OOM). A 70–90 s episode needs ~10–14 clips
+  the session when done. Per-clip cost ~15–19 min for a direct-720p
+  ~5 s shot (verified 2026-11-22, shots 1–2: 19m08s, 15m16s,
+  16m39s, 15m20s); 720p is generated direct at 1280×704 — Wan2GP's
+  720p preset list has no 1280x720, 1280x704 is the closest 16:9
+  preset (user order 2026-11-22 — the old 480p + latent x2 upscale
+  route is retired).
+  A 70–90 s episode needs ~10–14 clips
   stitched; keep dialogue per clip to 1–2 short lines so the model
   can finish the speech inside the clip.
 - Kaggle session & disk lessons (2026-11-21, EP2): (a) a session can
@@ -3173,6 +3177,15 @@ a number.
   from where the previous one ended. After generating a shot, extract
   its first frame and compare it against the previous shot's last
   frame; if they do not match, regenerate that shot.
+  **Start-image carry-over (2026-11-22 lesson — EP1 Shot 3)**:
+  the start image brings its WHOLE cast forward — an animal in the
+  previous last frame CANNOT be removed by prompt text: two
+  attempts with "no other animals" both kept the deer that the
+  start image carried in. Write each shot's cast list to match what
+  the start image actually brings; an animal in the frame must be
+  named and described in the prompt. To change the cast, break at
+  a new scene beat with a Text-Only generation instead of a start
+  image.
   **Start-image gallery trap (2026-11-21 lesson — EP2 Shot 4)**:
   the Wan2GP start-image gallery KEEPS old reference images, and
   consecutive shots' last frames look almost identical (same circle
@@ -3230,8 +3243,90 @@ a number.
   shots back-to-back with no gaps; verify fast and start the next
   shot at once. If a wait of more than ~30 minutes is coming
   (waiting for the user, waiting for the next batch), STOP the
-  session and restart when ready — a restart costs ~26 minutes, so
+  session and restart when ready — a restart costs ~15 minutes, so
   stopping only pays off for gaps longer than that.
+  **How the idle timeout actually works (verified 2026-11-22)**:
+  it does NOT silently stop the session at 30 minutes — it first
+  shows an "Are you still there?" dialog, and only stops the
+  session if nobody clicks it for ~30 minutes. It watches whether
+  anyone is interacting with the PAGE, not whether background work
+  is running: on 2026-11-22 00:16 the upscale was actively running
+  and still got stopped because nobody clicked the dialog, and the
+  half-finished upscale was lost. Do NOT rely on it to save quota:
+  the ~30 minutes before it stops are already burned, and it kills
+  running work too. Save quota by stopping the session yourself
+  when it is not needed, and during long tasks interact with the
+  editor every ≤20 minutes and click "Continue editing" the moment
+  the dialog appears.
+  **Quota mechanics (verified 2026-11-22)**: the number on the
+  Kaggle page is weekly hours USED, not remaining; the 30 hours
+  reset every Saturday 00:00 UTC (Saturday 08:00 Singapore time)
+  and unused hours do NOT roll over to the next week — use them
+  or lose them. Verified 2026-11-22 08:26: used 19:53/30,
+  remaining ~10:07.
+- **Kaggle 额度防浪费方案（2026-11-22 用户令，完整版）**: (1) 开工
+  前：先查本周剩余额度（页面数字是已用，不是剩余；每周六
+  00:00 UTC＝周六 08:00 新加坡重置，不用完作废）；剧本和提示词
+  全部备好再开会话，绝不开着会话等剧本；重启约 15 分钟。
+  (2) 开工：Run All 后立即开工，一镜接一镜、中间不留空档；
+  每镜出片立即下载到 VM（会话不保存文件）；核验要快，验完
+  立刻开下一镜。 (3) 监控：长任务期间每 ≤20 分钟与编辑器交
+  互一次；“Are you still there?” 对话框一出现立即点 “Continue
+  editing”——它看的是页面操作不是后台任务，任务在跑也会被停
+  （2026-11-22 00:16 升频实例，升到一半的成品没了）；别指望它
+  替你省额度，停之前那半小时已经白烧了。 (4) 收尾：做完立即
+  Stop 会话；预计要等超过 30 分钟就直接停，等开工再重启。
+  (5) 证明方法（用户 2026-11-22 令）：被问到时用实数回答，
+  不要只说规则——当前会话状态、额度读数（已用 X/30、剩 Y）、
+  当前做到哪一步、上次页面交互时间。例证：2026-11-22 08:26，
+  会话启动 16 分钟、启动完成、额度 19:53/30 剩 10:07、无闲置框。
+- **Every animal's outfit fully specified (user order 2026-11-22,
+  EP1 feedback #1)**: the script must describe EVERY animal's
+  clothes item by item — or state explicitly "wears nothing,
+  intentional" — no animal may be left unspecified. Origin:
+  Ningning's original design gave her only a pink scarf and no
+  clothes, and the user asked why she wasn't wearing any. The
+  full costume repeats in every shot prompt, same as the character
+  design.
+- **Scene map and spatial continuity (user order 2026-11-22, EP1
+  feedback #3)**: the whole episode is ONE place, ONE fixed camera
+  (STATIC WIDE SHOT, never moves). The river is ALWAYS at the
+  bottom of the frame; everyone ALWAYS stands on the near-bank
+  grass; nobody ever crosses to the far bank. The ball's position
+  and every character's position are tracked shot by shot; each
+  shot's positions continue naturally from the previous shot's last
+  frame — nobody teleports to the other side, appears, or vanishes
+  between shots. Shot 13→14 is the explicit case: Zhuangzhuang
+  puts Huihui back on the SAME patch of near-bank grass, same
+  place, same side.
+- **No duplicate leads (user order 2026-11-22, EP1 feedback #4;
+  tightens the "one of each" rule)**: the WHOLE episode has
+  exactly ONE white rabbit (Tiaotiao), ONE white goat (Ningning),
+  ONE white tiger (Huihui). Background extras must differ from the
+  three leads in ALL THREE of species, fur colour, and clothes (a
+  background rabbit must be brown or grey and never wear red; a
+  background goat must be brown). Every shot names each animal
+  individually — who, left/center/right, what they are doing —
+  never a vague "a few animals".
+- **Every shot fully detailed (user order 2026-11-22, user words:
+  "the script should specify every animal's description, every
+  frame should describe every detail of everything")**: each shot
+  carries a per-animal list (name + left/center/right position +
+  action) + ball position + dialogue + a self-contained Kaggle
+  prompt (full costume + map + positions + ball + voice anchors) +
+  check points.
+- **Every character and animal in every frame described in full
+  (user order 2026-11-22)**: in every shot, EVERY character and
+  animal that appears in the frame — leads AND background extras —
+  must be described clearly in the script and in the prompt: who it
+  is, what it looks like (species, fur colour, clothes), where it
+  is (left/center/right, near/far), what it is doing. No animal in
+  the frame may be left undescribed, unnamed, or covered by a vague
+  phrase like "other animals" or "a few animals". If an animal is
+  in the frame, it is named and described; if it is not described,
+  it is not in the frame. The "no other animals" closing line means
+  "no animals OTHER than the ones just described", not a licence to
+  leave animals undescribed.
 - Rich, fun story with a full arc (user order 2026-11-20, EP2
   rewrite — match the reference video's richness): every episode
   must have a proper setup and payoff (来龙去脉). The FIRST episode
@@ -3247,7 +3342,12 @@ a number.
   TOGETHER with a team idea (elephant lifts the tiger so the tiger
   can reach). One reversal minimum per episode. The ball / key prop
   must stay visible in every shot — never vanish between frames
-  (EP2 v1 lesson: the ball disappeared by the last frame).
+  (EP2 v1 lesson: the ball disappeared by the last frame). For
+  action shots, keep the ball ON THE GROUND rolling slowly — a
+  kicked/bouncing ball flies out of frame and never comes back
+  (EP1 Shot 3 attempt 2, 2026-11-22: ball gone after 1.5 s for the
+  rest of the shot). Fast jumping also smears faces — prefer small,
+  slow movements.
 - Text is ALWAYS added in post-production, never generated with the
   video (user order 2026-11-20 — subtitles, on-screen English,
   title cards, quiz cards): Kaggle generates ONLY the picture and
@@ -3258,16 +3358,21 @@ a number.
   ask the video model to render text in the picture: it garbles
   letters and the timing cannot be known before generation. This
   applies to every episode, no exceptions.
-- Resolution (user order 2026-11-20 — EP2 looked soft at 480p;
-  user confirmed 2026-11-21 03:03: 720p is enough): generate at
-  480p, then latent x2 upscale to 720p inside Kaggle; never
-  generate direct 720p (slow, may OOM on T4). The final episode
+- Resolution (user order 2026-11-22 — direct 720p; supersedes the
+  2026-11-20 480p + latent x2 upscale route): generate direct at
+  720p — Wan2GP's 720p preset list has no 1280x720; the closest
+  16:9 preset is 1280x704, so shots come out 1280x704 (verified
+  2026-11-22, shots 1–2) and are scaled to 1280x720 at assembly.
+  720p inside Kaggle) is retired — the upscale needed an 18.1 GB
+  INT8 convrot model download and took ~5 h for a 75 s episode,
+  and direct 720p skips it entirely. Direct 720p may be slower
+  per shot and may OOM on a single T4 (activations scale with
+  pixels, ~2.5× vs 480p); if a shot fails on memory, report it
+  and do NOT silently fall back to 480p. The final episode
   is 720p — no higher needed. Frames per second: NO requirement
   (user corrected 2026-11-21 03:04 — not "minimum frames", just
   no fps requirement; whatever the generation produces, e.g.
-  24 fps / 121 frames per ~5 s shot, is fine). If 720p upscaled
-  still looks soft, report it and try direct 720p for one test
-  clip before committing the whole episode to it.
+  24 fps / 121 frames per ~5 s shot, is fine).
 - Picture clarity — why the reference looks sharp (2026-11-21
   lesson, learned from watching 小蚂蚁安特的英语频道 EP14
   《牙疼的花豹》, Douyin 7708790521417747750, 2026-11-16, 30 s,
@@ -3289,8 +3394,7 @@ a number.
   trap above: push-ins blur the picture and push characters out of
   frame); a shot may use shallow depth of field with the subject
   sharp; ask the prompt for rich texture (fur, leaves, highlights)
-  so frames read as detailed. Resolution: EP2 stays 480p → latent
-  x2 to 720p (do NOT switch mid-episode — mixed sharpness looks
-  inconsistent); EP3 tests direct 720p on ONE clip first, then
-  decides. This bullet is animation-line only — the other four
+  so frames read as detailed. Resolution: this episode (EP1 remake)
+  is direct 720p; the old 480p → latent x2 route is retired (see
+  Resolution above). This bullet is animation-line only — the other four
   lines are untouched.
