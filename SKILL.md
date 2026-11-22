@@ -3348,6 +3348,7 @@ a number.
   (EP1 Shot 3 attempt 2, 2026-11-22: ball gone after 1.5 s for the
   rest of the shot). Fast jumping also smears faces — prefer small,
   slow movements.
+- Verdict priority (user order 2026-11-22): people and dialogue are the hard gate; a prop being slightly off is acceptable. The prompt still asks for the ball/key prop to stay visible, but a shot is LOCKED when the animals and the spoken lines are right, even if the ball is missing for part of the shot — do NOT re-shoot for the prop alone (EP1 Shot 3 attempt 3, 2026-11-22: locked with the ball gone from ~1.5 s because all 5 animals and both lines were right; the planned 4th attempt was cancelled mid-generation).
 - Text is ALWAYS added in post-production, never generated with the
   video (user order 2026-11-20 — subtitles, on-screen English,
   title cards, quiz cards): Kaggle generates ONLY the picture and
