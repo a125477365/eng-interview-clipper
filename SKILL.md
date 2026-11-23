@@ -3441,7 +3441,14 @@ a number.
   in the frame, it is named and described; if it is not described,
   it is not in the frame. The "no other animals" closing line means
   "no animals OTHER than the ones just described", not a licence to
-  leave animals undescribed.
+  leave animals undescribed. **Background in full detail too
+  (user order 2026-11-23)**: the background of every shot is
+  written out in detail — the sunlight (quality, direction, where
+  it falls, shadows, and how it changes when curtains open), every
+  object in the room, and the COLOUR of every object (walls,
+  window frame, curtains, bed frame, blanket, table, alarm clock,
+  door, rug, floor). No object in the frame may be left without a
+  colour.
 - Rich, fun story with a full arc (user order 2026-11-20, EP2
   rewrite — match the reference video's richness): every episode
   must have a proper setup and payoff (来龙去脉). The opening
