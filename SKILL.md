@@ -3200,12 +3200,19 @@ a number.
   (1) TEXT: every shot's prompt repeats the character's FULL
   description verbatim (species, fur, stripes, clothes, eyes,
   proportions, style — never abbreviated), from the script §2.
-  (2) START IMAGE: from shot 2 onward each shot uses the previous
-  shot's last frame as its start image (see Shot-to-shot continuity
-  below), so the actual on-screen look carries forward; for the FIRST
-  shot of a new episode (or a character's first appearance), use the
-  approved character reference image as the start image so the model
-  begins from the approved look, not from text alone. LIMIT — state it
+  (2) START IMAGE — always from an approved image (user order
+  2026-11-23, "以后都要从我已定的形象给它，防止不一致"): the start
+  image for ANY shot must come from an approved source — the
+  user-approved character reference image (new-designs/) or the last
+  frame of a previous shot that was itself verified against the
+  approved design. Never start a shot from an unverified image or
+  from text alone when an approved image exists. In practice: the
+  FIRST shot of a new episode (or a character's first appearance)
+  uses the approved character reference image as the start image;
+  from shot 2 onward each shot uses the previous shot's last frame
+  (see Shot-to-shot continuity below), which carries the approved
+  look forward because that frame was verified against the approved
+  design. LIMIT — state it
   plainly: a text description is an instruction, not a blueprint; the
   video model (LTX-2.5) interprets it and will NOT reproduce the
   reference image pixel-for-pixel. The reference image is the design
