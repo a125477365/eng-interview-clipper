@@ -3490,7 +3490,14 @@ a number.
   a shared voice anchor ("cheerful bright girl voice") does NOT
   count — each line gets its own tone word, including the second
   line after "then". The emotion must match the expression in the
-  shot (see the 表情库 in the script's §2).
+  shot (see the 表情库 in the script's §2). **Emotion follows
+  context, not just the line (user order 2026-11-23)**: when a
+  line's surface emotion conflicts with the scene's state, the
+  scene's state is the primary emotion and the line's emotion is
+  secondary — a character who just woke up shows sleepiness first
+  and surprise second (eyes half-open, never wide open), and a
+  character still in bed complains sleepily, not energetically.
+  Never assign an emotion from the words alone; read the scene.
 - Rich, fun story with a full arc (user order 2026-11-20, EP2
   rewrite — match the reference video's richness): every episode
   must have a proper setup and payoff (来龙去脉). The opening
