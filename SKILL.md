@@ -3473,7 +3473,10 @@ a number.
   card. A static full-screen still image is still banned. The
   announcement text is GOLD (the Chinese-text colour of the
   series — subtitles are EN white / ZH gold), with a dark outline
-  so it stays readable on the bright picture.
+  so it stays readable on the bright picture. Font size 72pt at
+  1280x720 (a title, clearly bigger than the ~40pt subtitles;
+  the 13 characters fit on one line, about 936px wide, readable
+  on a phone in 2 seconds).
   * DURATION VARIES: the announcement length is set by the actual
     title — every episode's title is a different length, so the
     announcement is a different length. NEVER fix it at "about 3
