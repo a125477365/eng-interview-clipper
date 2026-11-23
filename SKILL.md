@@ -3450,8 +3450,7 @@ a number.
   worry / excitement) and contains at least one core vocabulary
   word. Never "Hi! I'm X!" as the first line.
   (c) Crisis trigger visible from frame 0, named in the first
-  line. The crisis TRIGGER (e.g. the alarm clock ringing) is
-  visible from the very first frame, during the title
+  line. The crisis TRIGGER is visible from the very first frame, during the title
   announcement. The problem is named in the first spoken line
   (shot 2), which comes right after the announcement plus the 2s
   gap.
@@ -3469,8 +3468,8 @@ a number.
   in a playful loud voice like Crayon Shin-chan. The
   announcement text is shown on screen in the CENTER as an
   overlay on the moving video (so parents instantly see what the
-  video is) — the picture underneath keeps moving (alarm ringing,
-  camera zooming), so this is NOT a static title card. A static
+  video is) — the picture underneath keeps moving (trigger in
+  action, camera zooming), so this is NOT a static title card. A static
   full-screen still image is still banned. The announcement text
   is GOLD (the Chinese-text colour of the series — subtitles are
   EN white / ZH gold), with a dark outline so it stays readable
@@ -3491,23 +3490,24 @@ a number.
   * PICTURE during the announcement: the story video has ALREADY
     started. Shot 1 shows the crisis trigger — a cinematic
     movie-style opening with NO speaking voices: the camera starts
-    on a close-up of the trigger (e.g. the alarm clock) and slowly
-    zooms out / dollies to reveal the protagonist (e.g. 灰灰 in
-    bed). SOUND EFFECTS (alarm, etc.) are fine, but the story has
+    on a close-up of the trigger and slowly
+    zooms out / dollies to reveal the protagonist. SOUND EFFECTS
+    from the trigger are fine, but the story has
     NO speaking voices during this phase. The ONLY voice is the
     announcement.
   * GAP AFTER THE ANNOUNCEMENT: after the announcement ends, AT
     LEAST 2 SECONDS must pass before ANY story speaking voice
     begins. The gap is silent dialogue-wise (SFX and picture
     continue). **The gap must contain the protagonist's first
-    silent physical reaction to the crisis trigger** — e.g. 灰灰,
-    still half-asleep, slowly and reluctantly reaches out his arm
-    to turn off the alarm, and the alarm stops. The gap is NOT
-    empty waiting time: it is a wordless action beat that shows
-    the protagonist reacting before speaking. The announcement
-    voice and the story dialogue NEVER overlap — they are
-    sequential with a ≥2s gap between them. This is the hard rule
-    against voice conflict.
+    silent physical reaction to the crisis trigger** — a wordless
+    action beat in which the protagonist reacts to the trigger
+    with a silent physical move (reaching for it, turning it off,
+    sitting up, stepping back, or similar) before any words. The
+    gap is NOT empty waiting time: it is a wordless action beat
+    that shows the protagonist reacting before speaking. The
+    announcement voice and the story dialogue NEVER overlap — they
+    are sequential with a ≥2s gap between them. This is the hard
+    rule against voice conflict.
   * Shot 1 (0–5s) is the OPENING and carries NO dialogue at all —
     the announcement plus the gap fill it. It is the ONLY shot in
     the episode with no dialogue; every other shot carries TWO
@@ -3523,9 +3523,8 @@ a number.
   (e) Shot 1 (0–5s) = OPENING: title announcement + ≥2s gap, no
   dialogue. Cinematic: close-up of the crisis trigger, slow zoom
   out to the protagonist; SFX only. During the gap the protagonist
-  performs the first silent physical reaction (e.g. slowly
-  reaching out to turn off the alarm) — the gap is a wordless
-  action beat, never empty waiting.
+  performs the first silent physical reaction to the trigger — the
+  gap is a wordless action beat, never empty waiting.
   (f) Shot 2 (5–10s) = HOOK: the protagonist reacts and the
   story's first two lines are spoken. Present: the protagonist +
   1–2 close companions, reacting. One clear speaker.
@@ -3600,8 +3599,7 @@ a number.
   for a video that will be rejected.
   Gate 2 — Shot gate (after shot 1, BEFORE shot 2): extract
   frames at t=0, t=1, t=2 and verify the crisis TRIGGER is visible
-  (e.g. the alarm clock ringing — the trigger is visible from
-  frame 0, during the title announcement); verify shot 1 carries
+  (the trigger is visible from frame 0, during the title announcement); verify shot 1 carries
   NO story dialogue (only the announcement voice plus SFX) and the
   announcement audio is the correct title. If shot 1 fails,
   regenerate shot 1. Do NOT proceed to shot 2 on a failing shot 1.
