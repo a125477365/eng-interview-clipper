@@ -3281,6 +3281,26 @@ a number.
   (a question, a suggestion, a reaction). Dialogue should fill most
   of each 5-second shot so children hear English most of the time,
   not just watch silent action.
+  **Dialogue quality (user order 2026-11-23 — 台词完整)**: EVERY
+  line must be a complete, natural English sentence that a child
+  can actually say — never a fragment, never a bare noun, never a
+  lone word that only makes sense with context. NO fragments like
+  "Oh no! Morning!" (unclear — fixed to "Oh no! It's morning!"),
+  "My shoes!", "Time for school!", "Me too!", "Breakfast?",
+  "Pancakes! Pancakes!", "Too bright!", "Yum! Breakfast!".
+  Use complete sentences instead: "Oh no! It's morning!",
+  "I'm putting on my shoes!", "It's time for school!",
+  "I'm ready too!", "Is it breakfast?", "Let's eat pancakes!",
+  "It's too bright!", "Yum! I love breakfast!". Greetings
+  ("Good morning!", "Thank you!"), imperatives ("Wake up!",
+  "Stop it!", "Let's go!") and laughter ("Ha ha!") are complete
+  utterances and are fine. Every line max 5 words. The Chinese
+  translation of every line must make its meaning instantly clear
+  to someone who does not speak English — if the user cannot tell
+  what a line expresses from the translation, the line is wrong
+  and must be rewritten. Check ALL lines in every script by
+  analogy (举一反三): one unclear line means every similar line
+  gets checked and fixed in the same pass.
   **Decide-and-go, never wait for a tap (user order 2026-11-21)**:
   when a shot fails twice, report both versions to the user WITH a
   clear recommendation — then proceed with the recommended version
@@ -3463,10 +3483,15 @@ a number.
   * GAP AFTER THE ANNOUNCEMENT: after the announcement ends, AT
     LEAST 2 SECONDS must pass before ANY story speaking voice
     begins. The gap is silent dialogue-wise (SFX and picture
-    continue; the protagonist may react visually, e.g. pulling the
-    blanket, but silently). The announcement voice and the story
-    dialogue NEVER overlap — they are sequential with a ≥2s gap
-    between them. This is the hard rule against voice conflict.
+    continue). **The gap must contain the protagonist's first
+    silent physical reaction to the crisis trigger** — e.g. 灰灰,
+    still half-asleep, slowly and reluctantly reaches out his arm
+    to turn off the alarm, and the alarm stops. The gap is NOT
+    empty waiting time: it is a wordless action beat that shows
+    the protagonist reacting before speaking. The announcement
+    voice and the story dialogue NEVER overlap — they are
+    sequential with a ≥2s gap between them. This is the hard rule
+    against voice conflict.
   * Shot 1 (0–5s) is the OPENING and carries NO dialogue at all —
     the announcement plus the gap fill it. It is the ONLY shot in
     the episode with no dialogue; every other shot carries TWO
@@ -3481,8 +3506,10 @@ a number.
     ("Today we learn 4 words" style).
   (e) Shot 1 (0–5s) = OPENING: title announcement + ≥2s gap, no
   dialogue. Cinematic: close-up of the crisis trigger, slow zoom
-  out to the protagonist; SFX only. The protagonist may react
-  visually (silently) during the gap.
+  out to the protagonist; SFX only. During the gap the protagonist
+  performs the first silent physical reaction (e.g. slowly
+  reaching out to turn off the alarm) — the gap is a wordless
+  action beat, never empty waiting.
   (f) Shot 2 (5–10s) = HOOK: the protagonist reacts and the
   story's first two lines are spoken. Present: the protagonist +
   1–2 close companions, reacting. One clear speaker.
