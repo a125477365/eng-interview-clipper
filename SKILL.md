@@ -3310,6 +3310,26 @@ a number.
   and must be rewritten. Check ALL lines in every script by
   analogy (举一反三): one unclear line means every similar line
   gets checked and fixed in the same pass.
+  **Background music (user order 2026-11-23 — 背景音乐)**:
+  ONE continuous music track per episode, running start to
+  finish without stopping — same piece, same style, same tempo
+  throughout; never switch tracks between shots. The music is
+  always present but its volume changes:
+  - NEEDS music (full volume, featured): the OPENING (shot 1:
+    announcement + gap), the ENDING (final shot: hug / closing),
+    and the QUIZ CARD. Music sets the mood here.
+  - DOES NOT need music (ducked to about -18dB, background
+    texture only): ALL dialogue shots (shot 2 through the
+    second-to-last shot). The music stays on for continuity but
+    is so quiet it never competes with the English — the dialogue
+    is always the foreground, crystal clear for learning.
+  Volume changes are smooth 0.5s fades, never hard cuts. Music
+  fades in at the very start and fades out at the very end.
+  Style: light, cheerful, gentle, piano-led, soft — warm and
+  optimistic, matching a daytime children's story. No heavy
+  drums, no loud brass, nothing that distracts from the words.
+  Tempo moderate (about 100–110 BPM). The music is added in
+  assembly (CPU work), not by Kaggle.
   **Decide-and-go, never wait for a tap (user order 2026-11-21)**:
   when a shot fails twice, report both versions to the user WITH a
   clear recommendation — then proceed with the recommended version
