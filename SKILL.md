@@ -3456,7 +3456,31 @@ a number.
   BOTH the script's "动作" field AND the Kaggle prompt (an action
   sentence before the dialogue, never jumping straight from the
   character descriptions to "speaks"). A shot with no expression
-  and no action sentence is incomplete.
+  and no action sentence is incomplete. **Gaze direction (mature
+  principle, 2026-11-23)**: every dialogue exchange states where
+  each speaker is looking — at the other character, at the sun, at
+  the door, back at the camera. Characters never stare blankly.
+  **Anticipation and squash & stretch (Pixar 12 principles,
+  2026-11-23)**: every big physical action gets a preparatory beat
+  (crouch before jumping, reach out before tickling, arms open
+  wide before hugging) and a squash-and-stretch quality on the
+  motion itself (bouncy landing, squirming with laughter). **Audio
+  layers in every prompt (mature principle, 2026-11-23)**: three
+  layers — dialogue (with a delivery tone on EVERY line: warmly,
+  excitedly, sleepily, proudly, playfully, not just the voice
+  anchor), SFX (the one sound that defines the shot: alarm,
+  blanket rustling, curtains swishing, footsteps, bag rustling),
+  and ambient (quiet morning room, faint birdsong outside the
+  window — same in every shot). **Negative line in every prompt
+  (mature principle, 2026-11-23)**: "No subtitles, no captions, no
+  watermarks, no extra limbs, no deformed hands or feet, no text
+  in the picture." **One action per shot (mature principle,
+  2026-11-23)**: a 5-second shot holds ONE clear action plus its
+  two dialogue lines; if a shot needs two distinct beats, split it
+  into two shots. **Ambient texture (mature principle,
+  2026-11-23)**: the setting carries a sensory detail that is not
+  an object — dust motes floating in the sunbeam, soft shadows —
+  so the room feels like air, not a flat backdrop.
 - Rich, fun story with a full arc (user order 2026-11-20, EP2
   rewrite — match the reference video's richness): every episode
   must have a proper setup and payoff (来龙去脉). The opening
