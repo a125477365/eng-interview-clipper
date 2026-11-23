@@ -2904,15 +2904,27 @@ a number.
 - Positioning: series name 《小老虎学英语》/《灰灰学英语》
   (English: Huihui Learns English). Audience 3–8 years old, English
   enlightenment. Each episode 60–120 s (standard 70–90 s). 16:9
-  landscape. 3D animation, Pixar-style rounded shapes, bright
-  saturated colors. Long-running series, target thousands of episodes.
+  landscape. 3D animation — Pixar-style cute 3D in the 小胖豹 style
+  (user order 2026-11-23, replacing the old cartoon look; reference:
+  Douyin 【小胖豹到🐱】《小胖好像闯祸了》, video
+  7709418230971895094): chubby round bodies, big round heads (head
+  about 1/2 of body height), short stubby limbs, huge round protruding
+  eyes with highlights and clear irises, soft plush short fur with
+  fluffy volume and no individual hair strands visible, bright
+  saturated warm colors, bright daylight, soft shadows, shallow depth
+  of field, clean cinematic look; environments near-photorealistic
+  3D. Approved character reference images (2026-11-23):
+  ~/workspace/kids-cartoon-tiger/new-designs/ (4 pair images, 8
+  characters). Long-running series, target thousands of episodes.
   Values: healthy, fun, never preachy — one small good trait per
   episode (brave, friendly, sharing, honest, helpful), hidden inside
   the joke, never stated as a lesson.
 - Main character 灰灰 (Huihui), little tiger (user-set 2026-11-19),
   about 7 years old — 5 was too young, 8 too old, 7 is the middle:
-  round chubby face, slightly taller than his sister, still clearly
-  a young kid. Voice: speaks firmly and confidently, but must still
+  round chubby face and chubby round body, big round head (head about
+  1/2 of body height), short stubby limbs, huge round blue eyes with
+  highlights, soft plush white fur, slightly taller than his sister,
+  still clearly a young kid. Voice: speaks firmly and confidently, but must still
   sound like a 7-year-old child, never like an adult.
   Face rule (2026-11-19 user correction — an earlier long-face /
   slanted-brow version looked like a villain and was discarded): the
@@ -2920,8 +2932,8 @@ a number.
   arched eyebrows that are NEVER angled or slanted, warm gentle smile;
   the face must never look long, sly, cunning, or villainous. Colour
   (user-set 2026-11-19): WHITE tiger — white fur with grey-black
-  stripes (the name 灰灰 fits the grey-white colouring); red vest
-  (fixed outfit); round ears, pink nose. Personality (all four,
+  stripes (the name 灰灰 fits the grey-white colouring); red vest and
+  red shorts (fixed outfit); round ears, pink nose. Personality (all four,
   user-set):
   strong (falls down, gets up himself; "I can try!"), boyish
   (loves running, jumping, adventure, curious, a little naughty but
@@ -2940,8 +2952,12 @@ a number.
   changed BACK to the lamb/goat because the shot-5 lamb looked the
   best — the rabbit is the new friend 跳跳 again), about 4 years old
   — shorter than 灰灰， which makes the big-brother / little-sister
-  dynamic visible at a glance: white little goat, round face, big
-  eyes, pink nose, pink scarf (fixed accessory). **Bipedal, ALWAYS
+  dynamic visible at a glance: white little goat, round face, huge
+  round dark eyes with highlights, pink nose, LIGHT PINK dress and
+  pink scarf (fixed: dress + scarf, both pink; dress is light pink so
+  it is clearly different from Tia's RED dress), small curved horns
+  and floppy ears, soft plush white fur, chubby round body, big round
+  head (head about 1/2 of body height). **Bipedal, ALWAYS
   standing upright on 2 legs with 2 arms, NEVER on all fours.**
   Goat bipedal is the hardest rule to enforce (2026-11-21 lesson —
   EP2 Shot 1 v1 failed it: the model drew Ningning on four legs
@@ -2963,9 +2979,10 @@ a number.
   end. Do NOT copy the reference video's lamb scenes; 宁宁 is family,
   not prey — the relationship is completely different. Voice: MUST be
   clearly a girl's voice, never boy-like (user correction 2026-11-19:
-  in some shots the lamb sounded like a boy). Shot-5 is the visual
-  standard for 宁宁 — the shot-5 lamb is the best-looking version;
-  all other shots use it as reference.
+  in some shots the lamb sounded like a boy). Visual standard
+  (2026-11-23): the approved reference image
+  ~/workspace/kids-cartoon-tiger/new-designs/ (灰灰＋宁宁 pair) — all
+  shots use it as reference; the old shot-5 standard is superseded.
 - Generation method (2026-11-20 user order — replaces the 2026-11-19
   pipeline): generate VOICED video DIRECTLY on Kaggle (LTX-2.5 +
   Wan2GP), one clip at a time, audio and picture together. The old
@@ -3157,18 +3174,45 @@ a number.
   below), synced to the Kaggle audio; verify each line's timing against
   the clip audio before assembly. Covers are still Muse-generated
   stills, same as before.
-- Character consistency (user order 2026-11-20 — 形象统一): character
-  designs are EXACTLY the ones set on 2026-11-19 (see the character
-  entries above — white tiger Huihui with red vest, head ~1/4 body
-  height, round friendly face, eyebrows never slanted; Ningning the
-  white goat with pink scarf; Tia, Pipi, Dudu, Qiu, Hua, Zhuang as
-  listed). Never invent a new look. Repeat the full character
-  description in EVERY shot's prompt so the model does not drift.
-  After each shot, check the characters against the reference:
-  colours, accessories, proportions, head size, face shape. If a
-  shot's characters drift (wrong colour, missing accessory, wrong
-  proportions, slanted brows), regenerate that shot — never stitch
-  a drifted shot in.
+- Character consistency (user order 2026-11-20 — 形象统一; style
+  updated 2026-11-23 to the 小胖豹 style): character designs are
+  EXACTLY the ones set on 2026-11-19 as restyled on 2026-11-23 (see
+  the character entries above and the bible §4.5 — white tiger Huihui
+  with red vest and red shorts, head ~1/2 body height, chubby round
+  body, huge round blue eyes with highlights, soft plush fur, round
+  friendly face, eyebrows never slanted; Ningning the white goat with
+  light pink dress and pink scarf, small curved horns, floppy ears;
+  Tia, Pipi, Dudu, Qiu, Hua, Zhuang as listed in the bible §4.5).
+  Never invent a new look. Repeat the full character description in
+  EVERY shot's prompt so the model does not drift. After each shot,
+  check the characters against the reference: colours, accessories,
+  proportions, head size, face shape. If a shot's characters drift
+  (wrong colour, missing accessory, wrong proportions, slanted brows),
+  regenerate that shot — never stitch a drifted shot in.
+- Character design approval (user order 2026-11-23): EVERY character
+  design — new characters AND redesigns — must be in the 小胖豹 style
+  (see Positioning) and must be SHOWN to the user as a reference image
+  BEFORE it is used in any episode. No character goes into a prompt
+  without the user having seen and approved its reference image first.
+  Reference images live in ~/workspace/kids-cartoon-tiger/new-designs/.
+- How the approved design reaches Kaggle (user asked 2026-11-23 —
+  answer honestly): the design is communicated in TWO ways.
+  (1) TEXT: every shot's prompt repeats the character's FULL
+  description verbatim (species, fur, stripes, clothes, eyes,
+  proportions, style — never abbreviated), from the script §2.
+  (2) START IMAGE: from shot 2 onward each shot uses the previous
+  shot's last frame as its start image (see Shot-to-shot continuity
+  below), so the actual on-screen look carries forward; for the FIRST
+  shot of a new episode (or a character's first appearance), use the
+  approved character reference image as the start image so the model
+  begins from the approved look, not from text alone. LIMIT — state it
+  plainly: a text description is an instruction, not a blueprint; the
+  video model (LTX-2.5) interprets it and will NOT reproduce the
+  reference image pixel-for-pixel. The reference image is the design
+  target. The real guarantee is the per-shot verification above: the
+  ASSISTANT personally checks every shot's extracted frames against
+  the approved design and regenerates any shot that drifted. Drift is
+  expected; verification catches it.
 - Shot-to-shot continuity (user order 2026-11-20 — 段段衔接): the
   LAST frame of each shot and the FIRST frame of the next shot must
   match — same character positions, same ball/prop position, same
