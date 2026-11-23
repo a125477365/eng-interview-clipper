@@ -3474,10 +3474,15 @@ a number.
   full-screen still image is still banned. The announcement text
   is GOLD (the Chinese-text colour of the series — subtitles are
   EN white / ZH gold), with a dark outline so it stays readable
-  on the bright picture. Font size around 72pt at 1280x720 (a
-  title, clearly bigger than the ~40pt subtitles; fit on one line
-  and readable on a phone in 2 seconds — go smaller if the title
-  is long).
+  on the bright picture. Font size is NOT fixed: it is set by
+  the title length. It must (a) fit the whole title on one line
+  with margins, (b) stay clearly bigger than the ~40pt subtitles,
+  and (c) be readable on a phone in 2 seconds. For a
+  typical-length title this lands around 72pt at 1280x720; a
+  longer title means a smaller size. The text appears with the
+  announcement voice and disappears when the voice ends (at the
+  end of the TTS audio) — it does NOT stay through the 2-second
+  gap, so the gap is clean picture + action only.
   * DURATION VARIES: the announcement length is set by the actual
     title — every episode's title is a different length, so the
     announcement is a different length. NEVER fix it at "about 3
