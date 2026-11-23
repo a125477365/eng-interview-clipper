@@ -3405,6 +3405,12 @@ a number.
   opening; cause: EP1 data — 80% 2s bounce, 6.67% completion vs.
   category median 50–60% bounce / 15–20% completion; Douyin's
   analysis + assistant's own review):
+  SCOPE (user order 2026-11-23): this convention applies ONLY to
+  the children's cartoon line (this §26). It does NOT touch the
+  interview line, the listening line, the conversation line, or the
+  bedtime line — their openings (title cards, 7s title overlays,
+  intro structure) are unchanged, and this convention must never be
+  applied to them.
   WHY: EP1 opened with a 2s static title card, then 13s of
   self-introduction before the story started; the crisis (ball in
   the river) did not arrive until ~20s. In a feed the first 2
