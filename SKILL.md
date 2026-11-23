@@ -3317,12 +3317,16 @@ a number.
   always present but its volume changes:
   - NEEDS music (full volume, featured): the OPENING (shot 1:
     announcement + gap), the ENDING (final shot: hug / closing),
-    and the QUIZ CARD. Music sets the mood here.
-  - DOES NOT need music (ducked to about -18dB, background
-    texture only): ALL dialogue shots (shot 2 through the
-    second-to-last shot). The music stays on for continuity but
-    is so quiet it never competes with the English — the dialogue
-    is always the foreground, crystal clear for learning.
+    and the QUIZ CARD. Music sets the mood here. Full music is
+    25% of dialogue volume (-12dB below dialogue; peaks about
+    -18 dBFS) — clearly audible, but well below the voices.
+  - DOES NOT need music (ducked to about 3% of dialogue volume,
+    background texture only): ALL dialogue shots (shot 2 through
+    the second-to-last shot). The music stays on for continuity
+    but is dropped 18dB below its full level (30dB below dialogue;
+    peaks about -36 dBFS) — barely audible, never competing with
+    the English. Dialogue is the reference at 100% (peaks about
+    -6 dBFS, overall about -14 LUFS).
   Volume changes are smooth 0.5s fades, never hard cuts. Music
   fades in at the very start and fades out at the very end.
   Style: light, cheerful, gentle, piano-led, soft — warm and
