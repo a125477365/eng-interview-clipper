@@ -3272,8 +3272,16 @@ a number.
   ending (hug / laugh together + a gentle moral, never a lecture). All daylight, sunny, no night, no
   monsters, no loud scares, no bullying, no mocking, no lying that
   pays off. Humour is gentle and physical (a wobbling trunk, a
-  stick that cannot reach) — never mean. Every line max 5 words;
+  stick that cannot reach) — never mean. Every line max 7 words;
   core sentences repeat so children can say them along.
+  **Dialogue level (user order 2026-11-23 — 美国3年级水平)**:
+  dialogue is at US 3rd grade level (8–9-year-old native
+  speaker) — not babyish, not complex. Complete natural sentences
+  a 3rd grader would actually say: natural intensifiers (so,
+  still, already, way, so much), complete structures (can, going
+  to, time for, need to), expressive words (best friends,
+  together, favorite). Too babyish (bare nouns, one-word lines)
+  and too complex (long clauses, hard words) are both wrong.
   **Dialogue share (user order 2026-11-21 — 对话占比)**: keep
   raising the share of dialogue in every episode — every shot
   carries TWO lines (a short question-and-answer or a reply), never
@@ -3288,13 +3296,14 @@ a number.
   "Oh no! Morning!" (unclear — fixed to "Oh no! It's morning!"),
   "My shoes!", "Time for school!", "Me too!", "Breakfast?",
   "Pancakes! Pancakes!", "Too bright!", "Yum! Breakfast!".
-  Use complete sentences instead: "Oh no! It's morning!",
+  Use complete sentences instead: "Oh no! It's morning already!",
   "I'm putting on my shoes!", "It's time for school!",
-  "I'm ready too!", "Is it breakfast?", "Let's eat pancakes!",
-  "It's too bright!", "Yum! I love breakfast!". Greetings
-  ("Good morning!", "Thank you!"), imperatives ("Wake up!",
-  "Stop it!", "Let's go!") and laughter ("Ha ha!") are complete
-  utterances and are fine. Every line max 5 words. The Chinese
+  "I'm ready too!", "Is it time for breakfast?", "Let's eat
+  pancakes!", "It's way too bright!", "Yum! I love breakfast so
+  much!". Greetings ("Good morning!", "Thank you!"), imperatives
+  ("Wake up!", "Stop it!", "Let's go!") and laughter ("Ha ha!")
+  are complete utterances and are fine. Every line max 7 words
+  (US 3rd grade level — see Dialogue level above). The Chinese
   translation of every line must make its meaning instantly clear
   to someone who does not speak English — if the user cannot tell
   what a line expresses from the translation, the line is wrong
