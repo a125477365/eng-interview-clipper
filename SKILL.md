@@ -3448,7 +3448,15 @@ a number.
   object in the room, and the COLOUR of every object (walls,
   window frame, curtains, bed frame, blanket, table, alarm clock,
   door, rug, floor). No object in the frame may be left without a
-  colour.
+  colour. **Expression and action in every shot (user order
+  2026-11-23)**: every shot describes EVERY character's facial
+  expression (smiling, surprised, sleepy, reluctant, proud,
+  squinting, wincing — not just the eyes in the costume block and
+  not just a cheerful voice) AND what each character is doing, in
+  BOTH the script's "动作" field AND the Kaggle prompt (an action
+  sentence before the dialogue, never jumping straight from the
+  character descriptions to "speaks"). A shot with no expression
+  and no action sentence is incomplete.
 - Rich, fun story with a full arc (user order 2026-11-20, EP2
   rewrite — match the reference video's richness): every episode
   must have a proper setup and payoff (来龙去脉). The opening
