@@ -3466,7 +3466,11 @@ a number.
   episode, and a 2s gap follows it)**: each episode opens with a
   child's Chinese voiceover announcing the title, e.g. "跟着灰灰
   学英语之灰灰起床了", in a playful loud voice like Crayon
-  Shin-chan. AUDIO ONLY, no static title card.
+  Shin-chan. The announcement text is shown on screen in the
+  CENTER as an overlay on the moving video (so parents instantly
+  see what the video is) — the picture underneath keeps moving
+  (alarm ringing, camera zooming), so this is NOT a static title
+  card. A static full-screen still image is still banned.
   * DURATION VARIES: the announcement length is set by the actual
     title — every episode's title is a different length, so the
     announcement is a different length. NEVER fix it at "about 3
@@ -3548,8 +3552,10 @@ a number.
   visual.
   DO NOT — hard rejects (a script or shot with any of these is
   REJECTED, not fixed in post):
-  1. A static title card (or any static image) as the first
-     2 seconds.
+  1. A static title card (a full-screen still image) as the first
+     2 seconds. A text overlay on a MOVING video is NOT a static
+     card — the announcement text centered on the moving picture
+     is allowed and required.
   2. An opening line that is a greeting ("Hi! I'm X!",
      "Hello, I'm...").
   3. A standalone self-introduction scene (characters taking
