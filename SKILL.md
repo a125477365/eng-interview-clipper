@@ -3266,10 +3266,10 @@ a number.
   too and their limb counts are checked the same way.
 - Story and child-suitability (user order 2026-11-20): every episode
   must be a complete story a 3–8-year-old can follow — opening
-  (friends playing), problem (a small trouble), trying (a funny
-  failed attempt), help arrives (a friend), twist (almost fails,
-  then succeeds), warm ending (hug / laugh together + a gentle
-  moral, never a lecture). All daylight, sunny, no night, no
+  (crisis already in progress — see Opening convention below),
+  problem (a small trouble), trying (a funny failed attempt), help
+  arrives (a friend), twist (almost fails, then succeeds), warm
+  ending (hug / laugh together + a gentle moral, never a lecture). All daylight, sunny, no night, no
   monsters, no loud scares, no bullying, no mocking, no lying that
   pays off. Humour is gentle and physical (a wobbling trunk, a
   stick that cannot reach) — never mean. Every line max 5 words;
@@ -3381,10 +3381,11 @@ a number.
   leave animals undescribed.
 - Rich, fun story with a full arc (user order 2026-11-20, EP2
   rewrite — match the reference video's richness): every episode
-  must have a proper setup and payoff (来龙去脉). The FIRST episode
-  of a story — and every episode's opening — introduces the
-  characters first (who they are, how they are related: sister,
-  best friend, new friend) BEFORE the plot starts. Every shot must
+  must have a proper setup and payoff (来龙去脉). The opening
+  follows the Opening convention below (crisis first, characters
+  introduced through action — NEVER a standalone self-introduction
+  before the plot starts; the old "introduce the characters first"
+  rule is RETIRED 2026-11-23 after EP1's 80% 2s bounce). Every shot must
   have ONE clear action (wave, introduce, kick the ball, chase,
   reach, swing, splash, lift, grab, hug) — never a shot of
   characters standing still just smiling. Build the story like the
@@ -3400,6 +3401,104 @@ a number.
   (EP1 Shot 3 attempt 2, 2026-11-22: ball gone after 1.5 s for the
   rest of the shot). Fast jumping also smears faces — prefer small,
   slow movements.
+- Opening convention (2026-11-23 — replaces the old "intro first"
+  opening; cause: EP1 data — 80% 2s bounce, 6.67% completion vs.
+  category median 50–60% bounce / 15–20% completion; Douyin's
+  analysis + assistant's own review):
+  WHY: EP1 opened with a 2s static title card, then 13s of
+  self-introduction before the story started; the crisis (ball in
+  the river) did not arrive until ~20s. In a feed the first 2
+  seconds decide whether the viewer stays. The math: 80% leave in
+  2s, so only 20% remain — and of those, ~33% watch to the end
+  (6.67 / 20). The story retains fine once started; the bottleneck
+  is the opening. Fix the first 5 seconds and completion should
+  rise toward the category median.
+  THE RULES:
+  (a) First frame = motion + crisis. The video's first frame is a
+  generated clip showing the inciting incident already in progress
+  (e.g. the ball rolling toward the river). No static card, no
+  title screen, no greeting.
+  (b) First line = reaction, not greeting. The first spoken line
+  (within 2–3s) is a character REACTING to the crisis (surprise /
+  worry / excitement) and contains at least one core vocabulary
+  word. Never "Hi! I'm X!" as the first line.
+  (c) Crisis visible in 2s, named in 5s. The problem is visible in
+  the first 2 seconds and stated in dialogue within the first
+  5 seconds (inside shot 1).
+  (d) No static title card at the start. The 2s static title card
+  is REMOVED from the front of the video. The episode title and the
+  4 core words appear as a brief burned-in overlay during shot 1
+  (first 3–5s, large enough to read on a phone, never covering a
+  face). Title/number also live in the cover and description.
+  (e) Shot 1 (0–5s) = HOOK: crisis + reaction. Present: the
+  protagonist + 1–2 close companions, reacting. One clear speaker.
+  (f) Shot 2 (5–10s) = ESCALATION: the problem gets worse or the
+  first attempt fails. Characters' names and relationships emerge
+  naturally in dialogue (one character calls another by name). By
+  10s the viewer knows: the problem, the characters, and what
+  English will be learned.
+  (g) Characters are introduced through ACTION, never by greeting
+  the camera. No standalone self-introduction scene. A name is
+  spoken naturally in dialogue (someone calls them) or shown in
+  the overlay.
+  (h) The rescuer arrives at the turning point, NOT in the opening.
+  The character who solves the problem must NOT appear in shots
+  1–2. Their arrival is the midpoint turn; if they are present
+  from the start there is no escalation and no reason to keep
+  watching.
+  (i) Linear story, no flashback. Do NOT open with the crisis and
+  then flash back to introduce characters. Children 3–8 need
+  linear cause-and-effect. Start at the inciting incident and go
+  forward.
+  (j) No narrator. The series has no narrator voice. Never add a
+  "Today we learn..." narrator line. Learning value is conveyed
+  through character dialogue and the burned-in word overlay only.
+  (k) No word-card flash cutaway. Do NOT cut away from the story
+  to flash 4 word cards in 2 seconds. Words are taught IN CONTEXT
+  (in dialogue, repeated through the story) and reviewed in the
+  end quiz card. A 0.5s-per-word flash is too fast for a 3–8-year-
+  old to read and breaks immersion. (Douyin suggested the flash;
+  rejected for this reason.)
+  (l) Core words: 4 per episode, visible in shot 1 (burned-in
+  overlay) and taught in context (each repeated ≥2 times).
+  (m) The 5s shot unit: Kaggle generates ~5s clips. The hook must
+  live INSIDE shot 1 (its first 2 seconds), not as a separate 2s
+  clip. Design shot 1 so its first 2 seconds are the crisis
+  visual.
+  DO NOT — hard rejects (a script or shot with any of these is
+  REJECTED, not fixed in post):
+  1. A static title card (or any static image) as the first
+     2 seconds.
+  2. An opening line that is a greeting ("Hi! I'm X!",
+     "Hello, I'm...").
+  3. A standalone self-introduction scene (characters taking
+     turns greeting the camera).
+  4. The crisis arriving after 5 seconds (shot 1 does not contain
+     the crisis).
+  5. A word-card flash / syllabus dump cutaway in the opening.
+  6. A narrator line ("Today we learn...", "Let's learn...").
+  7. The rescuer (problem-solver) present in shots 1–2.
+  8. A flashback / non-linear opening.
+  9. More than 2 characters speaking in shot 1 (one clear
+     speaker; others react silently or with a single short line).
+  THREE GATES — how a non-conforming script/video is stopped
+  before it ships:
+  Gate 1 — Script gate (BEFORE any Kaggle generation): check the
+  script against the Do-Not list + the opening rules (crisis in
+  shot 1's first 2s? first line a reaction not a greeting? no
+  title card? rescuer absent from shots 1–2? no narrator? no word
+  flash? linear?). If ANY check fails, REWRITE the script. Do not
+  start generation on a failing script — it burns Kaggle quota
+  for a video that will be rejected.
+  Gate 2 — Shot gate (after shot 1, BEFORE shot 2): extract
+  frames at t=0, t=1, t=2 and verify the crisis is visible;
+  verify the first line's audio matches the script (ASR). If shot
+  1 fails, regenerate shot 1. Do NOT proceed to shot 2 on a
+  failing shot 1.
+  Gate 3 — Assembly gate (before final assembly): watch/extract
+  the first 5 seconds and verify: no static card, crisis visible,
+  first line is a reaction, words overlay present. If it fails,
+  fix the assembly. Do not ship.
 - Verdict priority (user order 2026-11-22): people and dialogue are the hard gate; a prop being slightly off is acceptable. The prompt still asks for the ball/key prop to stay visible, but a shot is LOCKED when the animals and the spoken lines are right, even if the ball is missing for part of the shot — do NOT re-shoot for the prop alone (EP1 Shot 3 attempt 3, 2026-11-22: locked with the ball gone from ~1.5 s because all 5 animals and both lines were right; the planned 4th attempt was cancelled mid-generation).
 - Text is ALWAYS added in post-production, never generated with the
   video (user order 2026-11-20 — subtitles, on-screen English,
