@@ -3465,7 +3465,7 @@ a number.
   style; timing corrected 2026-11-23 — duration VARIES per
   episode, and a 2s gap follows it)**: each episode opens with a
   child's Chinese voiceover announcing the title, e.g. "跟着灰灰
-  学英语之：开始美好的一天", in a playful loud voice like Crayon
+  学英语：开始美好的一天", in a playful loud voice like Crayon
   Shin-chan. The announcement text is shown on screen in the
   CENTER as an overlay on the moving video (so parents instantly
   see what the video is) — the picture underneath keeps moving
@@ -3473,9 +3473,9 @@ a number.
   card. A static full-screen still image is still banned. The
   announcement text is GOLD (the Chinese-text colour of the
   series — subtitles are EN white / ZH gold), with a dark outline
-  so it stays readable on the bright picture. Font size 64pt at
+  so it stays readable on the bright picture. Font size 72pt at
   1280x720 (a title, clearly bigger than the ~40pt subtitles;
-  the 16 characters fit on one line, about 1024px wide, readable
+  the 15 characters fit on one line, about 1080px wide, readable
   on a phone in 2 seconds).
   * DURATION VARIES: the announcement length is set by the actual
     title — every episode's title is a different length, so the
