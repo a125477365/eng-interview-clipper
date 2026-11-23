@@ -3480,7 +3480,17 @@ a number.
   into two shots. **Ambient texture (mature principle,
   2026-11-23)**: the setting carries a sensory detail that is not
   an object — dust motes floating in the sunbeam, soft shadows —
-  so the room feels like air, not a flat backdrop.
+  so the room feels like air, not a flat backdrop. **Emotion on
+  every line (user order 2026-11-23)**: EVERY dialogue line carries
+  an explicit delivery emotion — written TWICE: once in the
+  script's 台词 field as an annotation after the speaker
+  (灰灰（惊讶） "Oh no!..."), and once in the prompt's speaks
+  clause as an adverb (in surprise, sleepily, cheerfully,
+  warmly, excitedly, proudly, playfully). A line that only inherits
+  a shared voice anchor ("cheerful bright girl voice") does NOT
+  count — each line gets its own tone word, including the second
+  line after "then". The emotion must match the expression in the
+  shot (see the 表情库 in the script's §2).
 - Rich, fun story with a full arc (user order 2026-11-20, EP2
   rewrite — match the reference video's richness): every episode
   must have a proper setup and payoff (来龙去脉). The opening
