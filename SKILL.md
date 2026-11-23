@@ -3407,6 +3407,13 @@ a number.
   between shots. Shot 13→14 is the explicit case: Zhuangzhuang
   puts Huihui back on the SAME patch of near-bank grass, same
   place, same side.
+  **Background varies per shot (user order 2026-11-23)**: the
+  ROOM (layout + colours) is fixed for the whole episode, but each
+  shot's BACKGROUND is written individually — which part of the
+  room is prominent, how the light falls, what the background
+  looks like in that shot. Never copy one identical background
+  block into all 15 prompts; every shot gets its own background
+  description in the script's "背景" field and in its prompt.
 - **No duplicate leads (user order 2026-11-22, EP1 feedback #4;
   tightens the "one of each" rule)**: the WHOLE episode has
   exactly ONE white rabbit (Tiaotiao), ONE white goat (Ningning),
