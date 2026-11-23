@@ -3326,7 +3326,10 @@ a number.
     but is dropped 18dB below its full level (30dB below dialogue;
     peaks about -36 dBFS) — barely audible, never competing with
     the English. Dialogue is the reference at 100% (peaks about
-    -6 dBFS, overall about -14 LUFS).
+    -6 dBFS, overall about -14 LUFS). The announcement voice sits
+    at 80% of dialogue volume (about -2dB below dialogue) — clear
+    and energetic, but slightly softer than the main English, so
+    it feels like a friendly intro rather than the main content.
   Volume changes are smooth 0.5s fades, never hard cuts. Music
   fades in at the very start and fades out at the very end.
   Style: light, cheerful, gentle, piano-led, soft — warm and
