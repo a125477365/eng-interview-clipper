@@ -3033,8 +3033,11 @@ a number.
   voice in the prompt itself: write the speaker, the line, and a
   voice anchor every clip. **Voice references (user order
   2026-11-23): The Lion King, for ALL EIGHT characters, by age
-  and gender — Huihui sounds like young Simba (bright, energetic,
-  adventurous young boy cub voice, a little high-pitched);
+  and gender — Huihui sounds like young Simba (confident and
+  determined, bright and energetic, a natural young boy voice —
+  NOT artificially high-pitched; user correction 2026-11-24: the
+  old "a little high-pitched" made the model push the pitch up
+  artificially and lose the determination);
   Ningning sounds like young Nala (sweet, clear, gentle and
   high-pitched little girl voice); Tiaotiao sounds like young Nala
   but a little higher and livelier (cheerful and bright); Zhuang
