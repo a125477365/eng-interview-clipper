@@ -3043,16 +3043,26 @@ a number.
   mischievous); Dudu sounds like a young Mufasa — deep and warm,
   but gentle and slow, not kingly; Qiu sounds like a young Zazu
   (soft, hesitant, a little nervous); Hua sounds like young Nala,
-  softer and more graceful.** The anchor is a style reference for
-  the model to interpret, not a clone of an actor's recording.
-  Repeat the same anchor wording for the same character in every
-  clip so the voice does not drift. The model cannot hit an exact
-  F0; judge by ear (must sound clearly like a young child, never
-  adult) and regenerate the clip if the voice sounds adult or if
-  two characters sound identical. 宁宁 must sound clearly like a
-  little girl; 跳跳 a little higher and livelier than 宁宁. If a
-  clip's voice is wrong, regenerate that clip only — do not rebuild
-  the whole episode.
+  softer and more graceful. **Recurring adult characters (appear
+  in later episodes, per the series map): Mom sounds like Sarabi
+  (warm, maternal adult female — a mother is the mother lion);
+  Teacher sounds like adult Nala (warm, clear, friendly adult
+  female, patient); Grandma sounds like Sarabi, older and gentler
+  (slower, softer, warm — the Lion King has no grandmother, so an
+  elderly Sarabi); Doctor sounds like Mufasa (calm, deep,
+  reassuring).** The anchor is a style reference for the model to
+  interpret, not a clone of an actor's recording. Repeat the same
+  anchor wording for the same character in every clip so the voice
+  does not drift. **Any new character introduced in a future
+  episode gets a Lion King reference assigned in that episode's
+  script and added to this table; a new character's visual design
+  must be shown to the user and approved before it is used.** The
+  model cannot hit an exact F0; judge by ear (must sound clearly
+  like a young child, never adult) and regenerate the clip if the
+  voice sounds adult or if two characters sound identical. 宁宁 must
+  sound clearly like a little girl; 跳跳 a little higher and
+  livelier than 宁宁. If a clip's voice is wrong, regenerate that
+  clip only — do not rebuild the whole episode.
 - Lip sync (retired 2026-11-20): no LatentSync, no separate dubbing.
   Kaggle generates the speech and the mouth movement together, so
   the lips match the words by construction. If a clip's mouth is
