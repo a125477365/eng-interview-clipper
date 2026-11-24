@@ -3058,11 +3058,12 @@ a number.
   **Delivery follows the script (user order 2026-11-24):** the
   Lion King anchor sets WHO the voice sounds like (pitch and
   timbre). HOW each line is delivered follows the script context
-  and the emotion of the moment — the speaks clause in every
-  prompt carries an explicit emotion adverb (sleepily, excitedly,
-  complaining sleepily, warmly, proudly...), and that emotion
-  governs the delivery of that line. The emotion in the speaks
-  clause takes precedence over any general quality in the anchor:
+  and the emotion of the moment — the parenthetical voice
+  description in every prompt carries an explicit delivery phrase
+  ("speaking sleepily", "speaking excitedly", "speaking warmly",
+  "speaking proudly"...), and that emotion governs the delivery of
+  that line. The emotion in the voice description takes precedence
+  over any general quality in the anchor:
   a character who just woke up speaks sleepily even if the anchor
   says bright and energetic; a line that is a proud boast is
   delivered proudly. Never deliver a line in the anchor's default
@@ -3524,12 +3525,15 @@ a number.
   every line (user order 2026-11-23)**: EVERY dialogue line carries
   an explicit delivery emotion — written TWICE: once in the
   script's 台词 field as an annotation after the speaker
-  (灰灰（惊讶） "Oh no!..."), and once in the prompt's speaks
-  clause as an adverb (in surprise, sleepily, cheerfully,
-  warmly, excitedly, proudly, playfully). A line that only inherits
+  (灰灰（惊讶） "Oh no!..."), and once in the prompt's parenthetical
+  voice description as a speaking phrase ("speaking sleepily",
+  "speaking cheerfully", "speaking warmly", "speaking excitedly",
+  "speaking proudly", "speaking playfully"). A line that only inherits
   a shared voice anchor ("cheerful bright girl voice") does NOT
-  count — each line gets its own tone word, including the second
-  line after "then". The emotion must match the expression in the
+  count — each line gets its own tone phrase, including the second
+  line when the same character speaks twice in one shot (each line
+  gets its own `Character (voice, speaking ...): "line"` segment).
+  The emotion must match the expression in the
   shot (see the 表情库 in the script's §2). **Emotion follows
   context, not just the line (user order 2026-11-23)**: when a
   line's surface emotion conflicts with the scene's state, the
@@ -3760,6 +3764,27 @@ a number.
   ask the video model to render text in the picture: it garbles
   letters and the timing cannot be known before generation. This
   applies to every episode, no exceptions.
+- Dialogue format in prompts (user order 2026-11-24 — EP1 format;
+  the "speaks" format burns text into the picture): every dialogue
+  line in a prompt MUST use Episode 1's format — `CharacterName
+  (voice anchor, speaking [emotion]): "line"` — e.g. `Huihui
+  (7-year-old boy tiger, voice like young Simba from The Lion King,
+  confident and determined, speaking sleepily with a hint of
+  surprise): "Oh no! It's morning already!"`. The delivery emotion
+  goes INSIDE the parentheses as part of the voice description
+  ("speaking sleepily", "speaking excitedly", "speaking warmly").
+  NEVER write dialogue as `He speaks in a..., [emotion]: "line"`,
+  `he says the words...`, or any `speaks/says` verb construction —
+  the model reads the verb "speaks/says" as an instruction to
+  DISPLAY the spoken words, and burns them into the picture as
+  (often misspelled) on-screen text, which then collides with the
+  post-production subtitles. Evidence: EP1 (15 shots, 2026-11-22)
+  used the Character format and burned text in ZERO shots; EP2
+  Shot 2 (8 attempts, 2026-11-24) used the "speaks" format and
+  burned text in every quoted attempt, and the quote-free attempts
+  produced unpredictable dialogue (stray words, whole descriptive
+  sentences spoken, descriptive text burned as garbled letters).
+  The negative-prompt field and NAG Scale 2 do NOT prevent it.
 - Resolution (user order 2026-11-22 — direct 720p; supersedes the
   2026-11-20 480p + latent x2 upscale route): generate direct at
   720p — Wan2GP's 720p preset list has no 1280x720; the closest
