@@ -3032,18 +3032,24 @@ a number.
   to pitch-shift and no Helio/Aria to assign. Direct each clip's
   voice in the prompt itself: write the speaker, the line, and a
   voice anchor every clip. **Voice references (user order
-  2026-11-23): The Lion King — Huihui sounds like young Simba
-  (bright, energetic, adventurous young boy cub voice, a little
-  high-pitched); Ningning sounds like young Nala (sweet, clear,
-  gentle and high-pitched little girl voice); Tiaotiao sounds like
-  young Nala but a little higher and livelier (cheerful and
-  bright).** The anchor is a style reference for the model to
-  interpret, not a clone of an actor's recording. Repeat the same
-  anchor wording for the same character in every clip so the voice
-  does not drift. The model cannot hit an exact F0; judge by ear
-  (must sound clearly like a young child, never adult) and
-  regenerate the clip if the voice sounds adult or if two
-  characters sound identical. 宁宁 must sound clearly like a
+  2026-11-23): The Lion King, for ALL EIGHT characters, by age
+  and gender — Huihui sounds like young Simba (bright, energetic,
+  adventurous young boy cub voice, a little high-pitched);
+  Ningning sounds like young Nala (sweet, clear, gentle and
+  high-pitched little girl voice); Tiaotiao sounds like young Nala
+  but a little higher and livelier (cheerful and bright); Zhuang
+  sounds like a young Pumbaa (warm, slow, kind, a little deep for
+  a child); Pipi sounds like Timon (fast, funny, energetic,
+  mischievous); Dudu sounds like a young Mufasa — deep and warm,
+  but gentle and slow, not kingly; Qiu sounds like a young Zazu
+  (soft, hesitant, a little nervous); Hua sounds like young Nala,
+  softer and more graceful.** The anchor is a style reference for
+  the model to interpret, not a clone of an actor's recording.
+  Repeat the same anchor wording for the same character in every
+  clip so the voice does not drift. The model cannot hit an exact
+  F0; judge by ear (must sound clearly like a young child, never
+  adult) and regenerate the clip if the voice sounds adult or if
+  two characters sound identical. 宁宁 must sound clearly like a
   little girl; 跳跳 a little higher and livelier than 宁宁. If a
   clip's voice is wrong, regenerate that clip only — do not rebuild
   the whole episode.
