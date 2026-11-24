@@ -3053,11 +3053,14 @@ a number.
   reassuring).** The anchor is a style reference for the model to
   interpret, not a clone of an actor's recording. Repeat the same
   anchor wording for the same character in every clip so the voice
-  does not drift. **Any new character introduced in a future
-  episode gets a Lion King reference assigned in that episode's
-  script and added to this table; a new character's visual design
-  must be shown to the user and approved before it is used.** The
-  model cannot hit an exact F0; judge by ear (must sound clearly
+  does not drift. **New characters (user order 2026-11-23): any
+  new character that appears in a future episode — BOTH its visual
+  design AND its Lion King voice reference must be confirmed with
+  the user first, before it is used in any prompt. Do not assign a
+  design or a voice to a new character on your own. Once the user
+  confirms, write the design and the voice reference into that
+  episode's script and add the voice to this table.** The model
+  cannot hit an exact F0; judge by ear (must sound clearly
   like a young child, never adult) and regenerate the clip if the
   voice sounds adult or if two characters sound identical. 宁宁 must
   sound clearly like a little girl; 跳跳 a little higher and
