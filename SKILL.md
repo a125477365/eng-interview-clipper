@@ -3038,9 +3038,11 @@ a number.
   NOT artificially high-pitched; user correction 2026-11-24: the
   old "a little high-pitched" made the model push the pitch up
   artificially and lose the determination);
-  Ningning sounds like young Nala (sweet, clear, gentle and
-  high-pitched little girl voice); Tiaotiao sounds like young Nala
-  but a little higher and livelier (cheerful and bright); Zhuang
+  Ningning sounds like young Nala (sweet, clear, gentle, a natural
+  little girl voice — NOT artificially high-pitched); Tiaotiao
+  sounds like young Nala, livelier and more cheerful (a natural
+  little girl voice — NOT artificially high-pitched; the difference
+  from Ningning is energy and cheerfulness, not pitch); Zhuang
   sounds like a young Pumbaa (warm, slow, kind, a little deep for
   a child); Pipi sounds like Timon (fast, funny, energetic,
   mischievous); Dudu sounds like a young Mufasa — deep and warm,
@@ -3066,9 +3068,10 @@ a number.
   cannot hit an exact F0; judge by ear (must sound clearly
   like a young child, never adult) and regenerate the clip if the
   voice sounds adult or if two characters sound identical. 宁宁 must
-  sound clearly like a little girl; 跳跳 a little higher and
-  livelier than 宁宁. If a clip's voice is wrong, regenerate that
-  clip only — do not rebuild the whole episode.
+  sound clearly like a little girl; 跳跳 livelier and more cheerful
+  than 宁宁 (the difference is energy, not pitch — never raise the
+  pitch to tell them apart). If a clip's voice is wrong, regenerate
+  that clip only — do not rebuild the whole episode.
 - Lip sync (retired 2026-11-20): no LatentSync, no separate dubbing.
   Kaggle generates the speech and the mouth movement together, so
   the lips match the words by construction. If a clip's mouth is
