@@ -3033,16 +3033,10 @@ a number.
   voice in the prompt itself: write the speaker, the line, and a
   voice anchor every clip. **Voice references (user order
   2026-11-23): The Lion King, for ALL EIGHT characters, by age
-  and gender — Huihui sounds like young Simba (confident and
-  determined, bright and energetic, a natural young boy voice —
-  NOT artificially high-pitched; user correction 2026-11-24: the
-  old "a little high-pitched" made the model push the pitch up
-  artificially and lose the determination);
-  Ningning sounds like young Nala (sweet, clear, gentle, a natural
-  little girl voice — NOT artificially high-pitched); Tiaotiao
-  sounds like young Nala, livelier and more cheerful (a natural
-  little girl voice — NOT artificially high-pitched; the difference
-  from Ningning is energy and cheerfulness, not pitch); Zhuang
+  and gender — Huihui sounds like young Simba (confident and determined, bright
+  and energetic);
+  Ningning sounds like young Nala (sweet, clear, gentle); Tiaotiao
+  sounds like young Nala, livelier and more cheerful; Zhuang
   sounds like a young Pumbaa (warm, slow, kind, a little deep for
   a child); Pipi sounds like Timon (fast, funny, energetic,
   mischievous); Dudu sounds like a young Mufasa — deep and warm,
@@ -3056,7 +3050,11 @@ a number.
   (slower, softer, warm — the Lion King has no grandmother, so an
   elderly Sarabi); Doctor sounds like Mufasa (calm, deep,
   reassuring).** The anchor is a style reference for the model to
-  interpret, not a clone of an actor's recording. Repeat the same
+  interpret, not a clone of an actor's recording. **Pitch and
+  timbre come from the Lion King reference alone (user order
+  2026-11-24) — do not add pitch words (high, low, natural) to
+  any voice anchor; the adjectives after the reference describe
+  delivery and character (confident, sweet, lively), not pitch.** Repeat the same
   anchor wording for the same character in every clip so the voice
   does not drift. **New characters (user order 2026-11-23): any
   new character that appears in a future episode — BOTH its visual
@@ -3069,8 +3067,7 @@ a number.
   like a young child, never adult) and regenerate the clip if the
   voice sounds adult or if two characters sound identical. 宁宁 must
   sound clearly like a little girl; 跳跳 livelier and more cheerful
-  than 宁宁 (the difference is energy, not pitch — never raise the
-  pitch to tell them apart). If a clip's voice is wrong, regenerate
+  than 宁宁. If a clip's voice is wrong, regenerate
   that clip only — do not rebuild the whole episode.
 - Lip sync (retired 2026-11-20): no LatentSync, no separate dubbing.
   Kaggle generates the speech and the mouth movement together, so
