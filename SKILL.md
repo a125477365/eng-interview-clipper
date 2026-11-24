@@ -3054,7 +3054,19 @@ a number.
   timbre come from the Lion King reference alone (user order
   2026-11-24) — do not add pitch words (high, low, natural) to
   any voice anchor; the adjectives after the reference describe
-  delivery and character (confident, sweet, lively), not pitch.** Repeat the same
+  delivery and character (confident, sweet, lively), not pitch.**
+  **Delivery follows the script (user order 2026-11-24):** the
+  Lion King anchor sets WHO the voice sounds like (pitch and
+  timbre). HOW each line is delivered follows the script context
+  and the emotion of the moment — the speaks clause in every
+  prompt carries an explicit emotion adverb (sleepily, excitedly,
+  complaining sleepily, warmly, proudly...), and that emotion
+  governs the delivery of that line. The emotion in the speaks
+  clause takes precedence over any general quality in the anchor:
+  a character who just woke up speaks sleepily even if the anchor
+  says bright and energetic; a line that is a proud boast is
+  delivered proudly. Never deliver a line in the anchor's default
+  mood when the script context says otherwise. Repeat the same
   anchor wording for the same character in every clip so the voice
   does not drift. **New characters (user order 2026-11-23): any
   new character that appears in a future episode — BOTH its visual
