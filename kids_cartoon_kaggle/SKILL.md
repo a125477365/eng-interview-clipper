@@ -109,7 +109,7 @@
 
 - Never use the previous shot's last frame directly as the next shot's first frame. For every shot from shot 2 onward, first regenerate an identical high-quality still from the previous shot's settled last frame with the image model, and use that regenerated still as the first frame.
 
-- The regenerated still keeps the same characters, poses, positions, room and door, and only raises the quality to the reference-image standard: flat, bright, even light, clean saturated colors, sharp HD. Resize it to 1280x720 and show it to the user before the shot is dispatched.
+- The regenerated still keeps the same characters, poses, positions, room and door, and only raises the quality to the reference-image standard: flat, bright, even light, clean saturated colors, sharp HD. Resize it to 1280x720 and show it to the user before the shot is dispatched. If the user does not answer within 1 minute, proceed on the assistant's own recommendation.
 
 - The regenerated still gets closer to the reference look, but it cannot be pixel-identical to the last frame. Judge it by whether the characters, poses, and composition match and the quality is high, not by pixel equality.
 
