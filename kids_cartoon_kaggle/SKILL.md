@@ -43,7 +43,7 @@
 
 ## Use MiniMax H3 Turbo (fused) as the only model
 
-- Use MiniMax H3 Turbo INT8 as the only model, because the user chose it on 2026-11-27 after LTX-2.5 burned text into 15 of 15 quoted dialogue attempts.
+- Use MiniMax H3 Turbo INT8 as the only model.
 
 - Do not use LTX-2.5 as the primary model, because its quoted dialogue burn, its slow generation and its camera push in were the reasons for the change.
 
@@ -81,7 +81,7 @@
 
 ## Write the prompt the H3 way
 
-- Fill the structured fields separately: Scene/action, Spoken line/dialogue, Language, Sound effects, Background music. Write dialogue and background separately and let the model generate the voice, because the user ordered that route on 2026-11-27 and dropped audio driven video.
+- Fill the structured fields separately: Scene/action, Spoken line/dialogue, Language, Sound effects, Background music. Write dialogue and background separately and let the model generate the voice.
 
 - The Spoken line/dialogue field contains ONLY the quoted lines, nothing before them. Any introduction written there is spoken aloud by the model.
 
@@ -153,13 +153,13 @@
 
 - Eyes are very large perfect circles, deep-blue irises, large black pupils, two white highlights. Eyebrows are thin, soft, slightly arched, never slanted.
 
-- New characters are generated in the established set style. The user no longer needs to see each new character first (relaxed 2026-11-26).
+- New characters are generated in the established set style. The user no longer needs to see each new character first.
 
 - Check head-to-body proportion on every final shot, count limbs on every animal in every frame (never six legs), count each animal once, and check that a bipedal character stands on two legs like a person.
 
 - The target look matches the character reference images: flat, bright, even light, clean colors, no shadows.
 
-- Do NOT add anti-cinema prompt wording. The user withdrew the "cinema feel" complaint on 2026-11-28. Brightness, flat light, clean colors, and HD still stand.
+- Do NOT add anti-cinema prompt wording. Brightness, flat light, clean colors, and HD still stand.
 
 ## Dialogue and voice
 
@@ -217,9 +217,9 @@
 
 ## Do not retest what already failed
 
-- Do not retest LTX-2.5 quoted dialogue, a negative prompt, NAG 11, the DEV model, or NAG 15 as a cure for burned-in text. NAG 15 only reduces it and does not cure it, and quoted dialogue burned text in 15 of 15 attempts.
+- Do not retest LTX-2.5 quoted dialogue, a negative prompt, NAG 11, the DEV model, or NAG 15 as a cure for burned-in text. NAG 15 only reduces it and does not cure it.
 
-- Do not retest audio driven video (A2V). The user dropped it on 2026-11-27 because its fixed audio could not carry a sleepy voice.
+- Do not retest audio driven video (A2V). Its fixed audio cannot carry a sleepy voice.
 
 - Do not retest Sulphur-3 as a replacement for LTX-2.5. The W4A8 build failed to load and the INT8 build finished with every frame black.
 
