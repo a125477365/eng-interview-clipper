@@ -20,6 +20,28 @@
 
 - Stop the session as soon as the work ends, and restart a fresh session rather than retrying in place after a long session degrades. A session running over 6 hours degrades and can die silently mid-generation. If a session dies in the middle of a shot, restart it with Run All and re-run that shot. After a restart the Gradio link changes, so report the new link.
 
+## Write the episode script
+
+- An episode is 15 shots. Shot 1 is the opening with no dialogue. Shots 2 to 15 have 2 spoken lines each.
+- Each episode follows five parts: opening hook (0 to 5 seconds, the crisis is already in progress, the first line is a reaction not a greeting), escalation (5 to 15 seconds, the problem gets worse or the first attempt fails, and within 15 seconds the viewer knows the problem, the characters, and what to learn), question and answer (15 to 50 seconds, 3 to 4 rounds, speaking while doing), reversal (50 to 65 seconds, an unexpected small turn), warm ending (65 to 75 seconds, a hug, a high-five, or laughing together, freezing on Huihui's big laugh).
+- Change the variant every 10 episodes to stay fresh: a new friend moves to town, a small misunderstanding, a small competition, or a small help.
+- Core words: 5 to 8 per episode, each bound to the picture (when a core word is spoken, the picture must show it). Four core words are the episode's focus.
+- Core sentence patterns: 2 to 3 per episode, each 8 words or fewer, each repeated at least twice by different characters.
+- Question and answer: at least 3 rounds per episode, and the questions are concrete (Where is...? What is this? Can you help me?), never abstract.
+- Picture first, then dialogue: a new word is shown in the picture before the line names it.
+- Quiz: each episode has one pinned-comment multiple-choice question testing an easy-to-confuse point of the episode's core words.
+- Do not teach: no grammar rules, no phonetics, no sentences over 8 words, no negative vocabulary.
+- Humor: use at least 2 of the 4 mechanisms in every episode: reversal, misunderstanding, exaggerated expressions, physical comedy (a small trip, water in the face, being tackled by a friend — a brief sting, then a laugh, no injury, nothing scary).
+- Health red lines, checked on every episode: no violent ending (no one hit, hurt, or driven away), no scary pictures (no night, no monsters, no sudden loud sounds), no negative values (no mocking, no bullying, no lying that succeeds — a lie is always found out and apologized for), conflict comes from misunderstanding and character, never good versus evil, and the ending is always reconciliation, a hug, or laughing together.
+- Values are healthy and fun, never preachy. Each episode carries one small good quality (brave, friendly, sharing, honest, helpful) hidden inside the joke, never stated as a lesson.
+- The series follows a full-day map. A kindergarten day runs EP2 to EP28 from waking to bedtime, then a day off follows. The same scene can produce many episodes with different small problems, words, and friends. Episode count has no cap.
+- Episode map, kindergarten day (each with 4 core words): EP2 wake up — wake up, morning, sun, breakfast. EP3 wash face and brush teeth — wash, face, teeth, brush. EP4 get dressed — shirt, pants, shoes, put on. EP5 breakfast — breakfast, milk, bread, eat. EP6 pack bag and say goodbye — bag, bye-bye, mom, ready. EP7 walk to school — walk, school, bird, look. EP8 arrive and greet — hello, teacher, friend, morning. EP9 morning circle and sing — sing, song, circle, together. EP10 blocks — block, build, tower, red. EP11 snack — snack, apple, juice, hungry. EP12 story — story, bear, book, listen. EP13 draw — draw, sun, crayon, color. EP14 outdoor play — slide, swing, run, fun. EP15 lunch — lunch, rice, yummy, eat. EP16 nap — nap, quiet, sleep, tired. EP17 afternoon snack — snack, banana, milk, yummy. EP18 clean up toys — clean up, toy, put away, help. EP19 go home — home, see you, tomorrow, bye. EP20 arrive home and wash hands — home, wash, hands, soap. EP21 play at home — play, toy, ball, fun. EP22 help set the table — help, plate, table, mom. EP23 dinner — dinner, rice, vegetable, yummy. EP24 bath — bath, water, bubble, wash. EP25 brush teeth — brush, teeth, toothpaste, clean. EP26 pajamas — pajamas, soft, sleep, put on. EP27 bedtime story — story, moon, sleep, please. EP28 good night — good night, sleep, dream, sweet.
+- Day-off episodes follow the same pattern (one real-life scene each): park, supermarket, zoo, beach and swimming, grandma's house, birthday party, doctor, rainy day at home, picnic, library, bus, playground, crafts, snow day, New Year, and more.
+- Mass production: each episode is 1 scene times 1 to 2 supporting characters times 1 sentence pattern times 1 story routine. Scene library (20): grass, orchard, river, wooden house, mushroom house, swing, stone bridge, hill, flower field, snow, beach, library, market, vegetable garden, pond, tree house, sports field, picnic spot, rainbow after rain, starry camp. Sentence-pattern library (30): Where is...? What is this? Can you help me? I can try! Don't worry! Let's go! Thank you! You are welcome! I'm sorry! It's OK! Look at this! I like it! Let's play! Be careful! Good job! See you! How are you? I'm fine! What's your name? My name is... Do you like...? Yes, I do! No, I don't! It's mine! Let's share! Wait for me! Come on! Hurry up! Great! Oh no! Story-routine library (12): new friend, small misunderstanding, small competition, small help, find something, birthday, rainy day, sick, share food, work together, lost, learn a new skill.
+- A script document has: metadata (episode number, title, 4 core words, core sentences, story line, announcement text, quiz question, duration), character set (the full appearance of every character in the episode, repeated in full in every shot's prompt), scene map (the fixed setting, layout, colors, light), and 15 shots (each with animals, background, action and timeline, dialogue, prompt, and check points).
+- The fixed setting for the morning episodes is Huihui's bedroom: a large light-wood bed on the LEFT with a blue blanket, a small light-wood table next to the bed with a round red alarm clock, a window on the RIGHT wall with white frame and light blue curtains mostly closed, a light-wood wardrobe beside the window, a light-wood door on the FAR RIGHT, a low light-wood bookshelf with colorful books near the door, a few soft plush toys on the floor beside the bed, small framed children's drawings on the wall, a round soft warm-orange rug on the light-wood floor in the center. Wall warm cream, floor light wood, window shows a clear blue sky and a bright golden sun. Curtains closed means soft morning light through the gaps; curtains open means bright golden sunlight. The room layout and colors stay the same across the whole series so the characters never drift.
+- Three gates, in order. Gate 1 (script): the script passes every rule in this section plus the political screen before any generation starts. Gate 2 (opening shot): Shot 1 is generated and verified first (the alarm is visible at t=0, t=1 and t=2, no dialogue, Huihui sits up and turns off the alarm) before the remaining shots are generated. Gate 3 (assembly): the assembled episode passes frame-by-frame check, ASR, and the political screen before delivery.
+
 ## Use MiniMax H3 Turbo (fused) as the only model
 
 - Use MiniMax H3 Turbo INT8 as the only model, because the user chose it on 2026-11-27 after LTX-2.5 burned text into 15 of 15 quoted dialogue attempts.
@@ -106,13 +128,29 @@
 
 ## Characters and picture style
 
-- The style is 3D cute-pet animation, chubby round bodies, big round heads, soft toy-like fur.
+- The style is 3D cute-pet animation, chubby round bodies, big round heads (head about 1/3 of body height), soft toy-like fur.
 
-- Huihui is a white tiger: white fur with grey-black stripes, red vest with gold buttons open at the front, red shorts, big round deep-blue eyes.
+- Huihui is a white tiger: white fur with grey-black stripes, red vest with gold buttons open at the front, red shorts, big round deep-blue eyes. He is about 7 years old, strong, boyish, brave, and friendly. His catchphrases are "I can try!", "Don't worry, I'm here!", and "We are friends!"
 
-- Ningning is a white goat: white fur, pink dress and pink scarf, small horns, standing on two legs like a person.
+- Ningning is a white goat: white fur, pink dress and pink scarf, small horns, standing on two legs like a person. She is Huihui's younger sister, about 4 years old, gentle, curious, and she asks "why" — she is the one who asks the questions and Huihui answers. Her voice must be clearly a girl's voice, never a boy's.
 
-- Tiaotiao is a white rabbit: white fur, long upright ears with pink inner ears, pink bow headband, red dress, standing on two legs.
+- Tiaotiao is a white rabbit: white fur, long upright ears with pink inner ears, pink bow headband, red dress, standing on two legs. Only one white rabbit exists in the whole series.
+
+- Zhuangzhuang is a grey-blue little elephant: plain grey-blue skin with subtle wrinkles (smooth skin, NOT furry), big floppy ears, long trunk in front, NO clothes and NO vest (deliberate), clearly bigger than the other animals, chubby round body, big round head, small round friendly eyes with highlights, friendly smile. Bipedal, standing on 2 legs, 2 arms.
+
+- Pipi is a brown monkey: soft plush brown fur, red cap, long tail, no other clothes (deliberate), huge round eyes with highlights, chubby round body, big round head, small round ears. Bipedal, 2 arms 2 legs.
+
+- Dudu is a brown bear: soft plush brown fur, round chubby body, yellow cap, no other clothes (deliberate), small round ears, huge round eyes with highlights, big round head, honey pot. Bipedal, 2 arms 2 legs.
+
+- Qiuqiu is a brown hedgehog: soft rounded spines (cute 3D, NOT sharp), carrying a small red apple, no clothes (deliberate), huge round eyes with highlights, small round body, big round head, small round ears. Bipedal, 2 arms 2 legs.
+
+- Huahua is a light brown deer: soft plush light brown fur, white spots, flower crown, no clothes (deliberate), huge round eyes with highlights, chubby round body, big round head, long legs but bipedal standing. Bipedal, 2 arms 2 legs.
+
+- The adult characters (Mom, Teacher, Grandma, Doctor) have their voices anchored, but their appearance is NOT yet set. A new adult character's appearance must be shown to the user and confirmed before it is used.
+
+- Every character's clothes are written out piece by piece in every shot's prompt, or the prompt states plainly that the character wears no clothes on purpose. Never leave clothing out.
+
+- The character reference images are the gold standard for how each character looks. A new user of this skill must obtain or regenerate them following the appearance descriptions in this section, because the images themselves are not part of this text file.
 
 - Eyes are very large perfect circles, deep-blue irises, large black pupils, two white highlights. Eyebrows are thin, soft, slightly arched, never slanted.
 
