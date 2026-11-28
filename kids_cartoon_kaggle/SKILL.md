@@ -150,7 +150,7 @@
 
 - Every character's clothes are written out piece by piece in every shot's prompt, or the prompt states plainly that the character wears no clothes on purpose. Never leave clothing out.
 
-- The character reference images are the gold standard for how each character looks. A new user of this skill must obtain or regenerate them following the appearance descriptions in this section, because the images themselves are not part of this text file.
+- The character reference images are the gold standard for how each character looks. They sit in the same directory as this skill (huihui_char_ref.png, ningning_char_ref.png, tiaotiao_char_ref.png); download them with the skill. If a character has no reference image yet, regenerate it following the appearance descriptions in this section.
 
 - Eyes are very large perfect circles, deep-blue irises, large black pupils, two white highlights. Eyebrows are thin, soft, slightly arched, never slanted.
 
